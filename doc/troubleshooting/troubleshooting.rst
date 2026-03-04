@@ -98,7 +98,7 @@ code.
 - Check that the trajectory has at most 1000 waypoints
 - Verify all servos are enabled and in the correct mode
 - Check the WMX error description in the action result ``error_string``
-- See :doc:`../getting_started/flowcharts` for the error handling flow
+
 
 Gripper Not Responding
 -----------------------

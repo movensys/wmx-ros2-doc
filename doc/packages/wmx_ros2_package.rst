@@ -17,9 +17,7 @@ differential drive mobile base through the WMX motion control engine.
    * - **Package Name**
      - ``wmx_ros2_package``
    * - **Version**
-     - 0.0.0
-   * - **Maintainer**
-     - mfikih15 (lp02781@gmail.com)
+     - 0.0.1
    * - **Build Type**
      - ``ament_cmake``
    * - **C++ Standard**
@@ -36,20 +34,20 @@ Package Structure
    ├── wmx_ros2_package/
    │   └── __init__.py
    ├── include/
-   │   └── wmx_general_header/
-   │       ├── wmx_ros2_general.hpp          # WmxRos2General class definition
-   │       ├── wmx_ros2_general.cpp          # Constructor, destructor, init
-   │       ├── wmx_ros2_engine.cpp           # Engine lifecycle methods
-   │       └── wmx_ros2_core_motion.cpp      # Motion control & axis methods
+   │   ├── wmx_engine_node.hpp               # WmxEngineNode class definition
+   │   ├── wmx_core_motion_node.hpp          # WmxCoreMotionNode class definition
+   │   ├── wmx_io_node.hpp                   # WmxIoNode class definition
+   │   └── wmx_ethercat_node.hpp             # WmxEtherCatNode class definition
    ├── src/
-   │   ├── wmx_ros2_general_node.cpp         # General node entry point
+   │   ├── wmx_engine_node.cpp               # Engine lifecycle node
+   │   ├── wmx_core_motion_node.cpp          # Axis control node
+   │   ├── wmx_io_node.cpp                   # Digital I/O node
+   │   ├── wmx_ethercat_node.cpp             # EtherCAT diagnostics node
    │   ├── manipulator_state.cpp             # Joint state publisher node
    │   ├── follow_joint_trajectory_server.cpp # Trajectory action server node
    │   └── diff_drive_controller.cpp         # Diff drive node (disabled)
-   ├── example/
-   │   └── wmx_ros2_general_example.cpp      # Full API demo client
    ├── launch/
-   │   ├── wmx_ros2_general.launch.py
+   │   ├── wmx_ros2_multi_node.launch.py
    │   ├── wmx_ros2_intel_manipulator_cr3a.launch.py
    │   ├── wmx_ros2_orin_manipulator_cr3a.launch.py
    │   └── wmx_ros2_diff_drive_controller.launch.py
@@ -354,39 +352,26 @@ Initialization
 3. ``CreateSplineBuffer(0, 1000)`` -- allocate trajectory buffer
 4. Create action server and gripper service
 
-wmx_ros2_general_node
-^^^^^^^^^^^^^^^^^^^^^^
+wmx_engine_node
+^^^^^^^^^^^^^^^^^
 
-Standalone WMX engine and axis control node. Provides service-based access
-to all WMX engine lifecycle and axis control operations, plus topic-based
-motion commands.
+Manages the WMX device lifecycle: creates the device, starts/stops EtherCAT
+communication, and publishes a ready signal to coordinate dependent nodes.
 
-**Source:** ``src/wmx_ros2_general_node.cpp`` (entry point),
-``include/wmx_general_header/wmx_ros2_general.hpp`` (class definition),
-``include/wmx_general_header/wmx_ros2_general.cpp`` (constructor),
-``include/wmx_general_header/wmx_ros2_engine.cpp`` (engine methods),
-``include/wmx_general_header/wmx_ros2_core_motion.cpp`` (motion methods)
+**Source:** ``src/wmx_engine_node.cpp``
 
-**Class:** ``WmxRos2General`` (inherits ``rclcpp::Node``)
+**Node name:** ``wmx_engine_node``
 
-**Node name:** ``wmx_ros2_general_node``
-
-**Internal axis count:** 2 (hardcoded in ``wmx_ros2_general.hpp``)
-
-Parameters
-"""""""""""
-
-This node does not declare any ROS2 parameters. All interface names are
-hardcoded in the class member initializers.
+On startup, the node automatically calls ``CreateDevice`` and
+``StartCommunication``. It also exposes manual-override services for cases
+where explicit control is needed.
 
 Services
 """""""""
 
-**Engine Management:**
-
 .. list-table::
    :header-rows: 1
-   :widths: 30 30 40
+   :widths: 35 35 30
 
    * - Service
      - Type
@@ -400,12 +385,40 @@ Services
    * - ``/wmx/engine/get_status``
      - ``std_srvs/srv/Trigger``
      - Query engine state (Idle/Running/Communicating/Shutdown)
+   * - ``/wmx/engine/scan_network``
+     - ``std_srvs/srv/Trigger``
+     - Trigger EtherCAT network scan to discover slaves
 
-**Axis Control:**
+Published Topics
+"""""""""""""""""
 
 .. list-table::
    :header-rows: 1
    :widths: 30 35 35
+
+   * - Topic
+     - Message Type
+     - Description
+   * - ``/wmx/engine/ready``
+     - ``std_msgs/msg/Bool``
+     - ``true`` when communication is active; ``false`` on shutdown
+
+wmx_core_motion_node
+^^^^^^^^^^^^^^^^^^^^^^
+
+Provides service-based axis control and topic-based motion commands.
+Waits for ``/wmx/engine/ready`` before activating.
+
+**Source:** ``src/wmx_core_motion_node.cpp``
+
+**Node name:** ``wmx_core_motion_node``
+
+Services
+"""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 35 30
 
    * - Service
      - Type
@@ -434,7 +447,7 @@ Published Topics
 
 .. list-table::
    :header-rows: 1
-   :widths: 25 35 15 25
+   :widths: 30 30 10 30
 
    * - Topic
      - Message Type
@@ -443,14 +456,14 @@ Published Topics
    * - ``/wmx/axis/state``
      - ``wmx_ros2_message/msg/AxisState``
      - 100 Hz
-     - Full axis status (12 fields)
+     - Full per-axis status (servo state, alarms, positions, velocities)
 
 Subscribed Topics
 """"""""""""""""""
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 35 35
+   :widths: 35 35 30
 
    * - Topic
      - Message Type
@@ -465,13 +478,77 @@ Subscribed Topics
      - ``wmx_ros2_message/msg/AxisPose``
      - Relative position → ``CoreMotion::StartMov()``
 
-Initialization
-"""""""""""""""
+wmx_io_node
+^^^^^^^^^^^^^
 
-1. ``CreateDevice("/opt/lmx/")`` with retry (5 attempts, 2s interval)
-2. Create all service servers, publishers, and subscribers (in class member
-   initializers)
-3. Start 100 Hz timer for ``axisStateStep()``
+Provides service-based access to EtherCAT digital I/O.
+Waits for ``/wmx/engine/ready`` before activating.
+
+**Source:** ``src/wmx_io_node.cpp``
+
+**Node name:** ``wmx_io_node``
+
+Services
+"""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 35 30
+
+   * - Service
+     - Type
+     - Description
+   * - ``/wmx/io/get_input_bit``
+     - ``wmx_ros2_message/srv/GetIoBit``
+     - Read a single digital input bit
+   * - ``/wmx/io/get_output_bit``
+     - ``wmx_ros2_message/srv/GetIoBit``
+     - Read back a digital output bit
+   * - ``/wmx/io/get_input_bytes``
+     - ``wmx_ros2_message/srv/GetIoBytes``
+     - Read a block of digital input bytes
+   * - ``/wmx/io/get_output_bytes``
+     - ``wmx_ros2_message/srv/GetIoBytes``
+     - Read a block of digital output bytes
+   * - ``/wmx/io/set_output_bit``
+     - ``wmx_ros2_message/srv/SetIoBit``
+     - Write a single digital output bit
+   * - ``/wmx/io/set_output_bytes``
+     - ``wmx_ros2_message/srv/SetIoBytes``
+     - Write a block of digital output bytes
+
+wmx_ethercat_node
+^^^^^^^^^^^^^^^^^^^
+
+Provides EtherCAT diagnostic services for network monitoring and debugging.
+Waits for ``/wmx/engine/ready`` before activating.
+
+**Source:** ``src/wmx_ethercat_node.cpp``
+
+**Node name:** ``wmx_ethercat_node``
+
+Services
+"""""""""
+
+.. list-table::
+   :header-rows: 1
+   :widths: 35 40 25
+
+   * - Service
+     - Type
+     - Description
+   * - ``/wmx/ecat/get_network_state``
+     - ``wmx_ros2_message/srv/EcatGetNetworkState``
+     - Full network state: master + all slaves
+   * - ``/wmx/ecat/register_read``
+     - ``wmx_ros2_message/srv/EcatRegisterRead``
+     - Read raw EtherCAT register from a slave
+   * - ``/wmx/ecat/reset_statistics``
+     - ``wmx_ros2_message/srv/EcatResetStatistics``
+     - Reset packet loss / timing counters
+   * - ``/wmx/ecat/start_hotconnect``
+     - ``wmx_ros2_message/srv/EcatStartHotconnect``
+     - Initiate hot-connect for dynamic slave addition
 
 diff_drive_controller (Disabled)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -598,88 +675,25 @@ Three timers run at the configured ``rate`` (Hz):
 - ``encoderOdometryStep()`` -- Compute and publish odometry from wheel
   encoder feedback
 
-Demo Application
---------------------
-
-wmx_ros2_general_example
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A standalone ROS2 client that demonstrates the full WMX control workflow
-through the ``wmx_ros2_general_node`` services and topics.
-
-**Source:** ``example/wmx_ros2_general_example.cpp``
-
-**Node name:** ``wmx_ros2_general_example``
-
-**This is NOT a long-running node** -- it executes a scripted demo sequence
-and exits.
-
-Execution Sequence
-"""""""""""""""""""
-
-**Phase 1 -- Setup:**
-
-1. Create device: ``/wmx/engine/set_device`` (path="/opt/lmx/")
-2. Start communication: ``/wmx/engine/set_comm`` (data=true)
-3. Set gear ratios: ``/wmx/axis/set_gear_ratio`` (8388608.0 / 6.28319)
-4. Set polarities: ``/wmx/axis/set_polarity`` (axis 0 = 1, axis 1 = -1)
-5. Clear alarms: ``/wmx/axis/clear_alarm``
-6. Set velocity mode: ``/wmx/axis/set_mode`` (data=[1, 1])
-7. Enable servos: ``/wmx/axis/set_on`` (data=[1, 1])
-8. Home axes: ``/wmx/axis/homing``
-
-**Phase 2 -- Velocity motion test:**
-
-9. Publish 1.0 rad/s velocity for 10 seconds
-10. Stop (0 rad/s) for 5 seconds
-
-**Phase 3 -- Position mode switch:**
-
-11. Disable servos, switch to position mode, re-enable, re-home
-
-**Phase 4 -- Absolute position test:**
-
-12. Move to 5.0 rad, wait 10 seconds
-13. Move to -2.0 rad, wait 10 seconds
-
-**Phase 5 -- Relative position test:**
-
-14. Home axes
-15. Move +5.0 rad relative, wait 10 seconds
-16. Move -2.0 rad relative, wait 10 seconds
-
-**Phase 6 -- Shutdown:**
-
-17. Disable servos
-18. Stop communication
-19. Close device
-
-Usage
-""""""
-
-.. code-block:: bash
-
-   # Ensure wmx_ros2_general_node is running first
-   ros2 run wmx_ros2_package wmx_ros2_general_example
-
-.. warning::
-
-   This example moves real motors. Ensure the robot workspace is clear.
-
 Launch Files
 ------------
 
-wmx_ros2_general.launch.py
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+wmx_ros2_multi_node.launch.py
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Starts only the ``wmx_ros2_general_node`` for standalone axis control
-without MoveIt2 integration.
+Starts the four WMX service nodes for standalone axis control without
+MoveIt2 integration.
 
-**Nodes launched:** ``wmx_ros2_general_node``
+**Nodes launched:**
 
-**Arguments:** None
+1. ``wmx_engine_node``
+2. ``wmx_core_motion_node``
+3. ``wmx_io_node``
+4. ``wmx_ethercat_node``
 
-**Config loaded:** None (node uses hardcoded defaults)
+**Arguments:** ``use_sim_time`` (default: ``false``)
+
+**Config loaded:** None (nodes use default parameters)
 
 .. code-block:: bash
 
@@ -695,7 +709,7 @@ without MoveIt2 integration.
         --preserve-env=RMW_IMPLEMENTATION \
         bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
                  source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package wmx_ros2_general.launch.py"
+                 ros2 launch wmx_ros2_package wmx_ros2_multi_node.launch.py"
 
 wmx_ros2_intel_manipulator_cr3a.launch.py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -706,7 +720,9 @@ Full manipulator launch for Intel x86_64 platforms.
 
 1. ``manipulator_state``
 2. ``follow_joint_trajectory_server``
-3. ``wmx_ros2_general_node``
+3. ``wmx_engine_node``
+4. ``wmx_core_motion_node``
+5. ``wmx_io_node``
 
 **Arguments:**
 
@@ -753,7 +769,9 @@ Full manipulator launch for NVIDIA Jetson Orin platforms.
 
 1. ``manipulator_state``
 2. ``follow_joint_trajectory_server``
-3. ``wmx_ros2_general_node``
+3. ``wmx_engine_node``
+4. ``wmx_core_motion_node``
+5. ``wmx_io_node``
 
 **Arguments:**
 
@@ -951,7 +969,10 @@ Expected:
 
 .. code-block:: text
 
+   wmx_ros2_package diff_drive_controller
    wmx_ros2_package follow_joint_trajectory_server
    wmx_ros2_package manipulator_state
-   wmx_ros2_package wmx_ros2_general_example
-   wmx_ros2_package wmx_ros2_general_node
+   wmx_ros2_package wmx_core_motion_node
+   wmx_ros2_package wmx_engine_node
+   wmx_ros2_package wmx_ethercat_node
+   wmx_ros2_package wmx_io_node

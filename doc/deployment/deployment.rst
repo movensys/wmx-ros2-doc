@@ -77,26 +77,20 @@ Debian Package Install
 
 .. note::
 
-   Debian packages are not yet available. The WMX ROS2 application must
-   currently be built from source.
-
-.. todo::
-
-   Create ``apt``-installable Debian packages for ``wmx_ros2_message``
-   and ``wmx_ros2_package`` for streamlined deployment.
+   Debian packages are not yet available. Use the source build method above.
+   Package releases will be announced in the project repository.
 
 Docker
 ------
 
 .. note::
 
-   Docker support is planned for future releases. The WMX ROS2 application
-   requires access to EtherCAT network interfaces and the WMX Runtime at
-   ``/opt/lmx/``, which requires special Docker configuration (host
-   networking, device passthrough, volume mounts for ``/opt/lmx/``).
+   Docker support for ``wmx_ros2_application`` is not yet available. The WMX
+   ROS2 application requires direct access to EtherCAT network interfaces and
+   the WMX Runtime at ``/opt/lmx/``, which requires special Docker
+   configuration (``--net=host``, ``--privileged``, and
+   ``-v /opt/lmx:/opt/lmx``).
 
-.. todo::
-
-   Create a Docker image with ROS2, WMX Runtime, and pre-built
-   ``wmx_ros2_application`` packages. Will require ``--net=host``,
-   ``--privileged``, and ``-v /opt/lmx:/opt/lmx`` for EtherCAT access.
+   For the Isaac ROS / cuMotion pipeline, Docker containers are already
+   provided in ``movensys_isaac_manipulator/``. See the Isaac manipulator
+   setup guide for details.

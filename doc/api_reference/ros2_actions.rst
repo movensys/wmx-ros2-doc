@@ -201,5 +201,4 @@ See Also
 
 - :doc:`ros2_topics` -- ``/joint_states`` topic details
 - :doc:`ros2_services` -- ``/wmx/set_gripper`` service on the same node
-- :doc:`../getting_started/flowcharts` -- Motion execution flow diagram
 - :doc:`../integration/moveit2_integration` -- MoveIt2 setup

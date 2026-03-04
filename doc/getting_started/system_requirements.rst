@@ -116,7 +116,7 @@ Hardware Requirements
   pneumatic gripper
 
 The architecture is robot-agnostic for any 6-DOF manipulator with EtherCAT
-servo drives. See :doc:`system_overview` for details on adapting
+servo drives. See :doc:`../packages/wmx_ros2_package` for details on adapting
 to other robots.
 
 Supported Models & Platforms
