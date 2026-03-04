@@ -83,9 +83,9 @@ nodes.
 
 **Used by:**
 
-- ``wmx_ros2_general_node`` -- subscribes on ``/wmx/axis/position`` and
+- ``wmx_core_motion_node`` -- subscribes on ``/wmx/axis/position`` and
   ``/wmx/axis/position/relative``
-- ``wmx_ros2_general_example`` -- publishes position and relative position
+- ``wmx_core_motion_node`` -- publishes position and relative position
   commands
 
 AxisVelocity
@@ -104,14 +104,14 @@ Used for continuous velocity motion commands. Published to
 
 **Used by:**
 
-- ``wmx_ros2_general_node`` -- subscribes on ``/wmx/axis/velocity``
-- ``wmx_ros2_general_example`` -- publishes velocity commands
+- ``wmx_core_motion_node`` -- subscribes on ``/wmx/axis/velocity``
+- ``wmx_core_motion_node`` -- publishes velocity commands
 
 AxisState
 ^^^^^^^^^^
 
 Comprehensive per-axis status feedback published at 100 Hz by the
-``wmx_ros2_general_node`` on ``/wmx/axis/state``.
+``wmx_core_motion_node`` on ``/wmx/axis/state``.
 
 .. code-block:: text
 
@@ -136,7 +136,7 @@ The status flags use ``int32`` (not ``bool``) to match the WMX
 
 **Used by:**
 
-- ``wmx_ros2_general_node`` -- publishes on ``/wmx/axis/state`` at 100 Hz
+- ``wmx_core_motion_node`` -- publishes on ``/wmx/axis/state`` at 100 Hz
 
 Service Definitions
 -------------------
@@ -159,7 +159,7 @@ Controls the WMX engine lifecycle (device creation and communication).
 
 **Used by service:**
 
-- ``/wmx/engine/set_device`` (on ``wmx_ros2_general_node``)
+- ``/wmx/engine/set_device`` (on ``wmx_core_motion_node``)
 
 SetAxis
 ^^^^^^^^
@@ -206,7 +206,7 @@ The effective gear ratio per axis is ``numerator / denumerator``.
 
 **Used by service:**
 
-- ``/wmx/axis/set_gear_ratio`` (on ``wmx_ros2_general_node``)
+- ``/wmx/axis/set_gear_ratio`` (on ``wmx_core_motion_node``)
 
 Building the Package
 --------------------

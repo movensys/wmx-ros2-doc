@@ -14,6 +14,11 @@ divided into published (output) and subscribed (input) categories.
      - Direction
      - Rate
      - Node
+   * - ``/wmx/engine/ready``
+     - ``std_msgs/Bool``
+     - Published
+     - On change
+     - ``wmx_engine_node``
    * - ``/joint_states``
      - ``sensor_msgs/JointState``
      - Published
@@ -33,22 +38,22 @@ divided into published (output) and subscribed (input) categories.
      - ``wmx_ros2_message/AxisState``
      - Published
      - 100 Hz
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - ``/wmx/axis/velocity``
      - ``wmx_ros2_message/AxisVelocity``
      - Subscribed
      - On demand
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - ``/wmx/axis/position``
      - ``wmx_ros2_message/AxisPose``
      - Subscribed
      - On demand
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - ``/wmx/axis/position/relative``
      - ``wmx_ros2_message/AxisPose``
      - Subscribed
      - On demand
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
 
 .. contents:: Topic Categories
    :local:
@@ -100,6 +105,34 @@ from ``wmx_ros2_message``.
 
 Published Topics
 ----------------
+
+Engine Ready Signal
+^^^^^^^^^^^^^^^^^^^^
+
+/wmx/engine/ready
+""""""""""""""""""
+
+.. list-table::
+   :widths: 25 75
+
+   * - **Message Type**
+     - ``std_msgs/msg/Bool``
+   * - **Publisher**
+     - ``wmx_engine_node``
+   * - **Rate**
+     - Published on state change (not periodic)
+   * - **Purpose**
+     - Signals to dependent nodes (``wmx_core_motion_node``, ``wmx_io_node``,
+       ``wmx_ethercat_node``) that EtherCAT communication is active
+
+``data=true`` is published once ``StartCommunication`` succeeds.
+``data=false`` is published on shutdown.
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 topic echo /wmx/engine/ready
 
 Joint State Feedback
 ^^^^^^^^^^^^^^^^^^^^^
@@ -265,13 +298,13 @@ Axis State Monitoring
    * - **Message Type**
      - ``wmx_ros2_message/msg/AxisState``
    * - **Publisher**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Rate**
      - 100 Hz (hardcoded ``rate_=100``)
    * - **Axis Count**
      - 2 (hardcoded ``axisCount_=2``)
    * - **Source**
-     - ``wmx_ros2_core_motion.cpp:axisStateStep()``
+     - ``wmx_core_motion_node.cpp:axisStateStep()``
    * - **Purpose**
      - Detailed per-axis status from the WMX CoreMotion API
 
@@ -280,7 +313,7 @@ limit switches, commanded vs. actual positions, velocities, and torques.
 
 .. important::
 
-   The axis count is hardcoded to **2** in ``wmx_ros2_general.hpp``
+   The axis count is hardcoded to **2** in ``wmx_core_motion_node.hpp``
    (``axisCount_=2``). This means the arrays in ``AxisState`` contain 2
    elements each, monitoring axes 0 and 1 only.
 
@@ -347,7 +380,7 @@ Subscribed Topics (Motion Commands)
 ------------------------------------
 
 These topics accept motion commands and are subscribed to by the
-``wmx_ros2_general_node`` (source: ``wmx_ros2_core_motion.cpp``). Publishing
+``wmx_core_motion_node`` (source: ``wmx_core_motion_node.cpp``). Publishing
 to these topics directly controls the WMX engine and moves real motors.
 
 .. warning::
@@ -364,7 +397,7 @@ to these topics directly controls the WMX engine and moves real motors.
    * - **Message Type**
      - ``wmx_ros2_message/msg/AxisVelocity``
    * - **Subscriber**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Callback**
      - ``axisVelCallback()``
    * - **Purpose**
@@ -403,7 +436,7 @@ The axis must be in velocity mode (see :doc:`ros2_services` for
    * - **Message Type**
      - ``wmx_ros2_message/msg/AxisPose``
    * - **Subscriber**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Callback**
      - ``axisPoseCallback()``
    * - **Purpose**
@@ -436,7 +469,7 @@ position.
    * - **Message Type**
      - ``wmx_ros2_message/msg/AxisPose``
    * - **Subscriber**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Callback**
      - ``axisPoseRelativeCallback()``
    * - **Purpose**

@@ -43,7 +43,10 @@ Expected:
 
 .. code-block:: text
 
+   wmx_ros2_package diff_drive_controller
    wmx_ros2_package follow_joint_trajectory_server
    wmx_ros2_package manipulator_state
-   wmx_ros2_package wmx_ros2_general_example
-   wmx_ros2_package wmx_ros2_general_node
+   wmx_ros2_package wmx_core_motion_node
+   wmx_ros2_package wmx_engine_node
+   wmx_ros2_package wmx_ethercat_node
+   wmx_ros2_package wmx_io_node

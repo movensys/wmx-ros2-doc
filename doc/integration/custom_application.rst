@@ -220,7 +220,7 @@ position to the specified joint targets.
 C++ Example: Send a Trajectory
 -------------------------------
 
-This example follows the same pattern used by ``wmx_ros2_general_example.cpp``
+This example follows the same pattern used by ``wmx_core_motion_node.cpp``
 in the workspace. It creates an action client, sends a trajectory goal, and
 waits for the result.
 
@@ -516,7 +516,7 @@ Direct Axis Control
 
 For applications that need real-time velocity or position control without
 trajectory planning, publish directly to the motion topics. This requires
-the ``wmx_ros2_general_node`` to be running.
+the ``wmx_core_motion_node`` to be running.
 
 .. code-block:: python
 
@@ -686,11 +686,11 @@ What stays the same
 ^^^^^^^^^^^^^^^^^^^^
 
 - All ROS2 node executables (``manipulator_state``,
-  ``follow_joint_trajectory_server``, ``wmx_ros2_general_node``)
+  ``follow_joint_trajectory_server``, ``wmx_core_motion_node``)
 - All service and topic names
 - The ``FollowJointTrajectory`` action interface
 - The ``wmx_ros2_message`` custom message types
 - The build process
 
-See :doc:`../getting_started/system_overview` for the full architecture and
+See :doc:`../packages/packages` for the full architecture and
 :doc:`../packages/wmx_ros2_package` for node and parameter details.

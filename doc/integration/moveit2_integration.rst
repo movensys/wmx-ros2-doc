@@ -108,5 +108,3 @@ processes it as described in the :doc:`../api_reference/ros2_actions` page:
 - The server blocks until motion completes
 - Returns ``error_code = 0`` on success
 
-See :doc:`../getting_started/flowcharts` for the detailed motion execution flow
-diagram.

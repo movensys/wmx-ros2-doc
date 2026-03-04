@@ -267,7 +267,7 @@ Standalone Axis Control
 -----------------------
 
 For applications that don't use trajectory-based planning, the
-``wmx_ros2_general_node`` provides direct axis control through:
+``wmx_core_motion_node`` provides direct axis control through:
 
 - **Velocity commands** via ``/wmx/axis/velocity``
   (``wmx_ros2_message/msg/AxisVelocity``)
@@ -295,4 +295,3 @@ See Also
 - :doc:`../api_reference/ros2_services` -- Service call workflow
 - :doc:`custom_application` -- Building custom applications with code examples
 - :doc:`moveit2_integration` -- MoveIt2 configuration
-- :doc:`../getting_started/flowcharts` -- Trajectory execution flow diagram

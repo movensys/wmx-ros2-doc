@@ -1,13 +1,13 @@
 ROS2 Services
 ==============
 
-The WMX ROS2 application provides 10 services for engine management, axis
-control, and gripper operation. Services use three custom types from
-``wmx_ros2_message`` plus two standard types from ``std_srvs``.
+The WMX ROS2 application provides services for engine management, axis
+control, I/O, EtherCAT diagnostics, and gripper operation. Services use
+custom types from ``wmx_ros2_message`` plus standard types from ``std_srvs``.
 
 .. list-table:: Service Summary
    :header-rows: 1
-   :widths: 30 25 20 25
+   :widths: 33 27 25 15
 
    * - Service Name
      - Type
@@ -15,40 +15,84 @@ control, and gripper operation. Services use three custom types from
      - Category
    * - ``/wmx/engine/set_device``
      - ``wmx_ros2_message/srv/SetEngine``
-     - ``wmx_ros2_general_node``
+     - ``wmx_engine_node``
      - Engine
    * - ``/wmx/engine/set_comm``
      - ``std_srvs/srv/SetBool``
-     - ``wmx_ros2_general_node``
+     - ``wmx_engine_node``
      - Engine
    * - ``/wmx/engine/get_status``
      - ``std_srvs/srv/Trigger``
-     - ``wmx_ros2_general_node``
+     - ``wmx_engine_node``
+     - Engine
+   * - ``/wmx/engine/scan_network``
+     - ``std_srvs/srv/Trigger``
+     - ``wmx_engine_node``
      - Engine
    * - ``/wmx/axis/set_on``
      - ``wmx_ros2_message/srv/SetAxis``
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
      - Axis Control
    * - ``/wmx/axis/clear_alarm``
      - ``wmx_ros2_message/srv/SetAxis``
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
      - Axis Control
    * - ``/wmx/axis/set_mode``
      - ``wmx_ros2_message/srv/SetAxis``
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
      - Axis Control
    * - ``/wmx/axis/set_polarity``
      - ``wmx_ros2_message/srv/SetAxis``
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
      - Axis Control
    * - ``/wmx/axis/set_gear_ratio``
      - ``wmx_ros2_message/srv/SetAxisGearRatio``
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
      - Axis Control
    * - ``/wmx/axis/homing``
      - ``wmx_ros2_message/srv/SetAxis``
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
      - Axis Control
+   * - ``/wmx/io/get_input_bit``
+     - ``wmx_ros2_message/srv/GetIoBit``
+     - ``wmx_io_node``
+     - I/O
+   * - ``/wmx/io/get_output_bit``
+     - ``wmx_ros2_message/srv/GetIoBit``
+     - ``wmx_io_node``
+     - I/O
+   * - ``/wmx/io/get_input_bytes``
+     - ``wmx_ros2_message/srv/GetIoBytes``
+     - ``wmx_io_node``
+     - I/O
+   * - ``/wmx/io/get_output_bytes``
+     - ``wmx_ros2_message/srv/GetIoBytes``
+     - ``wmx_io_node``
+     - I/O
+   * - ``/wmx/io/set_output_bit``
+     - ``wmx_ros2_message/srv/SetIoBit``
+     - ``wmx_io_node``
+     - I/O
+   * - ``/wmx/io/set_output_bytes``
+     - ``wmx_ros2_message/srv/SetIoBytes``
+     - ``wmx_io_node``
+     - I/O
+   * - ``/wmx/ecat/get_network_state``
+     - ``wmx_ros2_message/srv/EcatGetNetworkState``
+     - ``wmx_ethercat_node``
+     - EtherCAT
+   * - ``/wmx/ecat/register_read``
+     - ``wmx_ros2_message/srv/EcatRegisterRead``
+     - ``wmx_ethercat_node``
+     - EtherCAT
+   * - ``/wmx/ecat/reset_statistics``
+     - ``wmx_ros2_message/srv/EcatResetStatistics``
+     - ``wmx_ethercat_node``
+     - EtherCAT
+   * - ``/wmx/ecat/start_hotconnect``
+     - ``wmx_ros2_message/srv/EcatStartHotconnect``
+     - ``wmx_ethercat_node``
+     - EtherCAT
    * - ``/wmx/set_gripper``
      - ``std_srvs/srv/SetBool``
      - ``follow_joint_trajectory_server``
@@ -105,8 +149,8 @@ from ``wmx_ros2_message``.
 Engine Management Services
 --------------------------
 
-These services manage the WMX engine lifecycle. They are hosted by the
-``wmx_ros2_general_node`` (source: ``wmx_ros2_engine.cpp``).
+These services manage the WMX engine lifecycle. They are hosted by
+``wmx_engine_node`` (source: ``wmx_engine_node.cpp``).
 
 /wmx/engine/set_device
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -117,7 +161,7 @@ These services manage the WMX engine lifecycle. They are hosted by the
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetEngine``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_engine_node``
    * - **Purpose**
      - Create or close the WMX device handle
 
@@ -174,7 +218,7 @@ These services manage the WMX engine lifecycle. They are hosted by the
    * - **Service Type**
      - ``std_srvs/srv/SetBool``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_engine_node``
    * - **Purpose**
      - Start or stop EtherCAT real-time communication
 
@@ -222,7 +266,7 @@ These services manage the WMX engine lifecycle. They are hosted by the
    * - **Service Type**
      - ``std_srvs/srv/Trigger``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_engine_node``
    * - **Purpose**
      - Query the current WMX engine state
 
@@ -264,11 +308,34 @@ Expected response when operating normally:
    success: True
    message: "Communicating"
 
+/wmx/engine/scan_network
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 25 75
+
+   * - **Service Type**
+     - ``std_srvs/srv/Trigger``
+   * - **Node**
+     - ``wmx_engine_node``
+   * - **Purpose**
+     - Trigger an EtherCAT network scan to discover connected slave devices
+
+Calls ``Ecat::ScanNetwork(masterId=0)``. Returns ``success=true`` and a
+summary message on success, or ``success=false`` with the WMX error code on
+failure.
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/engine/scan_network std_srvs/srv/Trigger
+
 Axis Control Services
 ---------------------
 
-These services control individual servo axes. All are hosted by the
-``wmx_ros2_general_node`` (source: ``wmx_ros2_core_motion.cpp``). Operations
+These services control individual servo axes. They are hosted by
+``wmx_core_motion_node`` (source: ``wmx_core_motion_node.cpp``). Operations
 are applied per-axis based on the ``index`` array in the request. The response
 ``success`` is ``true`` only if **all** specified axes succeeded.
 
@@ -281,7 +348,7 @@ are applied per-axis based on the ``index`` array in the request. The response
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetAxis``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Purpose**
      - Enable or disable servo drives
 
@@ -325,7 +392,7 @@ message is concatenated per-axis (e.g., ``"Set axis 0 on. Set axis 1 on."``).
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetAxis``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Purpose**
      - Clear amplifier alarm (fault) on specified axes
 
@@ -348,7 +415,7 @@ is not used -- only the ``index`` array determines which axes are cleared.
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetAxis``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Purpose**
      - Set the control mode for each axis
 
@@ -394,7 +461,7 @@ Invalid mode values are rejected per-axis with the message
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetAxis``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Purpose**
      - Set the rotation direction polarity for each axis
 
@@ -430,7 +497,7 @@ the message ``"Invalid polarity value for axis <index>: <value>"``.
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetAxisGearRatio``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Purpose**
      - Configure the encoder gear ratio for each axis
 
@@ -438,7 +505,7 @@ Calls ``CoreMotion::SetGearRatio(axis, numerator, denominator)`` for each
 axis. The gear ratio maps encoder counts to physical units (radians):
 ``position_radians = encoder_counts * (denominator / numerator)``.
 
-**Example -- Set gear ratios (from wmx_ros2_general_example):**
+**Example -- Set gear ratios for 2 axes:**
 
 .. code-block:: bash
 
@@ -457,7 +524,7 @@ axis. The gear ratio maps encoder counts to physical units (radians):
    * - **Service Type**
      - ``wmx_ros2_message/srv/SetAxis``
    * - **Node**
-     - ``wmx_ros2_general_node``
+     - ``wmx_core_motion_node``
    * - **Purpose**
      - Set the home (zero) position for specified axes
 
@@ -549,13 +616,243 @@ The gripper state is also reflected in the ``/joint_states`` topic. The
 and maps it to the ``picker_1_joint`` and ``picker_2_joint`` values using
 the ``gripper_open_value`` and ``gripper_close_value`` parameters.
 
+I/O Services
+------------
+
+These services provide direct access to EtherCAT digital I/O. They are hosted
+by ``wmx_io_node`` (source: ``wmx_io_node.cpp``). The node becomes active
+after ``wmx_engine_node`` publishes ``/wmx/engine/ready``.
+
+Custom service types used:
+
+**wmx_ros2_message/srv/GetIoBit**
+
+.. code-block:: text
+
+   int32 byte   # I/O byte address
+   int32 bit    # Bit index within the byte (0–7)
+   ---
+   bool success    # true if read succeeded
+   int32 value     # Bit value: 0 or 1
+   string message  # Response or error description
+
+**wmx_ros2_message/srv/GetIoBytes**
+
+.. code-block:: text
+
+   int32 byte    # Starting I/O byte address
+   int32 length  # Number of bytes to read (must be > 0)
+   ---
+   bool success   # true if read succeeded
+   uint8[] data   # Byte values read from I/O
+   string message # Response or error description
+
+**wmx_ros2_message/srv/SetIoBit**
+
+.. code-block:: text
+
+   int32 byte   # Output I/O byte address
+   int32 bit    # Bit index within the byte (0–7)
+   int32 value  # Bit value to write: 0 or 1
+   ---
+   bool success    # true if write succeeded
+   string message  # Response or error description
+
+**wmx_ros2_message/srv/SetIoBytes**
+
+.. code-block:: text
+
+   int32 byte    # Starting output I/O byte address
+   uint8[] data  # Byte values to write
+   ---
+   bool success    # true if write succeeded
+   string message  # Response or error description
+
+/wmx/io/get_input_bit
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Read a single bit from an EtherCAT digital input.
+
+**Example -- Read input bit 3 of byte 0:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/io/get_input_bit wmx_ros2_message/srv/GetIoBit \
+     "{byte: 0, bit: 3}"
+
+/wmx/io/get_output_bit
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read the current value of a digital output bit (reads back the commanded
+output state, not a physical input).
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/io/get_output_bit wmx_ros2_message/srv/GetIoBit \
+     "{byte: 0, bit: 0}"
+
+/wmx/io/get_input_bytes
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read a contiguous block of digital input bytes.
+
+**Example -- Read 4 input bytes starting at address 0:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/io/get_input_bytes wmx_ros2_message/srv/GetIoBytes \
+     "{byte: 0, length: 4}"
+
+/wmx/io/get_output_bytes
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read the current values of a contiguous block of digital output bytes.
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/io/get_output_bytes wmx_ros2_message/srv/GetIoBytes \
+     "{byte: 0, length: 4}"
+
+/wmx/io/set_output_bit
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set a single digital output bit. The ``/wmx/set_gripper`` service uses the
+same underlying ``Io::SetOutBit`` call (byte=0, bit=0). Use this service for
+general-purpose digital outputs.
+
+**Example -- Set output bit 1 of byte 0 to high:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/io/set_output_bit wmx_ros2_message/srv/SetIoBit \
+     "{byte: 0, bit: 1, value: 1}"
+
+/wmx/io/set_output_bytes
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Write a block of digital output bytes in a single call.
+
+**Example -- Write [0x01, 0x00] to output bytes 0–1:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/io/set_output_bytes wmx_ros2_message/srv/SetIoBytes \
+     "{byte: 0, data: [1, 0]}"
+
+EtherCAT Diagnostic Services
+-----------------------------
+
+These services provide low-level EtherCAT diagnostics and are hosted by
+``wmx_ethercat_node`` (source: ``wmx_ethercat_node.cpp``). The node becomes
+active after ``wmx_engine_node`` publishes ``/wmx/engine/ready``.
+
+Custom service types used:
+
+**wmx_ros2_message/srv/EcatGetNetworkState**
+
+.. code-block:: text
+
+   int32 master_id
+   ---
+   bool success
+   string message
+   # Master info
+   int32 master_state   # EcStateMachine: 0=None 1=Init 2=Preop 4=Boot 8=Safeop 16=Op
+   int32 master_mode    # EcMasterMode: 0=Cyclic 1=PP 2=Monitor
+   uint32 comm_period
+   uint32 total_axes
+   uint32 packet_loss
+   uint32 over_cycle
+   # Per-slave arrays (parallel, one entry per slave)
+   int32 num_of_slaves
+   int32[] slave_ids
+   int32[] slave_states
+   bool[] slave_offline
+   bool[] slave_inaccessible
+   uint32[] slave_vendor_ids
+   uint32[] slave_product_codes
+   # (plus additional timing and addressing fields)
+
+**wmx_ros2_message/srv/EcatRegisterRead**
+
+.. code-block:: text
+
+   int32 master_id
+   int32 slave_id
+   int32 reg_address   # valid range: 0x000–0xFFF
+   int32 length        # valid range: 1–4096 bytes
+   ---
+   bool success
+   uint8[] data
+   string message
+
+**wmx_ros2_message/srv/EcatResetStatistics** / **EcatStartHotconnect**
+
+Both take only ``int32 master_id`` in the request and return
+``bool success`` + ``string message``.
+
+/wmx/ecat/get_network_state
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Query the complete EtherCAT network state including master and all slave
+devices. Useful for verifying that all drives are online and in operational
+state (``slave_states`` = 16).
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/ecat/get_network_state \
+     wmx_ros2_message/srv/EcatGetNetworkState "{master_id: 0}"
+
+/wmx/ecat/register_read
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read raw EtherCAT register data from a specific slave device. Primarily used
+for low-level diagnostics.
+
+**Example -- Read 4 bytes from register 0x0130 of slave 1:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/ecat/register_read \
+     wmx_ros2_message/srv/EcatRegisterRead \
+     "{master_id: 0, slave_id: 1, reg_address: 304, length: 4}"
+
+/wmx/ecat/reset_statistics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Reset EtherCAT packet counters (packet loss, timeout, over-cycle counts).
+Useful when starting a measurement window.
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/ecat/reset_statistics \
+     wmx_ros2_message/srv/EcatResetStatistics "{master_id: 0}"
+
+/wmx/ecat/start_hotconnect
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Initiate the EtherCAT hot-connect procedure for dynamic slave addition.
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/ecat/start_hotconnect \
+     wmx_ros2_message/srv/EcatStartHotconnect "{master_id: 0}"
+
 Service Call Workflow
 ---------------------
 
-For standalone axis control (without MoveIt2), services are called in the
-following order. This sequence is demonstrated by
-``wmx_ros2_general_example``. See :doc:`../getting_started/flowcharts` for
-detailed flow diagrams.
+For standalone axis control (without MoveIt2), call services in the following
+order.
 
 **Setup phase:**
 
@@ -598,5 +895,4 @@ See Also
 
 - :doc:`ros2_actions` -- FollowJointTrajectory action for MoveIt2 integration
 - :doc:`ros2_topics` -- Motion command topics and state feedback
-- :doc:`../getting_started/flowcharts` -- Detailed error handling flow diagrams
 - :doc:`../packages/wmx_ros2_message` -- Custom message type definitions
