@@ -1,5 +1,5 @@
 Example Applications
-=================
+====================
 
 Overview
 --------

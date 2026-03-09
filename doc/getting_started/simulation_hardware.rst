@@ -1,4 +1,4 @@
-Launch with Mock Hardware
+Testing in Simulation
 =========================
 
 The WMX ROS2 nodes communicate directly with the WMX engine over EtherCAT.
@@ -22,7 +22,7 @@ Test the General Node (Standalone)
         --preserve-env=RMW_IMPLEMENTATION \
         bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
                  source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package wmx_ros2_multi_node.launch.py"
+                 ros2 launch wmx_ros2_package wmx_ros2_general_package.launch.py"
 
 If no EtherCAT hardware is connected, the nodes will log retry attempts but
 ROS2 service endpoints will still be registered.

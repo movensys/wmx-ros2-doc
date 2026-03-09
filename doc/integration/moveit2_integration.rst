@@ -75,7 +75,6 @@ Usage
 
    .. code-block:: bash
 
-      # Intel platform example
       sudo --preserve-env=PATH \
            --preserve-env=AMENT_PREFIX_PATH \
            --preserve-env=COLCON_PREFIX_PATH \
@@ -89,7 +88,7 @@ Usage
            bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
                     source ~/wmx_ros2_ws/install/setup.bash && \
                     ros2 launch wmx_ros2_package \
-                      wmx_ros2_intel_manipulator_cr3a.launch.py \
+                      wmx_ros2_cr3a_manipulator.launch.py \
                       use_sim_time:=false"
 
 2. Launch MoveIt2 with your robot's MoveIt configuration package.

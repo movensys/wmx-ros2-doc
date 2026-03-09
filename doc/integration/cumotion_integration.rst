@@ -111,7 +111,7 @@ Open the HiL scene:
      bash -c "source /opt/ros/humble/setup.bash && \
               source ~/wmx_ros2_ws/install/setup.bash && \
               ros2 launch wmx_ros2_package \
-                wmx_ros2_orin_manipulator_cr3a.launch.py"
+                wmx_ros2_cr3a_manipulator.launch.py"
 
 **Step 3: Launch cuMotion [IPC]**
 
@@ -163,5 +163,5 @@ See Also
 
 - :doc:`../examples/isaac_manipulator` -- Full stage-by-stage Isaac manipulator demo
 - :doc:`../api_reference/ros2_actions` -- FollowJointTrajectory action details
-- :doc:`../packages/wmx_ros2_package` -- Orin configuration file parameters
+- :doc:`../packages/wmx_ros2_package` -- CR3A configuration file parameters
 - :doc:`moveit2_integration` -- Stage 1 MoveIt2 OMPL planning

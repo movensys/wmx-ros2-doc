@@ -15,7 +15,7 @@ launching your first robot control session with WMX ROS2.
       | :doc:`install_dependencies`
       | :doc:`create_workspace`
       | :doc:`configure_environment`
-      | :doc:`mock_hardware`
+      | :doc:`simulation_hardware`
       | :doc:`physical_hardware`
       | :doc:`communication`
 
@@ -28,6 +28,6 @@ launching your first robot control session with WMX ROS2.
    install_dependencies
    create_workspace
    configure_environment
-   mock_hardware
+   simulation_hardware
    physical_hardware
    communication
