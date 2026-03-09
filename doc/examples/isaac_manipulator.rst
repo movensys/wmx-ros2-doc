@@ -1,4 +1,4 @@
-Isaac Sim Manipulator Example
+Isaac Sim Manipulator
 ==============================
 
 Overview

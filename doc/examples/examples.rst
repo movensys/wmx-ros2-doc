@@ -1,4 +1,4 @@
-Demo Applications
+Example Applications
 =================
 
 Overview
@@ -28,7 +28,7 @@ WMX XML parameters, and launch files) differ between setups.
      - Intel x86_64
      - Manipulator control with Gazebo integration
 
-Prerequisites
+Requirements
 -------------
 
 All examples require:
