@@ -12,7 +12,7 @@ Follow the steps in order. At step 6 choose the path that matches your setup
    :zoom:
 
    %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#1a73e8", "primaryTextColor": "#fff", "primaryBorderColor": "#1558b0", "lineColor": "#1a73e8"}}}%%
-   flowchart LR
+   flowchart TB
        S1["1 System<br/>Requirements"]
        S2["2 Install<br/>ROS2"]
        S3["3 Install<br/>Dependencies"]
