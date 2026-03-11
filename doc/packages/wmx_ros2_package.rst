@@ -166,42 +166,11 @@ Nodes
 The diagram below shows all nodes, their topics, services, and how they
 relate to each other and to external clients (MoveIt2, Isaac Sim):
 
-.. mermaid::
-   :caption: wmx_ros2_package — node graph (topics, services, and dependencies)
-   :zoom:
+.. figure:: /_static/images/node_graph.png
+   :alt: wmx_ros2_package — node graph 
+   :align: center
 
-   %%{init: {"theme": "base", "themeVariables": {"primaryColor": "#1a73e8", "primaryTextColor": "#fff", "primaryBorderColor": "#1558b0", "lineColor": "#555"}}}%%
-   flowchart LR
-       subgraph EXT["External Clients"]
-           MV["MoveIt2 / RViz2"]
-           IS["Isaac Sim<br/>(digital twin)"]
-           MON["Monitoring tools"]
-       end
-
-       subgraph PKG["wmx_ros2_package  Nodes"]
-           WEN["wmx_engine_node<br/>─────────────<br/>CreateDevice<br/>StartCommunication<br/>ScanNetwork"]
-           MS["manipulator_state<br/>─────────────<br/>EtherCAT init<br/>Encoder feedback<br/>/joint_states @ 500 Hz"]
-           FJT["follow_joint_trajectory_server<br/>─────────────<br/>FollowJointTrajectory<br/>action server<br/>WMX3 CSpline execution"]
-           WCM["wmx_core_motion_node<br/>─────────────<br/>Axis enable / disable<br/>Position & velocity<br/>commands"]
-           WIO["wmx_io_node<br/>─────────────<br/>Digital I/O<br/>read / write"]
-           WEC["wmx_ethercat_node<br/>─────────────<br/>Network diagnostics<br/>Register read"]
-       end
-
-       WEN -->|"/wmx/engine/ready  Bool"| WCM & WIO & WEC
-
-       MS -->|"/joint_states  JointState  500 Hz"| MV
-       MS -->|"/isaacsim/joint_command  JointState"| IS
-       WCM -->|"/wmx/axis/state  AxisState  100 Hz"| MON
-
-       MV -->|"FollowJointTrajectory  goal"| FJT
-       FJT -.->|"/wmx/set_gripper  SetBool"| WIO
-
-       style WEN fill:#1a73e8,color:#fff
-       style MS fill:#34a853,color:#fff
-       style FJT fill:#34a853,color:#fff
-       style WCM fill:#fa7b17,color:#fff
-       style WIO fill:#fa7b17,color:#fff
-       style WEC fill:#9e9e9e,color:#fff
+   wmx_ros2_package — node graph 
 
 manipulator_state
 ^^^^^^^^^^^^^^^^^^
