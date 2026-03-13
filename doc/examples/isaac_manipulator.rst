@@ -1,4 +1,4 @@
-Isaac Sim Manipulator Example
+Isaac Sim Manipulator
 ==============================
 
 Overview
@@ -39,6 +39,13 @@ The workspace is located at::
      - 3D volumetric mapping for collision-free planning
      - ``isaac_ros_nvblox``
 
+The diagram below shows the four stages and how each one builds on the previous:
+
+.. image:: /_static/images/isaac_stages.png
+   :alt: Isaac Manipulator — 4-stage progressive capability workflow
+   :class: with-border
+   :align: center
+
 Each stage can run in three environments:
 
 - **Simulation** -- Isaac Sim provides both the physics engine and sensor
@@ -53,6 +60,9 @@ Each stage can run in three environments:
 
 Architecture
 ------------
+.. figure:: /_static/images/Isaac_manipulator_example.png
+   :alt: Isaac Manipulator architecture example
+   :align: center
 
 Packages
 ^^^^^^^^
@@ -147,47 +157,6 @@ The ``simulation_action`` node bridges MoveIt2 and Isaac Sim in simulation mode:
   ``vel_scale=1.0``, ``acc_scale=1.0``
 - ``stage4_nvblox_cpp`` (``src/stage4_nvblox.cpp``) --
   Moves between two poses with obstacle-aware planning via cuMotion + NvBlox ESDF
-
-Data Flow (Simulation Mode)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-::
-
-   MoveIt2 (OMPL/cuMotion)
-     |
-     | FollowJointTrajectory action
-     v
-   simulation_action
-     |
-     | /joint_command (sensor_msgs/JointState)
-     v
-   Isaac Sim
-     |
-     | /joint_states (sensor_msgs/JointState)
-     v
-   robot_state_publisher -> RViz2
-
-Data Flow (HiL / Real Robot)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-::
-
-   MoveIt2 (OMPL/cuMotion)
-     |
-     | FollowJointTrajectory action
-     v
-   WMX ROS2 follow_joint_trajectory_server
-     |
-     | WMX3 CSpline -> EtherCAT
-     v
-   Physical Robot Servos
-     |
-     | Encoder feedback via WMX3
-     v
-   WMX ROS2 /joint_states
-     |
-     +-> robot_state_publisher -> RViz2
-     +-> Isaac Sim (digital twin via /isaacsim/joint_command)
 
 
 Prerequisites

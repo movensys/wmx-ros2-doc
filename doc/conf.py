@@ -10,6 +10,7 @@ extensions = [
     'sphinx.ext.autodoc',    # Auto-generate from docstrings
     'sphinx.ext.intersphinx',# Cross-reference other Sphinx docs
     'sphinx.ext.todo',       # TODO directives
+    'sphinxcontrib.mermaid', # Mermaid diagram support
 ]
 
 # Markdown support

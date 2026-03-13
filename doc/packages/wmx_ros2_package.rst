@@ -163,6 +163,15 @@ All executables link against the WMX shared libraries at ``/opt/lmx/lib/``:
 Nodes
 -----
 
+The diagram below shows all nodes, their topics, services, and how they
+relate to each other and to external clients (MoveIt2, Isaac Sim):
+
+.. figure:: /_static/images/node_graph.png
+   :alt: wmx_ros2_package — node graph 
+   :align: center
+
+   wmx_ros2_package — node graph 
+
 manipulator_state
 ^^^^^^^^^^^^^^^^^^
 
@@ -254,6 +263,42 @@ digital I/O bit (``Io::GetOutBit(0, 0)``).
 
 Initialization Sequence
 """"""""""""""""""""""""
+
+.. mermaid::
+   :caption: manipulator_state — startup sequence diagram
+   :zoom:
+
+   %%{init: {"theme": "base", "themeVariables": {"actorBkg": "#1a73e8", "actorTextColor": "#fff", "actorBorderColor": "#1558b0", "signalColor": "#555", "signalTextColor": "#1a1a1a", "noteBkgColor": "#fff3cd", "noteTextColor": "#856404"}}}%%
+   sequenceDiagram
+       participant N as manipulator_state
+       participant W as WMX API
+       participant E as EtherCAT Bus
+       participant S as Servo Drives (J1–J6)
+
+       Note over N: Reads all ROS2 parameters<br/>(joint_number, feedback_rate, xml path …)
+
+       loop Retry up to 5×, 2 s interval
+           N->>W: CreateDevice("/opt/lmx/")
+           W-->>N: Device handle (or retry on failure)
+       end
+
+       N->>E: Ecat::ScanNetwork(masterId=0)
+       E-->>N: 6 servo drives + I/O module discovered
+
+       N->>W: StartCommunication(timeout=10 s)
+       W-->>N: Real-time EtherCAT cycle active
+
+       N->>W: config->ImportAndSetAll(xml_path)
+       W-->>N: Gear ratios + polarities loaded
+
+       loop For each joint  J1 → J6
+           N->>S: ClearAmpAlarm(axis)
+           S-->>N: Alarm cleared
+           N->>S: SetServoOn(axis, enable=true)
+           S-->>N: Servo enabled
+       end
+
+       Note over N: Publishing /joint_states @ 500 Hz
 
 1. Declare and read all ROS2 parameters
 2. ``CreateDevice("/opt/lmx/")`` with retry (5 attempts, 2s interval)

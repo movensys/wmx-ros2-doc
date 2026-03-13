@@ -12,24 +12,10 @@ on real hardware via the WMX cubic spline engine.
 Architecture
 ------------
 
-.. code-block:: text
-
-   MoveIt2 Planner
-       │
-       ├── Reads /joint_states (current robot state)
-       │     └── Published by manipulator_state @ 500 Hz
-       │
-       ├── Plans collision-free trajectory
-       │
-       └── Sends FollowJointTrajectory Action Goal
-             │
-             └── follow_joint_trajectory_server
-                   │
-                   ├── Converts trajectory to WMX3 CSplinePos command
-                   ├── Executes via AdvancedMotion API
-                   └── Returns result (success/failure)
-                         │
-                         EtherCAT → Servo Drives → Robot Motion
+.. image:: /_static/images/moveIt2_trajectory_flow.png
+   :alt: MoveIt2 integration — end-to-end data flow
+   :class: with-border
+   :align: center
 
 Prerequisites
 -------------
@@ -75,7 +61,6 @@ Usage
 
    .. code-block:: bash
 
-      # Intel platform example
       sudo --preserve-env=PATH \
            --preserve-env=AMENT_PREFIX_PATH \
            --preserve-env=COLCON_PREFIX_PATH \
@@ -89,7 +74,7 @@ Usage
            bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
                     source ~/wmx_ros2_ws/install/setup.bash && \
                     ros2 launch wmx_ros2_package \
-                      wmx_ros2_intel_manipulator_cr3a.launch.py \
+                      wmx_ros2_cr3a_manipulator.launch.py \
                       use_sim_time:=false"
 
 2. Launch MoveIt2 with your robot's MoveIt configuration package.

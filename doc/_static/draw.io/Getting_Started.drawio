@@ -1,0 +1,65 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram name="Page-1" id="XtYsEBrx1kEfSFTFPLxJ">
+    <mxGraphModel dx="786" dy="494" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-7" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ODAoTMuPnSRSwLSKrWtA-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="-1-&amp;nbsp;&lt;div&gt;Verify System&lt;div&gt;Requirements&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="80" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-8" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ODAoTMuPnSRSwLSKrWtA-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="-2-&amp;nbsp;&lt;div&gt;Install&amp;nbsp;&lt;/div&gt;&lt;div&gt;ROS2&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="294" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-14" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ODAoTMuPnSRSwLSKrWtA-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="-3-&amp;nbsp;&lt;div&gt;Install Additional&lt;/div&gt;&lt;div&gt;Dependencies&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="510" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-15" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="ODAoTMuPnSRSwLSKrWtA-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="-4-&amp;nbsp;&lt;div&gt;Setup&amp;nbsp;&lt;/div&gt;&lt;div&gt;Workspace&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="510" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-17" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ODAoTMuPnSRSwLSKrWtA-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="-5-&amp;nbsp;&lt;div&gt;Configure Environment&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="300" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-20" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ODAoTMuPnSRSwLSKrWtA-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-22" connectable="0" parent="ODAoTMuPnSRSwLSKrWtA-20" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="No" vertex="1">
+          <mxGeometry relative="1" x="-0.2369" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-21" edge="1" parent="1" source="ODAoTMuPnSRSwLSKrWtA-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="ODAoTMuPnSRSwLSKrWtA-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-23" connectable="0" parent="ODAoTMuPnSRSwLSKrWtA-21" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Yes" vertex="1">
+          <mxGeometry relative="1" x="-0.2657" y="-3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-16" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Real&amp;nbsp;&lt;div&gt;Hardware?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="100" x="310" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="-6b-&amp;nbsp;&lt;div&gt;Operate Real&lt;/div&gt;&lt;div&gt;Robot&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="430" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="ODAoTMuPnSRSwLSKrWtA-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="-6a-&amp;nbsp;&lt;div&gt;Simulator&lt;/div&gt;&lt;div&gt;(Isaac/Gazebo)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="180" y="440" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

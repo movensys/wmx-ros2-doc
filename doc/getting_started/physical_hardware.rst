@@ -1,5 +1,5 @@
-Launch with Physical Hardware
-==============================
+Testing with Real Robot
+========================
 
 Prerequisites
 -------------
@@ -18,8 +18,9 @@ EtherCAT Wiring
    ┌──────────────┐    Ethernet     ┌──────────┐    ┌──────────┐         ┌──────────┐
    │  Compute PC  │────(EtherCAT)──►│ Servo J1 │───►│ Servo J2 │── ... ──│ Servo J6 │
    │  (dedicated  │                 └──────────┘    └──────────┘         └──────────┘
-   │   NIC port)  │                     │
-   └──────────────┘              Gripper I/O module
+   │   NIC port)  │
+   └──────────────┘
+
 
 - Use a **dedicated Ethernet port** for EtherCAT
 - Servo drives are daisy-chained (each drive has IN and OUT ports)
@@ -50,8 +51,6 @@ Configuration
 Launch Commands
 ----------------
 
-**Intel Platform:**
-
 .. code-block:: bash
 
    sudo --preserve-env=PATH \
@@ -66,27 +65,9 @@ Launch Commands
         --preserve-env=RMW_IMPLEMENTATION \
         bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
                  source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package wmx_ros2_intel_manipulator_cr3a.launch.py \
+                 ros2 launch wmx_ros2_package wmx_ros2_cr3a_manipulator.launch.py \
                  use_sim_time:=false"
 
-**NVIDIA Jetson Orin Platform:**
-
-.. code-block:: bash
-
-   sudo --preserve-env=PATH \
-        --preserve-env=AMENT_PREFIX_PATH \
-        --preserve-env=COLCON_PREFIX_PATH \
-        --preserve-env=PYTHONPATH \
-        --preserve-env=LD_LIBRARY_PATH \
-        --preserve-env=ROS_DISTRO \
-        --preserve-env=ROS_VERSION \
-        --preserve-env=ROS_PYTHON_VERSION \
-        --preserve-env=ROS_DOMAIN_ID \
-        --preserve-env=RMW_IMPLEMENTATION \
-        bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
-                 source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package wmx_ros2_orin_manipulator_cr3a.launch.py \
-                 use_sim_time:=false"
 
 Startup Sequence
 -----------------

@@ -51,6 +51,13 @@ Each stage can run in three environments:
 Architecture
 ------------
 
+.. figure:: /_static/images/Intel_manipulator_example.png
+   :alt: Intel Manipulator architecture example
+   :align: center
+
+   Intel Manipulator — system architecture overview
+
+
 Packages
 ^^^^^^^^
 

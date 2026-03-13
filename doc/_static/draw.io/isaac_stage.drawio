@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram name="Page-1" id="b3YVEx4VxkkW_zfdpi86">
+    <mxGraphModel dx="786" dy="494" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LbrsOriI_48QPwDwE2KK-6" edge="1" parent="1" source="LbrsOriI_48QPwDwE2KK-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LbrsOriI_48QPwDwE2KK-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-7" connectable="0" parent="LbrsOriI_48QPwDwE2KK-6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;nbsp;+ GPU Planner&amp;nbsp;" vertex="1">
+          <mxGeometry relative="1" x="0.04" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;shadow=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Stage 1&lt;div&gt;Basic Trajectory&amp;nbsp;&lt;/div&gt;&lt;div&gt;Moveit2 Planner (OMPL)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="40" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-11" edge="1" parent="1" source="LbrsOriI_48QPwDwE2KK-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LbrsOriI_48QPwDwE2KK-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-13" connectable="0" parent="LbrsOriI_48QPwDwE2KK-11" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="+ Camera Vision" vertex="1">
+          <mxGeometry relative="1" x="-0.1667" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;shadow=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Stage 2&lt;div&gt;cumotion planning&lt;/div&gt;&lt;div&gt;isaac_ros_cumotion&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="40" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-12" edge="1" parent="1" source="LbrsOriI_48QPwDwE2KK-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="LbrsOriI_48QPwDwE2KK-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-14" connectable="0" parent="LbrsOriI_48QPwDwE2KK-12" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="+ Depth camera + 3D mapping" vertex="1">
+          <mxGeometry relative="1" x="-0.1333" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;shadow=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Stage 3&lt;div&gt;AprilTag Pick &amp;amp; Place&lt;/div&gt;&lt;div&gt;isaac_ros_apriltag&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="40" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="LbrsOriI_48QPwDwE2KK-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;shadow=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Stage 4&lt;div&gt;Nvblox obstacle avoidance&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="40" y="450" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

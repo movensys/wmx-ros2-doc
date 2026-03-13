@@ -15,7 +15,6 @@ platform over EtherCAT. The current supported robot is the **Dobot CR3A**.
 - Explore :doc:`integration/integration` for MoveIt2 and Isaac cuMotion planning.
 - Check the :doc:`api_reference/api_reference` for ROS2 services, topics, and actions.
 - See :doc:`examples/examples` for real-world application demos.
-- Reference :doc:`deployment/deployment` for source build, Debian, and Docker options.
 - Scan through :doc:`troubleshooting/troubleshooting` for answers to common issues.
 
 .. toctree::
@@ -26,6 +25,5 @@ platform over EtherCAT. The current supported robot is the **Dobot CR3A**.
    integration/integration
    api_reference/api_reference
    examples/examples
-   deployment/deployment
    support
    about
