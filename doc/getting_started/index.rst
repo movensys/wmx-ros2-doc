@@ -13,22 +13,6 @@ Follow the steps in order. At step 6 choose the path that matches your setup
 
    Getting Started — step-by-step flow
 
-.. container:: on-this-page
-
-   **On this page**
-
-   .. container:: on-this-page__links
-
-      | :doc:`system_requirements`
-      | :doc:`install_ros2`
-      | :doc:`install_wmx3`
-      | :doc:`install_dependencies`
-      | :doc:`create_workspace`
-      | :doc:`configure_environment`
-      | :doc:`simulation_hardware`
-      | :doc:`physical_hardware`
-      | :doc:`communication`
-
 .. toctree::
    :maxdepth: 1
    :hidden:
