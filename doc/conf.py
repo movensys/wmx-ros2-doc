@@ -21,6 +21,7 @@ source_suffix = {
 
 rst_prolog = """
 .. role:: bi
+.. role:: red
 """
 
 templates_path = ['_templates']

@@ -378,6 +378,11 @@ code.literal {
     font-style: italic;
 }
 
+/* ---------- Red inline role ---------- */
+.red {
+    color: #cc0000;
+}
+
 /* ---------- Selection highlight ---------- */
 ::selection {
     background-color: rgba(109, 193, 63, 0.25);
