@@ -4,29 +4,35 @@ WMX ROS2 Documentation
 Overview
 ----------------------------------------
 
-:red:`opening`
-Welcome to the WMX ROS2 documentation. This project provides ROS2 packages
-for controlling various robot platforms through the WMX motion control platform over EtherCAT. 
-
-:red:`what is problem`
-may robotics hard to go to industrial application due to requirement for deterministic 
+Welcome to the WMX ROS2 documentation. Between ROS2 trajectory planners
+(MoveIt2, Nav2) and industrial servo drives sits a layer most motion stacks
+leave empty: deterministic, scan-rate command execution. Existing
+``ros2_control`` hardware interfaces either talk TCP/IP to a closed controller,
+or expose raw EtherCAT cyclic access without motion profile generation. This
+project provides the missing layer.
 
 What is wmx-ros2
 ----------------------------------------
 
-:red:`what is wmx-ros2`
-In this project, wmx-ros2 is a package that wrapped WMX with ROS2 framework. It has common nodes such as joint trajectory controller, joint state broadcaster, etc.
-It provides simulation, hardware in loop and real world deployment. 
+wmx-ros2 is an MIT-licensed ROS2 package that handles trajectory interpolation,
+multi-axis coordination, and scan-rate EtherCAT command generation in a
+single-PC architecture. It exposes two modes: a ``ros2_control``
+``SystemInterface`` plugin for use with standard controllers
+(``JointTrajectoryController``, ``DiffDriveController``), and a native execution
+mode that bypasses the per-cycle ``ros2_control`` loop for latency-critical
+workloads. It runs in simulation, hardware-in-loop, and real EtherCAT
+deployment on x86 and Jetson under PREEMPT_RT.
 
-:red:`what is wmx`
-WMX is a deterministic motion control engine with over a decade of industrial deployment in semicondutor, manufacturing, and  precision robotics. 
-It uses Ethercat with deterministic real-time kernel system as the dominant industrial filedbus. 
-It has various motion profiling such as PVT (Position-Velocity-Time), multi-axis coordinated motion. 
-It can takes irregural axes trajectory points and generate exact cyclic commands at the scan rate. 
-It has free trial every 6 hours, only need to restart the engine.
+What is WMX
+----------------------------------------
 
-
-
+WMX is the deterministic motion control engine that wmx-ros2 sits on top of.
+It has over a decade of industrial deployment in semiconductor, manufacturing,
+and precision robotics, and uses EtherCAT under a real-time kernel as the
+fieldbus. It supports motion profiling such as PVT (Position-Velocity-Time)
+and multi-axis coordinated motion -- it takes irregular trajectory waypoints
+and generates exact cyclic commands at the scan rate. WMX is available as a
+free, full-featured download with a renewable time-limited license.
 
 
 
