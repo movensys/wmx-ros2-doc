@@ -18,8 +18,8 @@ Follow the steps in order. At step 6 choose the path that matches your setup
    :hidden:
 
    system_requirements
-   install_ros2
    install_wmx3
+   install_ros2
    install_dependencies
    create_workspace
    configure_environment
