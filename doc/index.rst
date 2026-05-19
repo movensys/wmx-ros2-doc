@@ -33,22 +33,20 @@ without a separate motion controller.
 Overview
 ----------------------------------------
 
-In a ROS2 motion stack, a planner such as MoveIt2 or Nav2 generates a
-trajectory and `ros2_control <https://control.ros.org/>`_ sends the joint
-commands to the hardware in real time. What comes next is the harder part
-because those commands still need to reach the motors as precisely timed
-signals and ROS2 alone does not handle this step.
+In a ROS2 motion stack a planner such as MoveIt2 or Nav2 generates a
+trajectory and `ros2_control <https://control.ros.org/>`_ sends joint
+commands to the hardware. Turning those commands into the precisely timed
+signals that motors actually execute is the harder step and ROS2 alone
+does not provide it.
 
-Most ROS2 setups solve this in two common ways. One uses a closed
-industrial controller over TCP/IP which adds latency and keeps the motion
-logic outside ROS2. The other sends raw commands directly over EtherCAT
-which works but leaves trajectory smoothing to the planner. Both are
-practical for many cases yet become limiting when timing precision is
-critical.
+Most setups address this with a closed industrial controller over TCP/IP
+which adds latency, or with raw EtherCAT commands which leave trajectory
+smoothing to the planner. Both become limiting when timing precision
+matters.
 
-wmx-ros2 fills this gap. It connects the WMX motion control engine to
-ROS2 so the planner's output runs as smooth and deterministic motion on
-real hardware while staying inside the ROS2 ecosystem.
+wmx-ros2 fills this gap by connecting the WMX motion control engine to
+ROS2 so the planner's output runs as smooth and deterministic motion
+while staying inside the ROS2 ecosystem.
 
 What is wmx-ros2?
 ----------------------------------------
@@ -58,14 +56,6 @@ timing sensitive parts of robot motion: smoothing trajectories,
 coordinating multiple joints, and generating commands at the rate that the
 hardware expects.
 
-It can be used in two modes:
-
-* **``ros2_control`` plugin mode.** Used alongside standard controllers
-  such as ``JointTrajectoryController`` or ``DiffDriveController`` to
-  integrate with an existing ``ros2_control`` setup.
-* **Native mode.** Full trajectories are sent directly to WMX, bypassing
-  the per cycle ``ros2_control`` loop for latency sensitive applications.
-
 wmx-ros2 runs in simulation, in hardware in the loop configurations, and
 on real EtherCAT hardware. Supported platforms include x86 PCs and NVIDIA
 Jetson boards running a real time Linux kernel (PREEMPT_RT).
@@ -74,21 +64,15 @@ What is WMX?
 ----------------------------------------
 
 WMX is the motion control engine that wmx-ros2 is built on. It exposes
-more than 200 APIs that cover the full motion control stack, including
-trajectory conversion, EtherCAT network configuration, I/O handling, and
-engine control. The whole engine runs on a deterministic real-time cycle
-to meet the timing requirements of motion hardware.
+more than 200 APIs covering trajectory conversion, EtherCAT network
+configuration, I/O, and engine control, all on a deterministic real-time
+cycle. WMX has over a decade of deployment in semiconductor equipment,
+manufacturing lines, and precision robotics, and supports motion profiles
+such as Position Velocity Time (PVT) and multi axis coordinated motion.
 
-WMX has been deployed for more than a decade in industrial settings such
-as semiconductor equipment, manufacturing lines, and precision robotics,
-where microsecond level timing accuracy is required. It provides motion
-profiling features such as Position Velocity Time (PVT) profiles and
-multi axis coordinated motion.
-
-The free license runs for 6 hours per session and continues simply by
-restarting the EtherCAT communication, which makes it suitable for
-development and evaluation use. A separate commercial license removes
-this 6 hour limit and is intended for business and production deployment.
+The free license runs in 6 hour sessions and continues by restarting the
+EtherCAT communication. A separate commercial license removes this limit
+for business and production use.
 
 
 
