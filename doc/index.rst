@@ -3,9 +3,7 @@ WMX ROS2 Documentation
 
 Welcome to the WMX ROS2 documentation. This project provides ROS2
 packages for controlling robot platforms through the WMX motion control
-engine over EtherCAT. 
-
-It is intended for applications that require deterministic, high precision
+engine over EtherCAT. It is intended for applications that require deterministic, high precision
 motion, such as manufacturing automation, semiconductor equipment, and
 surgical robotics.
 
@@ -19,11 +17,18 @@ wmx-ros2 integrates with widely used projects in the ROS2 ecosystem:
 * `YOLO <https://docs.ultralytics.com/>`_ for real time object detection
 * `Intel OpenVINO <https://docs.openvino.ai/>`_ for optimized inference on
   CPU and integrated accelerators
-* Multimodal large language models (LLMs) for natural language task
-  specification and high level reasoning
+* Multimodal large language models (LLMs) and vision language models
+  (VLMs) for natural language task specification and high level reasoning
 
 The entire stack runs on a single industrial PC (IPC) or edge device
 without a separate motion controller.
+
+.. figure:: /_static/images/wmx-ros2_overview.drawio.png
+   :alt: wmx-ros2 architecture overview
+   :align: center
+   :width: 100%
+
+   wmx-ros2 architecture overview.
 
 Overview
 ----------------------------------------
