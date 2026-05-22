@@ -19,9 +19,6 @@ Follow the steps in order. At step 6 choose the path that matches your setup
 
    system_requirements
    install_wmx3
-   install_ros2
-   install_dependencies
-   create_workspace
    configure_environment
    simulation_hardware
    physical_hardware

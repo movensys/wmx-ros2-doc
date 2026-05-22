@@ -1,3 +1,5 @@
+:tocdepth: 1
+
 System Requirements
 ===================
 
@@ -23,7 +25,7 @@ and physical servo drives.
   robot-agnostic; only configuration files differ between robots
 
 The WMX runtime (LMX) must be installed at ``/opt/wmx3/`` before building or
-running the WMX ROS2 packages. See :doc:`install_dependencies` for verification
+running the WMX ROS2 packages. See :doc:`install_wmx3` for verification
 steps.
 
 Operating System
@@ -59,10 +61,10 @@ ROS2 Distribution
    * - Distribution
      - Ubuntu Version
      - Platform
-   * - ROS2 Humble Hawksbill
+   * - `ROS2 Humble Hawksbill <https://docs.ros.org/en/humble/index.html>`_
      - Ubuntu 22.04
      - NVIDIA Jetson Orin, Intel x86_64
-   * - ROS2 Jazzy Jalisco
+   * - `ROS2 Jazzy Jalisco <https://docs.ros.org/en/jazzy/index.html>`_
      - Ubuntu 24.04
      - Intel x86_64
 

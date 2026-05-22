@@ -11,6 +11,7 @@ extensions = [
     'sphinx.ext.intersphinx',# Cross-reference other Sphinx docs
     'sphinx.ext.todo',       # TODO directives
     'sphinxcontrib.mermaid', # Mermaid diagram support
+    'sphinx_design',         # Tabs, cards, grids
 ]
 
 # Markdown support
