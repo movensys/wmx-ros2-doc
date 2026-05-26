@@ -37,15 +37,15 @@ Why need a Real-Time OS?
 
 Industrial automation requires deterministic and high precision motion
 as a baseline. The drives that move a robot expect a new command at a
-fixed interval, for example every 1 millisecond. If a command arrives
+fixed interval. If a command arrives
 late the motion stutters, accuracy drops, and on a production line the
-drives can fault and stop the machine in the middle of a part. A
+drives can fault and stop the machine in the middle of process. A
 standard Linux kernel is built for throughput rather than keeping a
-strict schedule, so it can pause your program for a few milliseconds
+strict schedule, so it can pause the program for a few milliseconds
 to handle a network packet or a background task. Those few
 milliseconds are exactly what causes a missed cycle. A Real-Time OS
 such as Linux with the PREEMPT_RT patch
-guarantees that high priority threads such as the WMX motion control
+guarantees that high priority threads for motion control
 thread run when they need to, even if the rest of the system is busy.
 That is why every industrial motion stack runs on top of a Real-Time
 OS.
@@ -64,7 +64,7 @@ TCP/IP. That choice adds latency the planner can never recover. The
 other common option sends raw EtherCAT commands and leaves smoothing
 and coordination to ROS2 which is not built for hard real-time work.
 Either approach becomes the limiting factor once a line needs the cycle
-accuracy that production equipment depends on. wmx-ros2 closes the gap
+accuracy that production equipment depends on. The wmx-ros2 package closes the gap
 by bringing the WMX motion control engine into ROS2 so the planner's
 output runs as smooth and deterministic motion without leaving the ROS2
 ecosystem.
@@ -72,7 +72,7 @@ ecosystem.
 What is wmx-ros2?
 ----------------------------------------
 
-wmx-ros2 is the open source MIT-licensed ROS2 package layer that owns
+The wmx-ros2 is the open source MIT-licensed ROS2 package layer that owns
 the timing-sensitive part of that pipeline. It smooths trajectories,
 coordinates multiple joints, and emits commands at the rate the drives
 expect. It runs in simulation, in hardware-in-the-loop configurations,
@@ -91,8 +91,7 @@ configuration, I/O, and engine control on a deterministic real-time
 cycle. It supports motion profiles such as Position Velocity Time (PVT)
 and multi-axis coordinated motion. WMX has over a decade of deployment
 in semiconductor equipment, manufacturing lines, and precision
-robotics. The engine that ROS2 nodes sit on top of is the same one
-already proven on the factory floor. The free license runs in 1-hour
+robotics. The free license runs in 1-hour
 sessions and continues by restarting EtherCAT communication. A separate
 commercial license removes this limit for business and production use.
 
