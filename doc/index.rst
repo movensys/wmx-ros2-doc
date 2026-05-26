@@ -3,10 +3,12 @@ WMX ROS2 Documentation
 
 Welcome to the WMX ROS2 documentation. This project provides ROS2
 packages for controlling robot platforms through the WMX motion control
-engine over EtherCAT. It is intended for applications that require deterministic, high precision
-motion, such as manufacturing automation and semiconductor equipment. 
-The entire stack runs on a single industrial PC (IPC) or edge device
-without a separate motion controller.
+engine over EtherCAT. It targets industrial applications that require
+deterministic and high precision motion, such as semiconductor
+equipment, manufacturing automation, and precision robotics. The entire
+stack runs on a single industrial PC (IPC) or edge device with no
+separate motion controller. A Real-Time OS is required
+so that motion timing stays predictable under load.
 
 wmx-ros2 integrates with widely used projects in the ROS2 ecosystem:
 
@@ -30,44 +32,69 @@ wmx-ros2 integrates with widely used projects in the ROS2 ecosystem:
 
    wmx-ros2 architecture overview.
 
+Why need a Real-Time OS?
+----------------------------------------
+
+Industrial automation requires deterministic and high precision motion
+as a baseline. The drives that move a robot expect a new command at a
+fixed interval, for example every 1 millisecond. If a command arrives
+late the motion stutters, accuracy drops, and on a production line the
+drives can fault and stop the machine in the middle of a part. A
+standard Linux kernel is built for throughput rather than keeping a
+strict schedule, so it can pause your program for a few milliseconds
+to handle a network packet or a background task. Those few
+milliseconds are exactly what causes a missed cycle. A Real-Time OS
+such as Linux with the PREEMPT_RT patch
+guarantees that high priority threads such as the WMX motion control
+thread run when they need to, even if the rest of the system is busy.
+That is why every industrial motion stack runs on top of a Real-Time
+OS.
+
 Why wmx-ros2?
 ----------------------------------------
 
-In a ROS2 motion stack a planner such as MoveIt2 or Nav2 generates a
-trajectory and `ros2_control <https://control.ros.org/>`_ sends joint
-commands to the hardware. Those commands must then be translated into the
-precisely timed signals that motors actually execute, which is the harder
-step and one that ROS2 alone does not provide. Most setups address this
-with a closed industrial controller over TCP/IP which adds latency, or
-with raw EtherCAT commands which leave trajectory smoothing to the
-planner, and both become limiting when timing precision matters. wmx-ros2
-fills this gap by connecting the WMX motion control engine to ROS2 so the
-planner's output runs as smooth and deterministic motion while staying
-inside the ROS2 ecosystem.
+A Real-Time OS handles the kernel-level guarantees, but the motion
+pipeline still has a step that ROS2 alone does not cover. A planner
+such as MoveIt2 or Nav2 produces a trajectory and
+`ros2_control <https://control.ros.org/>`_ hands joint commands to the
+hardware. Those commands still need to be translated into the precisely
+timed signals that drives execute on a fixed cycle. Most ROS2 setups
+close this execution gap with a closed industrial controller over
+TCP/IP. That choice adds latency the planner can never recover. The
+other common option sends raw EtherCAT commands and leaves smoothing
+and coordination to ROS2 which is not built for hard real-time work.
+Either approach becomes the limiting factor once a line needs the cycle
+accuracy that production equipment depends on. wmx-ros2 closes the gap
+by bringing the WMX motion control engine into ROS2 so the planner's
+output runs as smooth and deterministic motion without leaving the ROS2
+ecosystem.
 
 What is wmx-ros2?
 ----------------------------------------
 
-wmx-ros2 is an open source, MIT licensed ROS2 package that handles the
-timing sensitive parts of robot motion: smoothing trajectories,
-coordinating multiple joints, and generating commands at the rate that the
-hardware expects. It runs in simulation, in hardware in the loop
-configurations, and on real EtherCAT hardware, with supported platforms
-including x86 PCs and NVIDIA Jetson boards running a real time Linux
-kernel (PREEMPT_RT).
+wmx-ros2 is the open source MIT-licensed ROS2 package layer that owns
+the timing-sensitive part of that pipeline. It smooths trajectories,
+coordinates multiple joints, and emits commands at the rate the drives
+expect. It runs in simulation, in hardware-in-the-loop configurations,
+and on real EtherCAT hardware. Supported platforms include x86
+industrial PCs and NVIDIA Jetson boards running a real-time Linux
+kernel (PREEMPT_RT). The same package moves from a developer's bench to
+a production cell without rewriting the motion layer.
 
 What is WMX?
 ----------------------------------------
 
-WMX is the motion control engine that wmx-ros2 is built on. It exposes
+WMX is the motion control engine underneath wmx-ros2 and the reason it
+can hold an industrial cycle on top of the Real-Time OS. It exposes
 more than 200 APIs covering trajectory conversion, EtherCAT network
-configuration, I/O, and engine control, all on a deterministic real-time
-cycle, and supports motion profiles such as Position Velocity Time (PVT)
-and multi axis coordinated motion. WMX has over a decade of deployment in
-semiconductor equipment, manufacturing lines, and precision robotics. The
-free license runs in 1 hour sessions and continues by restarting the
-EtherCAT communication, while a separate commercial license removes this
-limit for business and production use.
+configuration, I/O, and engine control on a deterministic real-time
+cycle. It supports motion profiles such as Position Velocity Time (PVT)
+and multi-axis coordinated motion. WMX has over a decade of deployment
+in semiconductor equipment, manufacturing lines, and precision
+robotics. The engine that ROS2 nodes sit on top of is the same one
+already proven on the factory floor. The free license runs in 1-hour
+sessions and continues by restarting EtherCAT communication. A separate
+commercial license removes this limit for business and production use.
 
 
 
