@@ -46,7 +46,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/movensys/wmx_ros2_doc",
+            "url": "https://github.com/movensys/wmx-ros2-doc",
             "icon": "fa-brands fa-github",
             "type": "fontawesome",
         },
@@ -78,3 +78,8 @@ html_context = {
 intersphinx_mapping = {
     'ros2': ('https://docs.ros.org/en/humble/', None),
 }
+
+# -- Options for linkcheck builder ------------------------------------------
+linkcheck_auth = [
+    (r'http://download\.movensys\.com.*', ('guest', 'guest')),
+]

@@ -18,7 +18,7 @@ wmx-ros2 integrates with widely used projects in the ROS2 ecosystem:
 * `NVIDIA Isaac ROS <https://developer.nvidia.com/isaac/ros>`_ for GPU
   accelerated perception
 * `YOLO <https://docs.ultralytics.com/>`_ for real time object detection
-* `Intel OpenVINO <https://docs.openvino.ai/>`_ for optimized inference on
+* `Intel OpenVINO <https://docs.openvino.ai/2026/index.html>`_ for optimized inference on
   CPU and integrated accelerators
 * Multimodal large language models (LLMs) and vision language models
   (VLMs) for natural language task specification and high level reasoning

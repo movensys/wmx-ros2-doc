@@ -11,5 +11,5 @@ cuMotion GPU-accelerated planning.
 
 **Contact:**
 
-- Website: `movensys.com <https://www.movensys.com>`_
-- Documentation issues: `GitHub Issues <https://github.com/movensys/wmx_ros2_doc/issues>`_
+- Website: `movensys.com <https://www.movensys.com/en/>`_
+- Documentation issues: `GitHub Issues <https://github.com/movensys/wmx-ros2-doc/issues>`_
