@@ -2,9 +2,7 @@ name: Lint
 
 on:
   pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+    branches: [main, devel]
 
 defaults:
   run:
