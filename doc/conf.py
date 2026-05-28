@@ -80,6 +80,8 @@ intersphinx_mapping = {
 }
 
 # -- Options for linkcheck builder ------------------------------------------
-linkcheck_auth = [
-    (r'http://download\.movensys\.com.*', ('guest', 'guest')),
+# The WMX3 installer downloads sit behind WebDAV basic auth (guest/guest)
+# that the linkcheck HEAD probe cannot satisfy, so skip them.
+linkcheck_ignore = [
+    r'^http://download\.movensys\.com:8111/.*',
 ]
