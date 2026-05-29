@@ -16,7 +16,8 @@ Every manipulator scenario runs in three execution modes:
 - **HIL** -- hardware-in-the-loop: simulator visuals with the real WMX runtime
 - **Real** -- the real robot via WMX over EtherCAT
 
-.. rubric:: Common requirements
+Common Requirements
+-------------------
 
 - The core WMX ROS2 packages built and the LMX (WMX Runtime) at ``/opt/wmx3/``
   (see :doc:`../getting_started/index`)
@@ -26,7 +27,8 @@ Every manipulator scenario runs in three execution modes:
 - The `movensys-simulation <https://github.com/movensys/movensys-simulation>`_
   repo for the Isaac Sim scenes
 
-.. rubric:: Manipulator setup
+Manipulator Setup
+-----------------
 
 Clone ``movensys-manipulator`` and configure the host environment, then build
 and start the container and enter it with the ``mros`` helper (host setup is in
@@ -57,7 +59,8 @@ HIL and Real modes, the manipulator is brought up with WMX ROS2 (see
    Sim 5.0.0+ with the ``isaacsim.ros2.bridge`` extension enabled. See the
    repository README for the full Isaac Sim setup.
 
-.. rubric:: Supported Configurations
+Supported Configurations
+------------------------
 
 **Framework support:**
 
@@ -112,6 +115,23 @@ HIL and Real modes, the manipulator is brought up with WMX ROS2 (see
    * - AprilTag pick and place with obstacle avoidance
      - ✓
      -
+
+Development Roadmap
+-------------------
+
+The examples are under active development. Planned and in-progress work
+includes:
+
+- **Dobot CR5A scenario coverage** -- extending AprilTag pick-and-place,
+  obstacle avoidance, and YOLO detection to the CR5A, which currently supports
+  trajectory planning only.
+- **Framework portability** -- bringing the obstacle-avoidance scenarios to the
+  ``general`` (non-Isaac-ROS) build, in addition to the Isaac ROS images.
+- **Mobile-base support** -- a differential-drive base driven by the same WMX
+  ROS2 stack (the WMX parameter set is already staged in the repository).
+- **Intelligence applications** -- further VLM/LLM-driven applications building
+  on the natural-language and vision control stack beyond the
+  :doc:`robopoly_game`.
 
 .. toctree::
    :maxdepth: 1

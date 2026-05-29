@@ -89,7 +89,8 @@ Where to go next
 ----------------------------------------
 
 * Follow the :doc:`getting_started/index` guide to set up the environment and run the package.
-* See :doc:`integration/integration` for current and planned integration scenarios.
+* Work through the :doc:`examples/examples` to run trajectory, perception, and intelligence demos.
+* See :doc:`integration/integration` for the supported motion-planning and application integrations.
 * Refer to the :doc:`api_reference/api_reference` for ROS2 services, topics, and actions.
 * Consult :doc:`support` for common issues and their resolutions.
 
