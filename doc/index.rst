@@ -103,6 +103,7 @@ Where to go next
 
    getting_started/index
    integration/integration
+   packages/packages
    api_reference/api_reference
    support
    about

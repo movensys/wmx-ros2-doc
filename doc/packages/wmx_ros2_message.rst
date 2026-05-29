@@ -9,6 +9,19 @@ interfaces used by all nodes in the WMX ROS2 application. It contains no
 executable nodes -- only interface definitions that are compiled into C++
 and Python bindings by ``rosidl``.
 
+**Package Metadata:**
+
+.. list-table::
+   :widths: 25 75
+
+   * - **Package Name**
+     - ``wmx_ros2_message``
+   * - **Version**
+     - 0.1.0
+   * - **License**
+     - MIT
+   * - **Build Type**
+     - ``ament_cmake``
 
 Package Structure
 -----------------
@@ -23,9 +36,19 @@ Package Structure
    │   ├── AxisState.msg
    │   └── AxisVelocity.msg
    └── srv/
+       ├── SetEngine.srv
        ├── SetAxis.srv
        ├── SetAxisGearRatio.srv
-       └── SetEngine.srv
+       ├── LoadWmxParams.srv
+       ├── GetWmxParams.srv
+       ├── GetIoBit.srv
+       ├── GetIoBytes.srv
+       ├── SetIoBit.srv
+       ├── SetIoBytes.srv
+       ├── EcatGetNetworkState.srv
+       ├── EcatRegisterRead.srv
+       ├── EcatResetStatistics.srv
+       └── EcatStartHotconnect.srv
 
 Dependencies
 ------------
@@ -40,21 +63,18 @@ Dependencies
    * - ``ament_cmake``
      - buildtool
      - CMake build system
-   * - ``rclcpp``
-     - build + exec
-     - ROS2 C++ client library
    * - ``rosidl_default_generators``
      - build
      - Message/service code generation
+   * - ``std_msgs``
+     - depend
+     - ``std_msgs/Header`` used by ``AxisState``
    * - ``rosidl_default_runtime``
      - exec
      - Runtime message type support
-   * - ``ament_lint_auto``
+   * - ``ament_lint_auto`` / ``ament_lint_common`` / ``ament_cmake_gtest``
      - test
-     - Automated linting
-   * - ``ament_lint_common``
-     - test
-     - Common lint rules
+     - Linting and tests
 
 The package is a member of the ``rosidl_interface_packages`` group, which
 allows other packages to discover its generated interfaces at build time.
@@ -65,91 +85,73 @@ Message Definitions
 AxisPose
 ^^^^^^^^^
 
-Used for absolute and relative position motion commands. Published to
-``/wmx/axis/position`` and ``/wmx/axis/position/relative``.
+Used for absolute and relative position motion commands. Subscribed by
+``wmx_core_motion_node`` on ``/wmx/axis/position`` and
+``/wmx/axis/position/relative``.
 
 .. code-block:: text
 
    int32[]   index       # Axis indices to command
    float64[] target      # Target positions (radians)
-   string    profile     # Motion profile type (reserved for future use)
    float64[] velocity    # Motion velocity per axis (rad/s)
    float64[] acc         # Acceleration per axis (rad/s²)
    float64[] dec         # Deceleration per axis (rad/s²)
 
 All array fields are parallel -- element ``i`` in each array corresponds to
-the same axis. The ``profile`` field is currently unused by the subscriber
-nodes.
-
-**Used by:**
-
-- ``wmx_core_motion_node`` -- subscribes on ``/wmx/axis/position`` and
-  ``/wmx/axis/position/relative``
-- ``wmx_core_motion_node`` -- publishes position and relative position
-  commands
+the same axis.
 
 AxisVelocity
 ^^^^^^^^^^^^^
 
-Used for continuous velocity motion commands. Published to
-``/wmx/axis/velocity``.
+Used for continuous velocity motion commands. Subscribed by
+``wmx_core_motion_node`` on ``/wmx/axis/velocity``.
 
 .. code-block:: text
 
    int32[]   index       # Axis indices to command
-   string    profile     # Motion profile type (reserved for future use)
    float64[] velocity    # Target velocity per axis (rad/s)
    float64[] acc         # Acceleration per axis (rad/s²)
    float64[] dec         # Deceleration per axis (rad/s²)
 
-**Used by:**
-
-- ``wmx_core_motion_node`` -- subscribes on ``/wmx/axis/velocity``
-- ``wmx_core_motion_node`` -- publishes velocity commands
-
 AxisState
 ^^^^^^^^^^
 
-Comprehensive per-axis status feedback published at 100 Hz by the
+Comprehensive per-axis status feedback published at 100 Hz by
 ``wmx_core_motion_node`` on ``/wmx/axis/state``.
 
 .. code-block:: text
 
+   std_msgs/Header header
+
    # Status flags (per axis)
-   int32[]   amp_alarm        # Amplifier alarm active (1 = fault)
-   int32[]   servo_on         # Servo enabled (1 = on)
-   int32[]   home_done        # Homing completed (1 = done)
-   int32[]   in_pos           # At target position (1 = in position)
-   int32[]   negative_ls      # Negative limit switch (1 = triggered)
-   int32[]   positive_ls      # Positive limit switch (1 = triggered)
-   int32[]   home_switch      # Home switch (1 = triggered)
+   bool[] amp_alarm        # Amplifier alarm active
+   bool[] servo_on         # Servo enabled
+   bool[] home_done        # Homing completed
+   bool[] home_switch      # Home switch triggered
+   bool[] negative_ls      # Negative limit switch triggered
+   bool[] positive_ls      # Positive limit switch triggered
+   bool[] motion_complete  # Motion finished / in position
 
    # Command and feedback values (per axis)
    float64[] pos_cmd          # Commanded position (radians)
    float64[] velocity_cmd     # Commanded velocity (rad/s)
    float64[] actual_pos       # Actual encoder position (radians)
    float64[] actual_velocity  # Actual velocity (rad/s)
-   float64[] actual_torque    # Actual torque (Nm)
-
-The status flags use ``int32`` (not ``bool``) to match the WMX
-``CoreMotionStatus`` structure directly.
-
-**Used by:**
-
-- ``wmx_core_motion_node`` -- publishes on ``/wmx/axis/state`` at 100 Hz
+   float64[] actual_torque    # Actual torque
 
 Service Definitions
 -------------------
 
-SetEngine
-^^^^^^^^^^
+Engine
+^^^^^^^
 
-Controls the WMX engine lifecycle (device creation and communication).
+**SetEngine** -- controls the WMX engine lifecycle (device creation and
+communication). Used by ``/wmx/engine/set_device`` on ``wmx_engine_node``.
 
 .. code-block:: text
 
    # Request
-   bool   data      # true = create/start, false = close/stop
+   bool   data      # true = create device, false = close device
    string path      # WMX3 device path (e.g., "/opt/wmx3/")
    string name      # Device name identifier
    ---
@@ -157,56 +159,129 @@ Controls the WMX engine lifecycle (device creation and communication).
    bool   success   # true if operation succeeded
    string message   # Human-readable result description
 
-**Used by service:**
+Axis Control
+^^^^^^^^^^^^^
 
-- ``/wmx/engine/set_device`` (on ``wmx_core_motion_node``)
-
-SetAxis
-^^^^^^^^
-
-Generic per-axis control operations. The meaning of the ``data`` field
-depends on which service uses this type.
+**SetAxis** -- generic per-axis control. The meaning of ``data`` depends on
+the service using it.
 
 .. code-block:: text
 
-   # Request
    int32[] index    # Axis indices (e.g., [0, 1, 2, 3, 4, 5])
    int32[] data     # Per-axis values (meaning varies by service)
    ---
-   # Response
    bool   success   # true only if ALL axes succeeded
    string message   # Concatenated per-axis result messages
 
-**Used by services:**
+Used by ``/wmx/axis/set_on`` (1=enable / 0=disable), ``/wmx/axis/clear_alarm``
+(data unused), ``/wmx/axis/set_mode`` (0=position / 1=velocity),
+``/wmx/axis/set_polarity`` (1=normal / -1=reversed), and ``/wmx/axis/homing``
+(data unused).
 
-- ``/wmx/axis/set_on`` -- ``data``: 1 = enable, 0 = disable
-- ``/wmx/axis/clear_alarm`` -- ``data``: not used (pass zeros)
-- ``/wmx/axis/set_mode`` -- ``data``: 0 = position, 1 = velocity
-- ``/wmx/axis/set_polarity`` -- ``data``: 1 = normal, -1 = reversed
-- ``/wmx/axis/homing`` -- ``data``: not used (pass zeros)
-
-SetAxisGearRatio
-^^^^^^^^^^^^^^^^^
-
-Configures the encoder gear ratio for each axis, mapping encoder counts to
-physical units (radians).
+**SetAxisGearRatio** -- configures the encoder gear ratio per axis. Used by
+``/wmx/axis/set_gear_ratio``.
 
 .. code-block:: text
 
-   # Request
    int32[]   index         # Axis indices
    float64[] numerator     # Gear ratio numerators
-   float64[] denumerator   # Gear ratio denominators
+   float64[] denominator   # Gear ratio denominators
    ---
-   # Response
-   bool   success          # true only if ALL axes succeeded
-   string message          # Concatenated per-axis result messages
+   bool   success
+   string message
 
-The effective gear ratio per axis is ``numerator / denumerator``.
+Parameters
+^^^^^^^^^^^
 
-**Used by service:**
+**LoadWmxParams** -- load axis parameters from a WMX3 XML file
+(``/wmx/params/load``).
 
-- ``/wmx/axis/set_gear_ratio`` (on ``wmx_core_motion_node``)
+.. code-block:: text
+
+   string file_path   # absolute path to the WMX3 XML parameter file
+   ---
+   bool   success
+   string message
+
+**GetWmxParams** -- retrieve active axis parameters as text
+(``/wmx/params/get``).
+
+.. code-block:: text
+
+   int32[] index          # axis indices to report
+   ---
+   bool     success
+   string   message
+   string[] params_dump   # formatted, human-readable parameter dump
+
+I/O
+^^^
+
+**GetIoBit** / **SetIoBit** -- read/write a single digital I/O bit.
+
+.. code-block:: text
+
+   # GetIoBit request          # SetIoBit request
+   int32 byte                  int32 byte
+   int32 bit                   int32 bit
+   ---                         int32 value
+   bool   success              ---
+   int32  value                bool   success
+   string message              string message
+
+**GetIoBytes** / **SetIoBytes** -- read/write a contiguous block of I/O bytes.
+
+.. code-block:: text
+
+   # GetIoBytes request        # SetIoBytes request
+   int32 byte                  int32 byte
+   int32 length                uint8[] data
+   ---                         ---
+   bool    success             bool   success
+   uint8[] data                string message
+   string  message
+
+EtherCAT
+^^^^^^^^^
+
+**EcatGetNetworkState** -- full master + per-slave network state.
+
+.. code-block:: text
+
+   int32 master_id
+   ---
+   bool   success
+   string message
+   int32  master_state      # 0=None 1=Init 2=Preop 4=Boot 8=Safeop 16=Op
+   int32  master_mode
+   uint32 comm_period
+   uint32 total_axes
+   uint32 packet_loss
+   uint32 over_cycle
+   int32  num_of_slaves
+   int32[]  slave_ids
+   int32[]  slave_states
+   bool[]   slave_offline
+   bool[]   slave_inaccessible
+   uint32[] slave_vendor_ids
+   uint32[] slave_product_codes
+   # (plus additional timing and addressing fields)
+
+**EcatRegisterRead** -- read raw register data from a slave.
+
+.. code-block:: text
+
+   int32 master_id
+   int32 slave_id
+   int32 reg_address   # 0x000–0xFFF
+   int32 length        # 1–4096 bytes
+   ---
+   bool    success
+   uint8[] data
+   string  message
+
+**EcatResetStatistics** / **EcatStartHotconnect** -- both take only
+``int32 master_id`` and return ``bool success`` + ``string message``.
 
 Building the Package
 --------------------
@@ -216,7 +291,7 @@ package depends on the generated message headers:
 
 .. code-block:: bash
 
-   cd ~/wmx_ros2_ws
+   cd ~/workspaces/movensys_ws
    colcon build --packages-select wmx_ros2_message
    source install/setup.bash
 
@@ -233,9 +308,19 @@ Expected:
    wmx_ros2_message/msg/AxisPose
    wmx_ros2_message/msg/AxisState
    wmx_ros2_message/msg/AxisVelocity
+   wmx_ros2_message/srv/EcatGetNetworkState
+   wmx_ros2_message/srv/EcatRegisterRead
+   wmx_ros2_message/srv/EcatResetStatistics
+   wmx_ros2_message/srv/EcatStartHotconnect
+   wmx_ros2_message/srv/GetIoBit
+   wmx_ros2_message/srv/GetIoBytes
+   wmx_ros2_message/srv/GetWmxParams
+   wmx_ros2_message/srv/LoadWmxParams
    wmx_ros2_message/srv/SetAxis
    wmx_ros2_message/srv/SetAxisGearRatio
    wmx_ros2_message/srv/SetEngine
+   wmx_ros2_message/srv/SetIoBit
+   wmx_ros2_message/srv/SetIoBytes
 
 Inspect a specific interface:
 

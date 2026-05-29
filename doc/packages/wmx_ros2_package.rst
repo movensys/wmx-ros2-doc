@@ -6,8 +6,19 @@ Overview
 
 The ``wmx_ros2_package`` is the main application package of the WMX ROS2
 system. It contains all executable nodes, launch files, and configuration
-files for operating a 6-DOF manipulator (Dobot CR3A) and an optional
-differential drive mobile base through the WMX motion control engine.
+files for driving robots — such as the Dobot CR3A and CR5A manipulators —
+through the WMX motion control engine over EtherCAT.
+
+The package provides two groups of nodes:
+
+- **General nodes** -- ``wmx_engine_node``, ``wmx_core_motion_node``,
+  ``wmx_io_node``, and ``wmx_ethercat_node`` expose the WMX engine, axis,
+  I/O, and EtherCAT interfaces as ROS2 services and topics. They are
+  robot-agnostic.
+- **Manipulator controllers** -- ``joint_state_broadcaster``,
+  ``joint_trajectory_controller``, and ``gripper_controller`` add joint-state
+  feedback, MoveIt2 trajectory execution, and gripper control for a specific
+  robot, configured from a per-robot YAML file.
 
 **Package Metadata:**
 
@@ -17,7 +28,9 @@ differential drive mobile base through the WMX motion control engine.
    * - **Package Name**
      - ``wmx_ros2_package``
    * - **Version**
-     - 0.0.1
+     - 0.1.0
+   * - **License**
+     - MIT
    * - **Build Type**
      - ``ament_cmake``
    * - **C++ Standard**
@@ -31,8 +44,6 @@ Package Structure
    wmx_ros2_package/
    ├── CMakeLists.txt
    ├── package.xml
-   ├── wmx_ros2_package/
-   │   └── __init__.py
    ├── include/
    │   ├── wmx_engine_node.hpp               # WmxEngineNode class definition
    │   ├── wmx_core_motion_node.hpp          # WmxCoreMotionNode class definition
@@ -40,23 +51,23 @@ Package Structure
    │   └── wmx_ethercat_node.hpp             # WmxEtherCatNode class definition
    ├── src/
    │   ├── wmx_engine_node.cpp               # Engine lifecycle node
-   │   ├── wmx_core_motion_node.cpp          # Axis control node
+   │   ├── wmx_core_motion_node.cpp          # Axis control + parameter node
    │   ├── wmx_io_node.cpp                   # Digital I/O node
    │   ├── wmx_ethercat_node.cpp             # EtherCAT diagnostics node
-   │   ├── manipulator_state.cpp             # Joint state publisher node
-   │   ├── follow_joint_trajectory_server.cpp # Trajectory action server node
-   │   └── diff_drive_controller.cpp         # Diff drive node (disabled)
+   │   ├── joint_state_broadcaster.cpp       # Joint state publisher node
+   │   ├── joint_trajectory_controller.cpp   # FollowJointTrajectory action node
+   │   └── gripper_controller.cpp            # Gripper control node
    ├── launch/
-   │   ├── wmx_ros2_multi_node.launch.py
-   │   ├── wmx_ros2_intel_manipulator_cr3a.launch.py
-   │   ├── wmx_ros2_orin_manipulator_cr3a.launch.py
-   │   └── wmx_ros2_diff_drive_controller.launch.py
-   └── config/
-       ├── intel_manipulator_config_cr3a.yaml
-       ├── orin_manipulator_config_cr3a.yaml
-       ├── diff_drive_controller_config.yaml
-       ├── cr3a_wmx_parameters.xml           # WMX3 axis params for CR3A
-       └── baymax_wmx_parameters.xml         # WMX3 axis params for Baymax
+   │   ├── wmx_ros2_general_nodes.launch.py
+   │   ├── wmx_ros2_cr3a_manipulator.launch.py
+   │   └── wmx_ros2_cr5a_manipulator.launch.py
+   ├── config/
+   │   ├── cr3a_manipulator_config.yaml
+   │   ├── cr3a_wmx_parameters.xml           # WMX3 axis params for CR3A
+   │   ├── cr5a_manipulator_config.yaml
+   │   ├── cr5a_wmx_parameters.xml           # WMX3 axis params for CR5A
+   │   └── diffbot_wmx_parameters.xml        # WMX3 axis params for a diff-drive base
+   └── test/
 
 Dependencies
 ------------
@@ -75,11 +86,26 @@ Package Dependencies (package.xml)
      - buildtool
      - CMake build system
    * - ``rclcpp``
-     - build + exec
+     - depend
      - ROS2 C++ client library
+   * - ``rclcpp_action``
+     - depend
+     - Action server support (FollowJointTrajectory)
    * - ``std_srvs``
      - depend
      - Standard service types (``SetBool``, ``Trigger``)
+   * - ``std_msgs``
+     - depend
+     - Standard message types (``Bool``, ``Float64MultiArray``)
+   * - ``sensor_msgs``
+     - depend
+     - ``JointState`` messages
+   * - ``control_msgs``
+     - depend
+     - ``FollowJointTrajectory`` action type
+   * - ``trajectory_msgs``
+     - depend
+     - ``JointTrajectory`` messages
    * - ``wmx_ros2_message``
      - depend
      - Custom message and service definitions
@@ -92,7 +118,7 @@ Package Dependencies (package.xml)
    * - ``robot_state_publisher``
      - exec
      - Robot TF broadcasting
-   * - ``rviz``
+   * - ``rviz2``
      - exec
      - Visualization
    * - ``xacro``
@@ -102,319 +128,86 @@ Package Dependencies (package.xml)
 CMake Dependencies (find_package)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. list-table::
-   :header-rows: 1
-   :widths: 35 65
-
-   * - Package
-     - Purpose
-   * - ``rclcpp``
-     - ROS2 C++ client library
-   * - ``rclcpp_action``
-     - Action server/client support
-   * - ``std_msgs``
-     - Standard message types (``Float64MultiArray``)
-   * - ``std_srvs``
-     - Standard service types (``SetBool``, ``Trigger``)
-   * - ``geometry_msgs``
-     - Twist messages (diff drive)
-   * - ``nav_msgs``
-     - Odometry messages (diff drive)
-   * - ``sensor_msgs``
-     - JointState messages
-   * - ``control_msgs``
-     - FollowJointTrajectory action type
-   * - ``trajectory_msgs``
-     - JointTrajectory messages
-   * - ``wmx_ros2_message``
-     - Custom WMX interfaces
+``ament_cmake``, ``rclcpp``, ``rclcpp_action``, ``std_msgs``, ``std_srvs``,
+``sensor_msgs``, ``control_msgs``, ``trajectory_msgs``, and
+``wmx_ros2_message``.
 
 WMX Libraries (External)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All executables link against the WMX shared libraries at ``/opt/wmx3/lib/``:
+Executables link against the WMX shared libraries at ``/opt/wmx3/lib/``.
+Each node links only the libraries it needs:
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 30 40
+   :widths: 32 40 28
 
    * - Library
      - Executable(s)
      - Purpose
-   * - ``libcoremotionapi.so``
+   * - ``libwmx3api.so`` / ``libimdll.so``
      - All nodes
-     - Position, velocity, axis control
+     - Core WMX device/engine management (and internal dependency)
+   * - ``libcoremotionapi.so``
+     - ``wmx_core_motion_node``, ``joint_state_broadcaster``,
+       ``joint_trajectory_controller``, ``gripper_controller``
+     - Position, velocity, and axis control
    * - ``libadvancedmotionapi.so``
-     - ``follow_joint_trajectory_server``
+     - ``joint_trajectory_controller``
      - Cubic spline trajectory execution
    * - ``libioapi.so``
-     - ``manipulator_state``, ``follow_joint_trajectory_server``
+     - ``wmx_io_node``, ``joint_state_broadcaster``, ``gripper_controller``
      - Digital I/O (gripper control)
    * - ``libecapi.so``
-     - ``manipulator_state``
-     - EtherCAT network scanning
-   * - ``libwmx3api.so``
-     - All nodes
-     - Core WMX device and engine management
-   * - ``libimdll.so``
-     - All nodes
-     - Internal WMX dependency
+     - ``wmx_engine_node``, ``wmx_ethercat_node``
+     - EtherCAT network scan and diagnostics
 
-Nodes
------
+Node Coordination
+-----------------
 
-The diagram below shows all nodes, their topics, services, and how they
-relate to each other and to external clients (MoveIt2, Isaac Sim):
-
-.. figure:: /_static/images/node_graph.png
-   :alt: wmx_ros2_package — node graph 
-   :align: center
-
-   wmx_ros2_package — node graph 
-
-manipulator_state
-^^^^^^^^^^^^^^^^^^
-
-The primary joint state publisher. Performs the full hardware initialization
-sequence (device creation, EtherCAT scan, communication start, parameter
-loading, servo enable) and then publishes encoder feedback at high frequency.
-
-**Source:** ``src/manipulator_state.cpp``
-
-**Class:** ``ManipulatorState`` (inherits ``rclcpp::Node``)
-
-**Node name:** ``manipulator_state``
-
-Parameters
-"""""""""""
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 15 20 35
-
-   * - Parameter
-     - Type
-     - Default
-     - Description
-   * - ``joint_number``
-     - ``int``
-     - ``0``
-     - Number of robot joints (typically 6)
-   * - ``joint_feedback_rate``
-     - ``int``
-     - ``0``
-     - Encoder publish rate in Hz (typically 500)
-   * - ``gripper_open_value``
-     - ``double``
-     - ``0.0``
-     - Joint position value when gripper is open
-   * - ``gripper_close_value``
-     - ``double``
-     - ``0.0``
-     - Joint position value when gripper is closed
-   * - ``joint_name``
-     - ``string[]``
-     - ``["j1"..."j6"]``
-     - Joint names for the JointState message
-   * - ``encoder_joint_topic``
-     - ``string``
-     - (required)
-     - Topic name for primary joint state output
-   * - ``isaacsim_joint_topic``
-     - ``string``
-     - (optional)
-     - Topic name for Isaac Sim joint command output
-   * - ``gazebo_joint_topic``
-     - ``string``
-     - (required)
-     - Topic name for Gazebo position controller output
-   * - ``wmx_param_file_path``
-     - ``string``
-     - (required)
-     - Absolute path to the WMX axis parameter XML file
-
-Published Topics
-"""""""""""""""""
-
-.. list-table::
-   :header-rows: 1
-   :widths: 35 30 15 20
-
-   * - Topic
-     - Message Type
-     - Rate
-     - Description
-   * - ``encoder_joint_topic`` (param)
-     - ``sensor_msgs/msg/JointState``
-     - ``joint_feedback_rate`` Hz
-     - Joint positions + gripper state
-   * - ``isaacsim_joint_topic`` (param)
-     - ``sensor_msgs/msg/JointState``
-     - ``joint_feedback_rate`` Hz
-     - Mirror for Isaac Sim (no timestamp)
-   * - ``gazebo_joint_topic`` (param)
-     - ``std_msgs/msg/Float64MultiArray``
-     - ``joint_feedback_rate`` Hz
-     - Joint positions for Gazebo
-
-The JointState message contains ``joint_number`` joint positions from
-encoder feedback plus 2 gripper finger positions derived from the EtherCAT
-digital I/O bit (``Io::GetOutBit(0, 0)``).
-
-Initialization Sequence
-""""""""""""""""""""""""
+Nodes start up in a fixed order, coordinated by two ``ready`` heartbeat
+topics so that dependent nodes only activate once the engine and motion
+layers are live:
 
 .. mermaid::
-   :caption: manipulator_state — startup sequence diagram
-   :zoom:
+   :caption: Node startup coordination via ready signals
 
-   %%{init: {"theme": "base", "themeVariables": {"actorBkg": "#1a73e8", "actorTextColor": "#fff", "actorBorderColor": "#1558b0", "signalColor": "#555", "signalTextColor": "#1a1a1a", "noteBkgColor": "#fff3cd", "noteTextColor": "#856404"}}}%%
    sequenceDiagram
-       participant N as manipulator_state
-       participant W as WMX API
-       participant E as EtherCAT Bus
-       participant S as Servo Drives (J1–J6)
+       participant E as wmx_engine_node
+       participant C as wmx_core_motion_node
+       participant I as wmx_io_node / wmx_ethercat_node
+       participant M as manipulator controllers
 
-       Note over N: Reads all ROS2 parameters<br/>(joint_number, feedback_rate, xml path …)
+       E->>E: CreateDevice + StartCommunication
+       E-->>C: /wmx/engine/ready (Bool)
+       E-->>I: /wmx/engine/ready (Bool)
+       E-->>M: /wmx/engine/ready (Bool)
+       C-->>M: /wmx/core_motion/ready (Bool)
+       Note over M: joint_state_broadcaster waits on<br/>/wmx/core_motion/ready before publishing
 
-       loop Retry up to 5×, 2 s interval
-           N->>W: CreateDevice("/opt/wmx3/")
-           W-->>N: Device handle (or retry on failure)
-       end
+- ``wmx_engine_node`` creates the WMX device, starts EtherCAT communication,
+  and publishes ``/wmx/engine/ready``.
+- ``wmx_core_motion_node``, ``wmx_io_node``, ``wmx_ethercat_node``,
+  ``gripper_controller``, and ``joint_trajectory_controller`` wait for
+  ``/wmx/engine/ready`` before activating.
+- ``wmx_core_motion_node`` publishes ``/wmx/core_motion/ready``;
+  ``joint_state_broadcaster`` waits for it before loading parameters and
+  publishing joint feedback.
 
-       N->>E: Ecat::ScanNetwork(masterId=0)
-       E-->>N: 6 servo drives + I/O module discovered
-
-       N->>W: StartCommunication(timeout=10 s)
-       W-->>N: Real-time EtherCAT cycle active
-
-       N->>W: config->ImportAndSetAll(xml_path)
-       W-->>N: Gear ratios + polarities loaded
-
-       loop For each joint  J1 → J6
-           N->>S: ClearAmpAlarm(axis)
-           S-->>N: Alarm cleared
-           N->>S: SetServoOn(axis, enable=true)
-           S-->>N: Servo enabled
-       end
-
-       Note over N: Publishing /joint_states @ 500 Hz
-
-1. Declare and read all ROS2 parameters
-2. ``CreateDevice("/opt/wmx3/")`` with retry (5 attempts, 2s interval)
-3. ``Ecat::ScanNetwork(masterId=0)`` -- EtherCAT device discovery
-4. ``StartCommunication(timeout=10s)`` -- begin real-time cycle
-5. ``config->ImportAndSetAll(wmx_param_file_path)`` -- load axis parameters
-6. For each joint: ``ClearAmpAlarm()`` then ``SetServoOn()``
-7. Start encoder feedback timer
-
-Shutdown Sequence
-""""""""""""""""""
-
-1. Disable all servos (``SetServoOn(axis, 0)`` for each joint)
-2. Stop EtherCAT communication
-3. Close WMX device
-4. Wait 3 seconds for cleanup
-
-follow_joint_trajectory_server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Action server for executing MoveIt2-planned trajectories on the physical
-robot using WMX cubic spline interpolation.
-
-**Source:** ``src/follow_joint_trajectory_server.cpp``
-
-**Class:** ``FollowJointTrajectoryServer`` (inherits ``rclcpp::Node``)
-
-**Node name:** ``follow_joint_trajectory_server``
-
-Parameters
-"""""""""""
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 15 20 35
-
-   * - Parameter
-     - Type
-     - Default
-     - Description
-   * - ``joint_number``
-     - ``int``
-     - ``0``
-     - Number of robot joints
-   * - ``joint_trajectory_action``
-     - ``string``
-     - (required)
-     - Action server name for FollowJointTrajectory
-   * - ``wmx_gripper_topic``
-     - ``string``
-     - (required)
-     - Service name for gripper open/close
-
-Action Server
-""""""""""""""
-
-.. list-table::
-   :widths: 25 75
-
-   * - **Action Name**
-     - From ``joint_trajectory_action`` parameter
-   * - **Action Type**
-     - ``control_msgs/action/FollowJointTrajectory``
-
-The server processes trajectories as follows:
-
-- Validates point count (max 1000 points)
-- Adjusts timing (first point time = 0, removes points <1 ms apart)
-- Builds a WMX ``CSplinePosData`` structure for all joints
-- Executes via ``AdvancedMotion::StartCSplinePos()``
-- Blocks on ``AdvancedMotion::Wait()`` until complete
-- Returns ``error_code = 0`` on success, or WMX error code on failure
-
-A spline buffer of 1000 points is allocated in the constructor via
-``AdvancedMotion::CreateSplineBuffer(0, 1000)`` and freed in the destructor.
-
-Service Server
-"""""""""""""""
-
-.. list-table::
-   :widths: 25 75
-
-   * - **Service Name**
-     - From ``wmx_gripper_topic`` parameter
-   * - **Service Type**
-     - ``std_srvs/srv/SetBool``
-
-Controls the pneumatic gripper via ``Io::SetOutBit(0, 0, value)``.
-``true`` = close (bit=1), ``false`` = open (bit=0).
-
-Initialization
-"""""""""""""""
-
-1. ``CreateDevice("/opt/wmx3/")`` with retry (5 attempts, 2s interval)
-2. Initialize CoreMotion and AdvancedMotion APIs
-3. ``CreateSplineBuffer(0, 1000)`` -- allocate trajectory buffer
-4. Create action server and gripper service
+General Nodes
+-------------
 
 wmx_engine_node
 ^^^^^^^^^^^^^^^^^
 
 Manages the WMX device lifecycle: creates the device, starts/stops EtherCAT
 communication, and publishes a ready signal to coordinate dependent nodes.
+On startup it automatically calls ``CreateDevice`` and ``StartCommunication``,
+and also exposes manual-override services.
 
-**Source:** ``src/wmx_engine_node.cpp``
+**Source:** ``src/wmx_engine_node.cpp`` — **Node name:** ``wmx_engine_node``
 
-**Node name:** ``wmx_engine_node``
-
-On startup, the node automatically calls ``CreateDevice`` and
-``StartCommunication``. It also exposes manual-override services for cases
-where explicit control is needed.
-
-Services
-"""""""""
-
-.. list-table::
+.. list-table:: Services
    :header-rows: 1
    :widths: 35 35 30
 
@@ -434,34 +227,19 @@ Services
      - ``std_srvs/srv/Trigger``
      - Trigger EtherCAT network scan to discover slaves
 
-Published Topics
-"""""""""""""""""
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 35 35
-
-   * - Topic
-     - Message Type
-     - Description
-   * - ``/wmx/engine/ready``
-     - ``std_msgs/msg/Bool``
-     - ``true`` when communication is active; ``false`` on shutdown
+Publishes ``/wmx/engine/ready`` (``std_msgs/msg/Bool``) — ``true`` when
+communication is active, ``false`` on shutdown.
 
 wmx_core_motion_node
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Provides service-based axis control and topic-based motion commands.
-Waits for ``/wmx/engine/ready`` before activating.
+Provides service-based axis control, XML parameter load/get, topic-based
+motion commands, and per-axis state publishing. Waits for
+``/wmx/engine/ready`` before activating.
 
-**Source:** ``src/wmx_core_motion_node.cpp``
+**Source:** ``src/wmx_core_motion_node.cpp`` — **Node name:** ``wmx_core_motion_node``
 
-**Node name:** ``wmx_core_motion_node``
-
-Services
-"""""""""
-
-.. list-table::
+.. list-table:: Services
    :header-rows: 1
    :widths: 35 35 30
 
@@ -486,57 +264,29 @@ Services
    * - ``/wmx/axis/homing``
      - ``wmx_ros2_message/srv/SetAxis``
      - Set current position as home (zero)
+   * - ``/wmx/params/load``
+     - ``wmx_ros2_message/srv/LoadWmxParams``
+     - Load axis parameters from a WMX3 XML file
+   * - ``/wmx/params/get``
+     - ``wmx_ros2_message/srv/GetWmxParams``
+     - Retrieve active axis parameters as text
 
-Published Topics
-"""""""""""""""""
+**Published topic:** ``/wmx/axis/state`` (``wmx_ros2_message/msg/AxisState``,
+100 Hz) — full per-axis status.
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 30 10 30
-
-   * - Topic
-     - Message Type
-     - Rate
-     - Description
-   * - ``/wmx/axis/state``
-     - ``wmx_ros2_message/msg/AxisState``
-     - 100 Hz
-     - Full per-axis status (servo state, alarms, positions, velocities)
-
-Subscribed Topics
-""""""""""""""""""
-
-.. list-table::
-   :header-rows: 1
-   :widths: 35 35 30
-
-   * - Topic
-     - Message Type
-     - Description
-   * - ``/wmx/axis/velocity``
-     - ``wmx_ros2_message/msg/AxisVelocity``
-     - Velocity commands → ``CoreMotion::StartVel()``
-   * - ``/wmx/axis/position``
-     - ``wmx_ros2_message/msg/AxisPose``
-     - Absolute position → ``CoreMotion::StartPos()``
-   * - ``/wmx/axis/position/relative``
-     - ``wmx_ros2_message/msg/AxisPose``
-     - Relative position → ``CoreMotion::StartMov()``
+**Subscribed topics:** ``/wmx/axis/velocity`` (``AxisVelocity`` →
+``CoreMotion::StartVel()``), ``/wmx/axis/position`` (``AxisPose`` →
+``CoreMotion::StartPos()``), ``/wmx/axis/position/relative`` (``AxisPose`` →
+``CoreMotion::StartMov()``). Also publishes ``/wmx/core_motion/ready``.
 
 wmx_io_node
 ^^^^^^^^^^^^^
 
-Provides service-based access to EtherCAT digital I/O.
-Waits for ``/wmx/engine/ready`` before activating.
+Service-based access to EtherCAT digital I/O. Waits for ``/wmx/engine/ready``.
 
-**Source:** ``src/wmx_io_node.cpp``
+**Source:** ``src/wmx_io_node.cpp`` — **Node name:** ``wmx_io_node``
 
-**Node name:** ``wmx_io_node``
-
-Services
-"""""""""
-
-.. list-table::
+.. list-table:: Services
    :header-rows: 1
    :widths: 35 35 30
 
@@ -565,17 +315,12 @@ Services
 wmx_ethercat_node
 ^^^^^^^^^^^^^^^^^^^
 
-Provides EtherCAT diagnostic services for network monitoring and debugging.
-Waits for ``/wmx/engine/ready`` before activating.
+EtherCAT diagnostic services for network monitoring and debugging. Waits for
+``/wmx/engine/ready``.
 
-**Source:** ``src/wmx_ethercat_node.cpp``
+**Source:** ``src/wmx_ethercat_node.cpp`` — **Node name:** ``wmx_ethercat_node``
 
-**Node name:** ``wmx_ethercat_node``
-
-Services
-"""""""""
-
-.. list-table::
+.. list-table:: Services
    :header-rows: 1
    :widths: 35 40 25
 
@@ -595,396 +340,238 @@ Services
      - ``wmx_ros2_message/srv/EcatStartHotconnect``
      - Initiate hot-connect for dynamic slave addition
 
-diff_drive_controller (Disabled)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Manipulator Controllers
+-----------------------
 
-Differential drive controller for mobile base applications. Converts
-``geometry_msgs/Twist`` commands into individual wheel velocity commands via
-the WMX engine.
+joint_state_broadcaster
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. note::
+Loads the robot's WMX axis parameters and publishes encoder feedback as
+``JointState`` (plus simulator mirrors). Waits for ``/wmx/core_motion/ready``
+before publishing.
 
-   This node is **commented out** in ``CMakeLists.txt`` and is not built
-   by default. It is documented here for reference.
+**Source:** ``src/joint_state_broadcaster.cpp`` — **Node name:** ``joint_state_broadcaster``
 
-**Source:** ``src/diff_drive_controller.cpp``
-
-**Class:** ``DiffDriveController`` (inherits ``rclcpp::Node``)
-
-**Node name:** ``diff_drive_controller``
-
-Parameters
-"""""""""""
-
-.. list-table::
+.. list-table:: Parameters
    :header-rows: 1
-   :widths: 30 15 20 35
+   :widths: 32 16 52
 
    * - Parameter
      - Type
-     - Default
      - Description
-   * - ``left_axis``
+   * - ``joint_axes``
+     - ``int[]``
+     - WMX axis indices for the robot joints (e.g. ``[0,1,2,3,4,5]``)
+   * - ``joint_feedback_rate``
      - ``int``
-     - ``0``
-     - WMX axis index for left wheel
-   * - ``right_axis``
-     - ``int``
-     - ``1``
-     - WMX axis index for right wheel
-   * - ``rate``
-     - ``int``
-     - ``10``
-     - Control loop rate in Hz
-   * - ``acc_time``
+     - Encoder publish rate in Hz
+   * - ``gripper_open_value`` / ``gripper_close_value``
      - ``double``
-     - ``1.0``
-     - Acceleration time (seconds)
-   * - ``dec_time``
-     - ``double``
-     - ``1.0``
-     - Deceleration time (seconds)
-   * - ``wheel_radius``
-     - ``double``
-     - ``0.09``
-     - Wheel radius in meters
-   * - ``wheel_to_wheel``
-     - ``double``
-     - ``0.55``
-     - Distance between wheels in meters
-   * - ``cmd_vel_topic``
+     - Joint position reported when the gripper is open / closed
+   * - ``joint_name``
+     - ``string[]``
+     - Joint names for the JointState message
+   * - ``gripper_joint_name``
+     - ``string[]``
+     - Gripper finger joint names (e.g. ``picker_1_joint``, ``picker_2_joint``)
+   * - ``gripper_address``
+     - ``int[]``
+     - I/O ``[byte, bit]`` address read for gripper state
+   * - ``encoder_joint_topic``
      - ``string``
-     - (required)
-     - Input velocity command topic
-   * - ``encoder_vel_topic``
+     - Primary joint state topic (typically ``/joint_states``)
+   * - ``isaacsim_joint_topic``
      - ``string``
-     - (required)
-     - Output velocity echo topic
-   * - ``encoder_omega_topic``
+     - Isaac Sim joint command topic
+   * - ``gazebo_joint_topic``
      - ``string``
-     - (required)
-     - Output wheel angular velocity topic
-   * - ``encoder_odometry_topic``
-     - ``string``
-     - (required)
-     - Output odometry topic
+     - Gazebo position controller topic
    * - ``wmx_param_file_path``
      - ``string``
-     - (required)
-     - Path to WMX parameter XML file
+     - Absolute path to the WMX axis parameter XML (resolved at launch)
 
-Subscribed Topics
-""""""""""""""""""
-
-.. list-table::
+.. list-table:: Published Topics
    :header-rows: 1
-   :widths: 30 35 35
+   :widths: 35 35 30
 
-   * - Topic
+   * - Topic (param)
      - Message Type
      - Description
-   * - ``cmd_vel_topic`` (param)
-     - ``geometry_msgs/msg/Twist``
-     - Linear/angular velocity commands
-
-Published Topics
-"""""""""""""""""
-
-.. list-table::
-   :header-rows: 1
-   :widths: 35 30 35
-
-   * - Topic
-     - Message Type
-     - Description
-   * - ``encoder_vel_topic`` (param)
-     - ``geometry_msgs/msg/Twist``
-     - Echo of received cmd_vel
-   * - ``encoder_omega_topic`` (param)
+   * - ``encoder_joint_topic``
+     - ``sensor_msgs/msg/JointState``
+     - Joint positions + gripper state
+   * - ``isaacsim_joint_topic``
+     - ``sensor_msgs/msg/JointState``
+     - Mirror for Isaac Sim
+   * - ``gazebo_joint_topic``
      - ``std_msgs/msg/Float64MultiArray``
-     - Wheel angular velocities
-   * - ``encoder_odometry_topic`` (param)
-     - ``nav_msgs/msg/Odometry``
-     - Encoder-based odometry
+     - Joint positions for Gazebo
 
-Timers
-"""""""
+joint_trajectory_controller
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Three timers run at the configured ``rate`` (Hz):
+Action server that executes MoveIt2-planned trajectories on the robot using
+WMX cubic spline interpolation. Waits for ``/wmx/engine/ready``.
 
-- ``cmdVelStep()`` -- Convert ``Twist`` to wheel velocities and send to WMX.
-  Includes safety checks: verifies engine is communicating, no amplifier
-  alarms, and servos are enabled before sending commands.
-- ``encoderOmegaStep()`` -- Read actual wheel velocities from WMX and
-  publish as ``Float64MultiArray``
-- ``encoderOdometryStep()`` -- Compute and publish odometry from wheel
-  encoder feedback
+**Source:** ``src/joint_trajectory_controller.cpp`` — **Node name:** ``joint_trajectory_controller``
+
+.. list-table:: Parameters
+   :header-rows: 1
+   :widths: 32 16 52
+
+   * - Parameter
+     - Type
+     - Description
+   * - ``joint_axes``
+     - ``int[]``
+     - WMX axis indices (sets the spline ``dimensionCount``)
+   * - ``joint_trajectory_action``
+     - ``string``
+     - Action server name for ``FollowJointTrajectory``
+
+Hosts the ``FollowJointTrajectory`` action
+(``control_msgs/action/FollowJointTrajectory``). See
+:doc:`../api_reference/ros2_actions` for the full execution details.
+
+gripper_controller
+^^^^^^^^^^^^^^^^^^^^
+
+Controls the pneumatic gripper via EtherCAT digital I/O. Waits for
+``/wmx/engine/ready``.
+
+**Source:** ``src/gripper_controller.cpp`` — **Node name:** ``gripper_controller``
+
+.. list-table:: Parameters
+   :header-rows: 1
+   :widths: 32 16 52
+
+   * - Parameter
+     - Type
+     - Description
+   * - ``wmx_gripper_topic``
+     - ``string``
+     - Service name for gripper open/close (typically ``/wmx/set_gripper``)
+   * - ``gripper_address``
+     - ``int[]``
+     - I/O ``[byte, bit]`` address written to actuate the gripper
+
+The gripper service is a ``std_srvs/srv/SetBool`` (``true`` = close,
+``false`` = open) backed by ``Io::SetOutBit``.
 
 Launch Files
 ------------
 
-wmx_ros2_multi_node.launch.py
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+wmx_ros2_general_nodes.launch.py
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Starts the four WMX service nodes for standalone axis control without
-MoveIt2 integration.
+Starts the four general nodes for standalone axis/IO/EtherCAT control without
+manipulator controllers.
 
-**Nodes launched:**
+**Nodes launched:** ``wmx_engine_node``, ``wmx_core_motion_node``,
+``wmx_io_node``, ``wmx_ethercat_node``.
 
-1. ``wmx_engine_node``
-2. ``wmx_core_motion_node``
-3. ``wmx_io_node``
-4. ``wmx_ethercat_node``
-
-**Arguments:** ``use_sim_time`` (default: ``false``)
-
-**Config loaded:** None (nodes use default parameters)
+**Arguments:** ``use_sim_time`` (default ``false``). **Config:** none.
 
 .. code-block:: bash
 
-   sudo --preserve-env=PATH \
-        --preserve-env=AMENT_PREFIX_PATH \
-        --preserve-env=COLCON_PREFIX_PATH \
-        --preserve-env=PYTHONPATH \
-        --preserve-env=LD_LIBRARY_PATH \
-        --preserve-env=ROS_DISTRO \
-        --preserve-env=ROS_VERSION \
-        --preserve-env=ROS_PYTHON_VERSION \
-        --preserve-env=ROS_DOMAIN_ID \
-        --preserve-env=RMW_IMPLEMENTATION \
-        bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
-                 source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package wmx_ros2_multi_node.launch.py"
+   ros2 launch wmx_ros2_package wmx_ros2_general_nodes.launch.py
 
-wmx_ros2_intel_manipulator_cr3a.launch.py
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+wmx_ros2_cr3a_manipulator.launch.py
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Full manipulator launch for Intel x86_64 platforms.
+Full Dobot CR3A manipulator launch. Includes
+``wmx_ros2_general_nodes.launch.py`` and then starts the manipulator
+controllers.
 
-**Nodes launched:**
+**Nodes launched:** the four general nodes (via include), plus
+``joint_state_broadcaster``, ``joint_trajectory_controller``, and
+``gripper_controller``.
 
-1. ``manipulator_state``
-2. ``follow_joint_trajectory_server``
-3. ``wmx_engine_node``
-4. ``wmx_core_motion_node``
-5. ``wmx_io_node``
-
-**Arguments:**
-
-.. list-table::
-   :header-rows: 1
-   :widths: 25 20 55
-
-   * - Argument
-     - Default
-     - Description
-   * - ``use_sim_time``
-     - ``false``
-     - Use simulated clock source
-
-**Config loaded:** ``config/intel_manipulator_config_cr3a.yaml``
-
-All three nodes receive parameters from the same YAML file plus the
-``use_sim_time`` argument.
+**Arguments:** ``use_sim_time`` (default ``false``).
+**Config:** ``config/cr3a_manipulator_config.yaml`` and
+``config/cr3a_wmx_parameters.xml`` (the WMX parameter path is resolved at
+launch time).
 
 .. code-block:: bash
 
-   sudo --preserve-env=PATH \
-        --preserve-env=AMENT_PREFIX_PATH \
-        --preserve-env=COLCON_PREFIX_PATH \
-        --preserve-env=PYTHONPATH \
-        --preserve-env=LD_LIBRARY_PATH \
-        --preserve-env=ROS_DISTRO \
-        --preserve-env=ROS_VERSION \
-        --preserve-env=ROS_PYTHON_VERSION \
-        --preserve-env=ROS_DOMAIN_ID \
-        --preserve-env=RMW_IMPLEMENTATION \
-        bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
-                 source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package \
-                   wmx_ros2_intel_manipulator_cr3a.launch.py \
-                   use_sim_time:=false"
+   ros2 launch wmx_ros2_package wmx_ros2_cr3a_manipulator.launch.py \
+     use_sim_time:=false
 
-wmx_ros2_orin_manipulator_cr3a.launch.py
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+wmx_ros2_cr5a_manipulator.launch.py
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Full manipulator launch for NVIDIA Jetson Orin platforms.
+Full Dobot CR5A manipulator launch. Includes the general nodes and starts
+``joint_state_broadcaster`` and ``joint_trajectory_controller``.
 
-**Nodes launched:**
-
-1. ``manipulator_state``
-2. ``follow_joint_trajectory_server``
-3. ``wmx_engine_node``
-4. ``wmx_core_motion_node``
-5. ``wmx_io_node``
-
-**Arguments:**
-
-.. list-table::
-   :header-rows: 1
-   :widths: 25 20 55
-
-   * - Argument
-     - Default
-     - Description
-   * - ``use_sim_time``
-     - ``false``
-     - Use simulated clock source
-
-**Config loaded:** ``config/orin_manipulator_config_cr3a.yaml``
+**Arguments:** ``use_sim_time`` (default ``false``).
+**Config:** ``config/cr5a_manipulator_config.yaml`` and
+``config/cr5a_wmx_parameters.xml``.
 
 .. code-block:: bash
 
-   sudo --preserve-env=PATH \
-        --preserve-env=AMENT_PREFIX_PATH \
-        --preserve-env=COLCON_PREFIX_PATH \
-        --preserve-env=PYTHONPATH \
-        --preserve-env=LD_LIBRARY_PATH \
-        --preserve-env=ROS_DISTRO \
-        --preserve-env=ROS_VERSION \
-        --preserve-env=ROS_PYTHON_VERSION \
-        --preserve-env=ROS_DOMAIN_ID \
-        --preserve-env=RMW_IMPLEMENTATION \
-        bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
-                 source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package \
-                   wmx_ros2_orin_manipulator_cr3a.launch.py \
-                   use_sim_time:=false"
-
-wmx_ros2_diff_drive_controller.launch.py
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ros2 launch wmx_ros2_package wmx_ros2_cr5a_manipulator.launch.py \
+     use_sim_time:=false
 
 .. note::
 
-   The ``diff_drive_controller`` executable is commented out in
-   ``CMakeLists.txt``. This launch file will fail unless the build
-   is modified to include it.
-
-**Nodes launched:** ``diff_drive_controller``
-
-**Arguments:** None
-
-**Config loaded:** ``config/diff_drive_controller_config.yaml``
-
-.. code-block:: bash
-
-   sudo --preserve-env=PATH \
-        --preserve-env=AMENT_PREFIX_PATH \
-        --preserve-env=COLCON_PREFIX_PATH \
-        --preserve-env=PYTHONPATH \
-        --preserve-env=LD_LIBRARY_PATH \
-        --preserve-env=ROS_DISTRO \
-        --preserve-env=ROS_VERSION \
-        --preserve-env=ROS_PYTHON_VERSION \
-        --preserve-env=ROS_DOMAIN_ID \
-        --preserve-env=RMW_IMPLEMENTATION \
-        bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
-                 source ~/wmx_ros2_ws/install/setup.bash && \
-                 ros2 launch wmx_ros2_package \
-                   wmx_ros2_diff_drive_controller.launch.py"
+   The launch commands above assume the workspace is already sourced. On real
+   hardware the nodes require ``sudo`` with the ROS2 environment preserved —
+   see :doc:`../getting_started/testing_wmx_ros2` for the full ``sudo
+   --preserve-env`` invocation.
 
 Configuration Files
 -------------------
 
-intel_manipulator_config_cr3a.yaml
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cr3a_manipulator_config.yaml
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Parameters for the Intel x86_64 manipulator deployment.
-
-.. code-block:: yaml
-
-   manipulator_state:
-     ros__parameters:
-       joint_number: 6
-       joint_feedback_rate: 500
-       gripper_open_value: 0.00
-       gripper_close_value: 0.045
-       joint_name: ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6",
-                     "picker_1_joint", "picker_2_joint"]
-       encoder_joint_topic: /joint_states
-       gazebo_joint_topic: /gazebo_position_controller/commands
-       wmx_param_file_path: /home/<user>/wmx_ros2_ws/src/wmx_ros2_application/
-                            wmx_ros2_package/config/cr3a_wmx_parameters.xml
-
-   follow_joint_trajectory_server:
-     ros__parameters:
-       joint_number: 6
-       wmx_gripper_topic: /wmx/set_gripper
-       joint_trajectory_action: /movensys_manipulator_arm_controller/
-                                follow_joint_trajectory
-
-.. important::
-
-   Update ``wmx_param_file_path`` to match your actual home directory.
-   The default references the machine username ``mvsk``.
-
-orin_manipulator_config_cr3a.yaml
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Parameters for the NVIDIA Jetson Orin manipulator deployment. Identical to
-the Intel config with two differences:
-
-- Adds ``isaacsim_joint_topic: /isaacsim/joint_command`` for Isaac Sim
-  integration
-- The ``wmx_param_file_path`` references the Orin machine path (username
-  ``mic-733ao``)
+Parameters for the Dobot CR3A manipulator, shared by the three manipulator
+controllers:
 
 .. code-block:: yaml
 
-   manipulator_state:
+   joint_state_broadcaster:
      ros__parameters:
-       joint_number: 6
-       joint_feedback_rate: 500
+       joint_feedback_rate: 100
        gripper_open_value: 0.00
        gripper_close_value: 0.045
-       joint_name: ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6",
-                     "picker_1_joint", "picker_2_joint"]
+       joint_axes: [0, 1, 2, 3, 4, 5]
+       joint_name: ["joint1", "joint2", "joint3", "joint4", "joint5", "joint6"]
+       gripper_joint_name: ["picker_1_joint", "picker_2_joint"]
+       gripper_address: [0, 0]
        encoder_joint_topic: /joint_states
        isaacsim_joint_topic: /isaacsim/joint_command
-       wmx_param_file_path: /home/<user>/wmx_ros2_ws/src/wmx_ros2_application/
-                            wmx_ros2_package/config/cr3a_wmx_parameters.xml
+       gazebo_joint_topic: /gazebo_position_controller/commands
+       wmx_param_file_path: ""   # resolved at launch via get_package_share_directory
 
-   follow_joint_trajectory_server:
+   joint_trajectory_controller:
      ros__parameters:
-       joint_number: 6
+       joint_axes: [0, 1, 2, 3, 4, 5]
+       joint_trajectory_action: /movensys_manipulator_arm_controller/follow_joint_trajectory
+
+   gripper_controller:
+     ros__parameters:
        wmx_gripper_topic: /wmx/set_gripper
-       joint_trajectory_action: /movensys_manipulator_arm_controller/
-                                follow_joint_trajectory
+       gripper_address: [0, 0]
 
-diff_drive_controller_config.yaml
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cr5a_manipulator_config.yaml
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Parameters for the differential drive mobile base controller.
-
-.. code-block:: yaml
-
-   diff_drive_controller:
-     ros__parameters:
-       left_axis: 0
-       right_axis: 1
-       rate: 100
-       acc_time: 1.0
-       dec_time: 1.0
-       wheel_radius: 0.09
-       wheel_to_wheel: 0.55
-       cmd_vel_topic: /cmd_vel
-       encoder_vel_topic: /cmd_vel_check
-       encoder_omega_topic: /velocity_controller/commands
-       encoder_odometry_topic: /odom_enc
-       wmx_param_file_path: /home/<user>/wmx_ros2_ws/src/wmx_ros2_application/
-                            wmx_ros2_package/config/baymax_wmx_parameters.xml
+The CR5A equivalent of the CR3A config, used by the CR5A launch file. It
+configures ``joint_state_broadcaster`` and ``joint_trajectory_controller`` for
+the CR5A robot.
 
 WMX Parameter XML Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Two robot-specific WMX parameter files define per-axis motor configuration:
+Robot-specific WMX parameter files define per-axis motor configuration (gear
+ratios, polarities, limits, home positions):
 
-- ``cr3a_wmx_parameters.xml`` -- Parameters for the Dobot CR3A manipulator
-  (gear ratios, polarities, limits, home positions for 6 joints)
-- ``baymax_wmx_parameters.xml`` -- Parameters for the Baymax mobile base
-  (gear ratios, limits for 2 wheel axes)
+- ``cr3a_wmx_parameters.xml`` -- Dobot CR3A manipulator (6 joints)
+- ``cr5a_wmx_parameters.xml`` -- Dobot CR5A manipulator (6 joints)
+- ``diffbot_wmx_parameters.xml`` -- differential-drive base axes
 
-These files are loaded at runtime by the ``manipulator_state`` node via
+These files are loaded at runtime via
 ``CoreMotion::config->ImportAndSetAll(path)``.
 
 Building the Package
@@ -994,7 +581,7 @@ This package depends on ``wmx_ros2_message`` and must be built after it:
 
 .. code-block:: bash
 
-   cd ~/wmx_ros2_ws
+   cd ~/workspaces/movensys_ws
 
    # Stage 1: Build message package
    colcon build --packages-select wmx_ros2_message
@@ -1014,9 +601,9 @@ Expected:
 
 .. code-block:: text
 
-   wmx_ros2_package diff_drive_controller
-   wmx_ros2_package follow_joint_trajectory_server
-   wmx_ros2_package manipulator_state
+   wmx_ros2_package gripper_controller
+   wmx_ros2_package joint_state_broadcaster
+   wmx_ros2_package joint_trajectory_controller
    wmx_ros2_package wmx_core_motion_node
    wmx_ros2_package wmx_engine_node
    wmx_ros2_package wmx_ethercat_node
