@@ -23,17 +23,17 @@ divided into published (output) and subscribed (input) categories.
      - ``sensor_msgs/JointState``
      - Published
      - 500 Hz
-     - ``manipulator_state``
+     - ``joint_state_broadcaster``
    * - ``/isaacsim/joint_command``
      - ``sensor_msgs/JointState``
      - Published
      - 500 Hz
-     - ``manipulator_state``
+     - ``joint_state_broadcaster``
    * - ``/gazebo_.../commands``
      - ``std_msgs/Float64MultiArray``
      - Published
      - 500 Hz
-     - ``manipulator_state``
+     - ``joint_state_broadcaster``
    * - ``/wmx/axis/state``
      - ``wmx_ros2_message/AxisState``
      - Published
@@ -146,13 +146,13 @@ Joint State Feedback
    * - **Message Type**
      - ``sensor_msgs/msg/JointState``
    * - **Publisher**
-     - ``manipulator_state``
+     - ``joint_state_broadcaster``
    * - **Rate**
      - 500 Hz (configurable via ``joint_feedback_rate`` parameter)
    * - **Configurable**
      - Topic name set via ``encoder_joint_topic`` parameter
    * - **Source**
-     - ``manipulator_state.cpp:encoderJointStep()``
+     - ``joint_state_broadcaster.cpp:publishJointState()``
 
 The primary joint state topic used by MoveIt2, RViz, and other ROS2
 consumers. Publishes encoder feedback for all 6 robot joints plus 2 gripper
@@ -222,7 +222,7 @@ Simulator Integration Topics
    * - **Message Type**
      - ``sensor_msgs/msg/JointState``
    * - **Publisher**
-     - ``manipulator_state``
+     - ``joint_state_broadcaster``
    * - **Rate**
      - 500 Hz (same timer as ``/joint_states``)
    * - **Configurable**
@@ -256,7 +256,7 @@ Same data content as ``/joint_states`` (8 joint names, positions, velocities).
    * - **Message Type**
      - ``std_msgs/msg/Float64MultiArray``
    * - **Publisher**
-     - ``manipulator_state``
+     - ``joint_state_broadcaster``
    * - **Rate**
      - 500 Hz (same timer as ``/joint_states``)
    * - **Configurable**

@@ -2,8 +2,9 @@ ROS2 Services
 ==============
 
 The WMX ROS2 application provides services for engine management, axis
-control, I/O, EtherCAT diagnostics, and gripper operation. Services use
-custom types from ``wmx_ros2_message`` plus standard types from ``std_srvs``.
+control, parameter loading, I/O, EtherCAT diagnostics, and gripper operation.
+Services use custom types from ``wmx_ros2_message`` plus standard types from
+``std_srvs``.
 
 .. list-table:: Service Summary
    :header-rows: 1
@@ -53,6 +54,14 @@ custom types from ``wmx_ros2_message`` plus standard types from ``std_srvs``.
      - ``wmx_ros2_message/srv/SetAxis``
      - ``wmx_core_motion_node``
      - Axis Control
+   * - ``/wmx/params/load``
+     - ``wmx_ros2_message/srv/LoadWmxParams``
+     - ``wmx_core_motion_node``
+     - Parameters
+   * - ``/wmx/params/get``
+     - ``wmx_ros2_message/srv/GetWmxParams``
+     - ``wmx_core_motion_node``
+     - Parameters
    * - ``/wmx/io/get_input_bit``
      - ``wmx_ros2_message/srv/GetIoBit``
      - ``wmx_io_node``
@@ -95,7 +104,7 @@ custom types from ``wmx_ros2_message`` plus standard types from ``std_srvs``.
      - EtherCAT
    * - ``/wmx/set_gripper``
      - ``std_srvs/srv/SetBool``
-     - ``follow_joint_trajectory_server``
+     - ``gripper_controller``
      - Gripper
 
 .. contents:: Service Categories
@@ -140,11 +149,34 @@ from ``wmx_ros2_message``.
    # Request
    int32[] index            # Axis indices
    float64[] numerator      # Gear ratio numerators (encoder counts)
-   float64[] denumerator    # Gear ratio denominators (physical units)
+   float64[] denominator    # Gear ratio denominators (physical units)
    ---
    # Response
    bool success             # true only if ALL axes succeeded
    string message           # Concatenated per-axis result messages
+
+**wmx_ros2_message/srv/LoadWmxParams**
+
+.. code-block:: text
+
+   # Request
+   string file_path     # absolute path to the WMX3 XML parameter file
+   ---
+   # Response
+   bool success
+   string message
+
+**wmx_ros2_message/srv/GetWmxParams**
+
+.. code-block:: text
+
+   # Request
+   int32[] index        # specific axis indices to display parameters for
+   ---
+   # Response
+   bool success
+   string message
+   string[] params_dump # formatted human-readable string of all parameters
 
 Engine Management Services
 --------------------------
@@ -513,7 +545,7 @@ axis. The gear ratio maps encoder counts to physical units (radians):
      wmx_ros2_message/srv/SetAxisGearRatio \
      "{index: [0, 1],
       numerator: [8388608.0, 8388608.0],
-      denumerator: [6.28319, 6.28319]}"
+      denominator: [6.28319, 6.28319]}"
 
 /wmx/axis/homing
 ^^^^^^^^^^^^^^^^^^
@@ -551,6 +583,60 @@ axes are homed.
    ros2 service call /wmx/axis/homing wmx_ros2_message/srv/SetAxis \
      "{index: [0, 1, 2, 3, 4, 5], data: [0, 0, 0, 0, 0, 0]}"
 
+Parameter Services
+------------------
+
+These services load and inspect WMX3 axis parameters (gear ratios, polarities,
+home settings, etc.). They are hosted by ``wmx_core_motion_node`` (source:
+``wmx_core_motion_node.cpp``).
+
+/wmx/params/load
+^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 25 75
+
+   * - **Service Type**
+     - ``wmx_ros2_message/srv/LoadWmxParams``
+   * - **Node**
+     - ``wmx_core_motion_node``
+   * - **Purpose**
+     - Import axis parameters from a WMX3 XML configuration file
+
+The request ``file_path`` is the absolute path to the WMX3 XML parameter file.
+Returns ``success=true`` with a confirmation ``message`` on success.
+
+**Example:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/params/load wmx_ros2_message/srv/LoadWmxParams \
+     "{file_path: '/opt/wmx3/param/cr3a_params.xml'}"
+
+/wmx/params/get
+^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 25 75
+
+   * - **Service Type**
+     - ``wmx_ros2_message/srv/GetWmxParams``
+   * - **Node**
+     - ``wmx_core_motion_node``
+   * - **Purpose**
+     - Retrieve the active axis configuration as human-readable text
+
+The request ``index`` array selects which axes to report. The response
+``params_dump`` holds a formatted, human-readable string of the parameters for
+each requested axis.
+
+**Example -- dump parameters for axes 0 and 1:**
+
+.. code-block:: bash
+
+   ros2 service call /wmx/params/get wmx_ros2_message/srv/GetWmxParams \
+     "{index: [0, 1]}"
+
 Gripper Service
 ---------------
 
@@ -563,7 +649,7 @@ Gripper Service
    * - **Service Type**
      - ``std_srvs/srv/SetBool``
    * - **Node**
-     - ``follow_joint_trajectory_server``
+     - ``gripper_controller``
    * - **Purpose**
      - Open or close the pneumatic gripper via EtherCAT digital I/O
    * - **Configurable**
@@ -612,7 +698,7 @@ API, which sets digital output bit 0 on I/O module 0 in the EtherCAT chain.
    ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: false}"
 
 The gripper state is also reflected in the ``/joint_states`` topic. The
-``manipulator_state`` node reads the I/O output bit via ``Io::GetOutBit()``
+``joint_state_broadcaster`` node reads the I/O output bit via ``Io::GetOutBit()``
 and maps it to the ``picker_1_joint`` and ``picker_2_joint`` values using
 the ``gripper_open_value`` and ``gripper_close_value`` parameters.
 
