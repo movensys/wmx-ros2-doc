@@ -643,7 +643,7 @@ Configuration files to create or modify
    * - File
      - Changes Required
    * - **YAML config** (e.g., ``new_robot_config.yaml``)
-     - Set ``joint_number``, ``joint_name`` list, ``joint_feedback_rate``,
+     - Set ``joint_axes``, ``joint_name`` list, ``joint_feedback_rate``,
        gripper values, topic names, and ``wmx_param_file_path``
    * - **WMX XML parameters** (e.g., ``new_robot_wmx_parameters.xml``)
      - Define gear ratios, axis polarities, encoder modes, homing parameters,

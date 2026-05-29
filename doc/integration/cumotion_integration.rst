@@ -98,6 +98,6 @@ See Also
 --------
 
 - :doc:`moveit2_integration` -- MoveIt2 setup and the ``/wmx/moveit2/*`` API
-- :doc:`../examples/isaac_manipulator` -- full Isaac manipulator example
+- :doc:`../examples/examples` -- end-to-end manipulator examples
 - The `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
   repository for the AprilTag, Nvblox, and YOLO walkthroughs

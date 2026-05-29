@@ -69,13 +69,14 @@ from ``wmx_ros2_message``.
 
 .. code-block:: text
 
-   int32[] amp_alarm          # Amplifier alarm active per axis
-   int32[] servo_on           # Servo enabled per axis
-   int32[] home_done          # Homing completed per axis
-   int32[] in_pos             # At target position per axis
-   int32[] negative_ls        # Negative limit switch active per axis
-   int32[] positive_ls        # Positive limit switch active per axis
-   int32[] home_switch        # Home switch active per axis
+   std_msgs/Header header
+   bool[] amp_alarm           # Amplifier alarm active per axis
+   bool[] servo_on            # Servo enabled per axis
+   bool[] home_done           # Homing completed per axis
+   bool[] home_switch         # Home switch active per axis
+   bool[] negative_ls         # Negative limit switch active per axis
+   bool[] positive_ls         # Positive limit switch active per axis
+   bool[] motion_complete     # Motion finished / in position per axis
    float64[] pos_cmd         # Commanded position per axis (radians)
    float64[] velocity_cmd    # Commanded velocity per axis (rad/s)
    float64[] actual_pos      # Actual encoder position per axis (radians)
@@ -88,7 +89,6 @@ from ``wmx_ros2_message``.
 
    int32[] index         # Axis indices to command
    float64[] target      # Target positions (radians)
-   string profile        # Motion profile type (reserved)
    float64[] velocity    # Motion velocity per axis (rad/s)
    float64[] acc         # Acceleration per axis (rad/s^2)
    float64[] dec         # Deceleration per axis (rad/s^2)
@@ -98,7 +98,6 @@ from ``wmx_ros2_message``.
 .. code-block:: text
 
    int32[] index         # Axis indices to command
-   string profile        # Motion profile type (reserved)
    float64[] velocity    # Target velocity per axis (rad/s)
    float64[] acc         # Acceleration per axis (rad/s^2)
    float64[] dec         # Deceleration per axis (rad/s^2)
@@ -418,14 +417,14 @@ The axis must be in velocity mode (see :doc:`ros2_services` for
 .. code-block:: bash
 
    ros2 topic pub --once /wmx/axis/velocity wmx_ros2_message/msg/AxisVelocity \
-     "{index: [0], profile: '', velocity: [1.0], acc: [10.0], dec: [10.0]}"
+     "{index: [0], velocity: [1.0], acc: [10.0], dec: [10.0]}"
 
 **Example -- Stop axis 0:**
 
 .. code-block:: bash
 
    ros2 topic pub --once /wmx/axis/velocity wmx_ros2_message/msg/AxisVelocity \
-     "{index: [0], profile: '', velocity: [0.0], acc: [10.0], dec: [10.0]}"
+     "{index: [0], velocity: [0.0], acc: [10.0], dec: [10.0]}"
 
 /wmx/axis/position
 ^^^^^^^^^^^^^^^^^^^^
@@ -458,7 +457,7 @@ position.
 .. code-block:: bash
 
    ros2 topic pub --once /wmx/axis/position wmx_ros2_message/msg/AxisPose \
-     "{index: [0], target: [1.5], profile: '', velocity: [5.0], acc: [10.0], dec: [10.0]}"
+     "{index: [0], target: [1.5], velocity: [5.0], acc: [10.0], dec: [10.0]}"
 
 /wmx/axis/position/relative
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -491,7 +490,7 @@ position.
 .. code-block:: bash
 
    ros2 topic pub --once /wmx/axis/position/relative wmx_ros2_message/msg/AxisPose \
-     "{index: [0], target: [0.5], profile: '', velocity: [5.0], acc: [10.0], dec: [10.0]}"
+     "{index: [0], target: [0.5], velocity: [5.0], acc: [10.0], dec: [10.0]}"
 
 Differential Drive Topics (Optional)
 --------------------------------------
