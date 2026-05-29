@@ -4,100 +4,6 @@ Integration Scenarios
 WMX ROS2 supports multiple motion planning backends and can be extended with
 custom planners and applications.
 
-.. rubric:: Supported Configurations
-
-**Framework support:**
-
-.. list-table::
-   :header-rows: 1
-   :widths: auto
-
-   * - Demo Scenario
-     - ROS2 Humble
-     - ROS2 Jazzy
-     - Isaac ROS 3.2
-     - Isaac ROS 4.1
-   * - Joint trajectory motion
-     - ✓
-     - ✓
-     - ✓
-     - ✓
-   * - AprilTag pick and place
-     - ✓
-     - ✓
-     - ✓
-     - ✓
-   * - Obstacle avoidance
-     -
-     -
-     - ✓
-     - ✓
-   * - AprilTag pick and place with obstacle avoidance
-     -
-     -
-     - ✓
-     - ✓
-
-**Supported devices:**
-
-.. list-table::
-   :header-rows: 1
-   :widths: auto
-
-   * - Model
-     - Processor / GPU
-     - OS
-     - Use Case
-   * - Advantech MIC-713-OX4A1
-     - Jetson Orin NX
-     - Ubuntu 22.04
-     - Edge deployment
-   * - Advantech MIC-733-AO5A1
-     - Jetson Orin AGX
-     - Ubuntu 22.04
-     - Edge deployment
-   * - Advantech MIC-743-AT7A1
-     - Jetson Orin AGX
-     - Ubuntu 24.04
-     - Edge deployment
-   * - Advantech UNO-258
-     - Intel Panther-Lake
-     - Ubuntu 24.04
-     - Edge deployment
-   * - Desktop PC
-     - NVIDIA GeForce RTX 5070
-     - Ubuntu 22.04 / 24.04
-     - Simulation
-   * - Desktop PC
-     - NVIDIA GeForce RTX 5090
-     - Ubuntu 22.04 / 24.04
-     - Simulation
-
-**Robot platform support:**
-
-.. list-table::
-   :header-rows: 1
-   :widths: auto
-
-   * - Demo Scenario
-     - Dobot CR3A
-     - Dobot CR5A
-   * - Joint trajectory motion
-     - ✓
-     - ✓
-   * - AprilTag pick and place
-     - ✓
-     -
-   * - Obstacle avoidance
-     - ✓
-     -
-   * - AprilTag pick and place with obstacle avoidance
-     - ✓
-     -
-
-**Future development:**
-
-
 .. rubric:: Planning Backend Selection
 
 Use the decision tree below to find the right integration for your use case,
@@ -164,6 +70,8 @@ Available integrations:
 - **Isaac cuMotion** -- NVIDIA GPU-accelerated collision-aware planning
 - **Custom Planner** -- Integrate your own planning algorithm
 - **Custom Application** -- Build standalone ROS2 apps using WMX services
+- **Natural-Language and Vision Control** -- drive the robot with a VLM/LLM
+  through a FastAPI service (an application layer on top of MoveIt2)
 
 .. toctree::
    :maxdepth: 2
@@ -172,3 +80,4 @@ Available integrations:
    cumotion_integration
    custom_planner
    custom_application
+   intelligence_integration

@@ -13,13 +13,22 @@ The system is designed for **generic 6-DOF robot arms** with EtherCAT servo
 drives. The ROS2 interface layer is independent of the specific robot model --
 only the configuration files and WMX parameter files are robot-specific.
 
-There are two approaches to controlling the robot:
+There are three approaches to controlling the robot:
 
-1. **Trajectory-based** -- Send a full trajectory to the
+1. **High-level pose/joint services** -- Call the ``/wmx/moveit2/*`` services
+   provided by the ``trajectory_api`` node in
+   `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
+   for MoveIt2-planned Cartesian and joint moves (see
+   :doc:`moveit2_integration`). This is the simplest option when MoveIt2 is
+   running.
+2. **Trajectory-based** -- Send a full trajectory to the
    ``FollowJointTrajectory`` action server (used by MoveIt2 and custom
    planners)
-2. **Direct axis control** -- Publish velocity or position commands to
+3. **Direct axis control** -- Publish velocity or position commands to
    individual axes via topics (used for low-level or real-time control)
+
+The examples below focus on approaches 2 and 3, which use the ``wmx_ros2_package``
+interfaces directly.
 
 Prerequisites
 -------------
@@ -30,7 +39,7 @@ Before building a custom application:
   (see :doc:`../getting_started/index`)
 - The WMX ROS2 nodes are running (either the manipulator launch or
   the general launch)
-- Your workspace is sourced: ``source ~/wmx_ros2_ws/install/setup.bash``
+- Your workspace is sourced: ``source ~/workspaces/movensys_ws/install/setup.bash``
 - You have a basic understanding of ROS2 actions, services, and topics
 
 Available Interfaces
@@ -45,7 +54,7 @@ Available Interfaces
      - Node
    * - ``/movensys_manipulator_arm_controller/follow_joint_trajectory``
      - ``control_msgs/action/FollowJointTrajectory``
-     - ``follow_joint_trajectory_server``
+     - ``joint_trajectory_controller``
 
 .. list-table:: Key Services
    :header-rows: 1
@@ -106,7 +115,7 @@ position to the specified joint targets.
 .. code-block:: python
 
    #!/usr/bin/env python3
-   """Send a joint trajectory to the WMX ROS2 follow_joint_trajectory_server."""
+   """Send a joint trajectory to the WMX ROS2 joint_trajectory_controller."""
 
    import rclpy
    from rclpy.action import ActionClient
@@ -319,7 +328,7 @@ Python Example: Read Robot State
 ---------------------------------
 
 This example subscribes to ``/joint_states`` and prints the current joint
-positions. The ``manipulator_state`` node publishes this topic at 500 Hz
+positions. The ``joint_state_broadcaster`` node publishes this topic at 500 Hz
 with 8 values (6 joints + 2 gripper fingers).
 
 .. code-block:: python
@@ -507,7 +516,7 @@ sends goals to the same ``FollowJointTrajectory`` action server.
        main()
 
 MoveIt2 handles trajectory planning, collision avoidance, and sends the
-result to the ``follow_joint_trajectory_server`` via the
+result to the ``joint_trajectory_controller`` via the
 ``FollowJointTrajectory`` action. See
 :doc:`moveit2_integration` for configuration details.
 
@@ -549,7 +558,6 @@ the ``wmx_core_motion_node`` to be running.
            """
            msg = AxisVelocity()
            msg.index = axis_indices
-           msg.profile = ''
            msg.velocity = velocities
            msg.acc = [acc] * len(axis_indices)
            msg.dec = [dec] * len(axis_indices)
@@ -563,7 +571,6 @@ the ``wmx_core_motion_node`` to be running.
            msg = AxisPose()
            msg.index = axis_indices
            msg.target = targets
-           msg.profile = ''
            msg.velocity = [vel] * len(axis_indices)
            msg.acc = [acc] * len(axis_indices)
            msg.dec = [dec] * len(axis_indices)
@@ -578,7 +585,6 @@ the ``wmx_core_motion_node`` to be running.
            msg = AxisPose()
            msg.index = axis_indices
            msg.target = displacements
-           msg.profile = ''
            msg.velocity = [vel] * len(axis_indices)
            msg.acc = [acc] * len(axis_indices)
            msg.dec = [dec] * len(axis_indices)
@@ -611,7 +617,7 @@ the ``wmx_core_motion_node`` to be running.
 
    Direct axis commands require the axes to be properly initialized first
    (servo enabled, mode set, homed). When using the manipulator launch file,
-   this is handled automatically by ``manipulator_state``. When using the
+   this is handled automatically by ``joint_state_broadcaster``. When using the
    general launch, call the setup services first as described in the
    :doc:`../api_reference/ros2_services` workflow section.
 
@@ -661,18 +667,18 @@ Steps to adapt
    ``numerator = encoder_counts_per_revolution``,
    ``denominator = 2 * pi (6.28319)``.
 
-3. **Create the YAML config** -- Copy ``intel_manipulator_config_cr3a.yaml``
+3. **Create the YAML config** -- Copy ``cr3a_manipulator_config.yaml``
    and update:
 
    .. code-block:: yaml
 
-      manipulator_state:
+      joint_state_broadcaster:
         ros__parameters:
-          joint_number: 6           # Must be 6 for the current system
-          joint_feedback_rate: 500  # Hz
-          joint_name: ["joint1", "joint2", "joint3", "joint4",
-                        "joint5", "joint6",
-                        "picker_1_joint", "picker_2_joint"]
+          joint_axes: [0, 1, 2, 3, 4, 5]   # WMX axis indices
+          joint_feedback_rate: 100         # Hz
+          joint_name: ["joint1", "joint2", "joint3",
+                        "joint4", "joint5", "joint6"]
+          gripper_joint_name: ["picker_1_joint", "picker_2_joint"]
           wmx_param_file_path: /path/to/new_robot_wmx_parameters.xml
 
 4. **Create a launch file** -- Copy an existing launch file and reference your
@@ -685,12 +691,12 @@ Steps to adapt
 What stays the same
 ^^^^^^^^^^^^^^^^^^^^
 
-- All ROS2 node executables (``manipulator_state``,
-  ``follow_joint_trajectory_server``, ``wmx_core_motion_node``)
+- All ROS2 node executables (``joint_state_broadcaster``,
+  ``joint_trajectory_controller``, ``wmx_core_motion_node``)
 - All service and topic names
 - The ``FollowJointTrajectory`` action interface
 - The ``wmx_ros2_message`` custom message types
 - The build process
 
-See :doc:`../packages/packages` for the full architecture and
-:doc:`../packages/wmx_ros2_package` for node and parameter details.
+See :doc:`../api_reference/wmx_ros2_package` for node and parameter details
+and :doc:`../api_reference/wmx_ros2_message` for the custom interface types.

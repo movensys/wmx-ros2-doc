@@ -38,6 +38,64 @@ All examples require:
 
 Each example page describes any additional dependencies specific to that setup.
 
+.. rubric:: Supported Configurations
+
+**Framework support:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Demo Scenario
+     - ROS2 Humble
+     - ROS2 Jazzy
+     - Isaac ROS 3.2
+     - Isaac ROS 4.1
+   * - Joint trajectory motion
+     - ✓
+     - ✓
+     - ✓
+     - ✓
+   * - AprilTag pick and place
+     - ✓
+     - ✓
+     - ✓
+     - ✓
+   * - Obstacle avoidance
+     -
+     -
+     - ✓
+     - ✓
+   * - AprilTag pick and place with obstacle avoidance
+     -
+     -
+     - ✓
+     - ✓
+
+**Robot platform support:**
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Demo Scenario
+     - Dobot CR3A
+     - Dobot CR5A
+   * - Joint trajectory motion
+     - ✓
+     - ✓
+   * - AprilTag pick and place
+     - ✓
+     -
+   * - Obstacle avoidance
+     - ✓
+     -
+   * - AprilTag pick and place with obstacle avoidance
+     - ✓
+     -
+
+**Future development:**
+
 .. toctree::
    :maxdepth: 2
 

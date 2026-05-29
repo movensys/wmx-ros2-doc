@@ -103,9 +103,8 @@ Where to go next
    :maxdepth: 3
 
    getting_started/index
-   integration/integration
    examples/examples
-   packages/packages
+   integration/integration
    api_reference/api_reference
    support
    about

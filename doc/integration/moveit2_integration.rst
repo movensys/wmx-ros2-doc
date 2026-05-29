@@ -4,10 +4,17 @@ MoveIt2 Motion Planning
 Overview
 --------
 
-MoveIt2 is the primary motion planning integration for the WMX ROS2
-application. It provides collision-aware trajectory planning, and the
-``follow_joint_trajectory_server`` node executes the planned trajectories
-on real hardware via the WMX cubic spline engine.
+MoveIt2 is the primary motion-planning integration for WMX ROS2. The
+`movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
+repository provides the ``movensys_manipulator_moveit_config`` package, which
+wraps MoveIt2 with a high-level service API and executes the planned motion on
+the robot through the WMX ROS2 stack.
+
+MoveIt2 produces collision-aware, time-parameterized trajectories; WMX runs
+them on a deterministic real-time cycle. The same configuration drives three
+execution modes: pure **simulation** (Isaac Sim or Gazebo), **hardware-in-the-loop**
+(simulator visuals with the real WMX runtime), and **real** robot control over
+EtherCAT.
 
 Architecture
 ------------
@@ -17,79 +24,154 @@ Architecture
    :class: with-border
    :align: center
 
-Prerequisites
--------------
+The ``trajectory_api`` node (in ``movensys_manipulator_moveit_config``) hosts
+a MoveIt2 ``MoveGroupInterface`` client and exposes simple pose/joint services
+under ``/wmx/moveit2/``. For each request it:
 
-MoveIt2 must be installed as part of the workspace dependencies:
+1. Sets a joint or Cartesian target on the move group.
+2. Plans with MoveIt2 (OMPL), or computes a Cartesian path for straight-line
+   moves.
+3. Time-parameterizes the trajectory with Time-Optimal Trajectory Generation
+   (TOTG), applying velocity and acceleration scaling.
+4. Executes it, which streams the trajectory to the WMX
+   ``joint_trajectory_controller`` for deterministic execution on the servos.
+
+It also publishes the live end-effector pose on ``/wmx/moveit2/eef_pose``
+(``geometry_msgs/PoseStamped``) and orientation on ``/wmx/moveit2/eef_rpy``
+(``geometry_msgs/Vector3Stamped``), and calls ``/wmx/set_gripper`` for gripper
+actions.
+
+Setup
+-----
+
+The MoveIt2 integration runs inside the ``movensys-manipulator`` Docker
+container. After cloning the repository and configuring the host environment,
+enter the container with the ``mros`` helper. Key environment variables:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 32 68
+
+   * - Variable
+     - Purpose
+   * - ``ROS_DISTRO``
+     - ``humble`` or ``jazzy``
+   * - ``MANIPULATOR_MODEL``
+     - ``dobot_cr3a`` or ``dobot_cr5a`` (selects the MoveIt config)
+   * - ``MOVENSYS_ROS_VERSION``
+     - ``isaac-ros_4.1``, ``isaac-ros_3.2``, or ``general``
+   * - ``CPU_ARCH``
+     - ``amd64`` or ``arm64``
+
+See the `movensys-manipulator README
+<https://github.com/movensys/movensys-manipulator>`_ for the full host setup,
+CycloneDDS buffer tuning, and container build steps.
+
+Running MoveIt2
+---------------
+
+Bring up the MoveIt2 stack (commands run through the ``mros`` container
+helper). For a real robot:
 
 .. code-block:: bash
 
-   sudo apt install ros-${ROS_DISTRO}-moveit*
+   # Start MoveIt2 (move_group + trajectory_api services)
+   mros ros2 launch movensys_manipulator_moveit_config moveit.launch.py
 
-See :doc:`../getting_started/index` for the complete dependency list.
+   # Run a trajectory test, or send your own service calls
+   mros ros2 launch movensys_manipulator_moveit_config trajectory_test.launch.py
 
-Configuration
--------------
+For simulation or hardware-in-the-loop, start the simulator bridge first and
+pass ``use_sim_time:=true``:
 
-The ``follow_joint_trajectory_server`` node must be configured with the
-correct action name that MoveIt2 expects. This is set in the config YAML:
+.. code-block:: bash
 
-.. code-block:: yaml
+   mros ros2 launch movensys_manipulator_moveit_config sim_bridge.launch.py \
+        simulator:=isaacsim use_sim_time:=true
+   mros ros2 launch movensys_manipulator_moveit_config moveit.launch.py \
+        use_sim_time:=true
 
-   follow_joint_trajectory_server:
-     ros__parameters:
-       joint_number: 6
-       joint_trajectory_action: /movensys_manipulator_arm_controller/follow_joint_trajectory
+Service API
+-----------
 
-The action name must match the controller configuration in the MoveIt2
-setup for your robot.
+The ``trajectory_api`` node exposes these services. Pose services use
+``movensys_manipulator_moveit_config/srv/MovePose`` (``pos`` = XYZ metres,
+``ori`` = roll/pitch/yaw radians); joint services use ``MoveJoints``.
 
-The ``manipulator_state`` node must publish to ``/joint_states`` so MoveIt2
-can read the current robot state:
+.. list-table::
+   :header-rows: 1
+   :widths: 45 30 25
 
-.. code-block:: yaml
+   * - Service
+     - Type
+     - Purpose
+   * - ``/wmx/moveit2/get_eef_pose``
+     - ``GetEefPose``
+     - Read the current end-effector pose (``pos`` + ``rpy``)
+   * - ``/wmx/moveit2/absolute_base_eef_cartesian``
+     - ``MovePose``
+     - Cartesian move to an absolute pose (base frame)
+   * - ``/wmx/moveit2/relative_base_eef_cartesian``
+     - ``MovePose``
+     - Cartesian move by a relative offset (base frame)
+   * - ``/wmx/moveit2/relative_tool_eef_cartesian``
+     - ``MovePose``
+     - Cartesian move by a relative offset (tool frame)
+   * - ``/wmx/moveit2/absolute_base_eef_joint_movement``
+     - ``MovePose``
+     - Plan to a pose target in joint space (base frame)
+   * - ``/wmx/moveit2/joint_movement``
+     - ``MoveJoints``
+     - Absolute joint-space move
+   * - ``/wmx/moveit2/relative_joint_movement``
+     - ``MoveJoints``
+     - Relative (incremental) joint-space move
 
-   manipulator_state:
-     ros__parameters:
-       encoder_joint_topic: /joint_states
+Examples
+--------
 
-Usage
------
+Read the current end-effector pose:
 
-1. Launch the WMX ROS2 manipulator nodes (see
-   :doc:`../getting_started/index`):
+.. code-block:: bash
 
-   .. code-block:: bash
+   mros ros2 service call /wmx/moveit2/get_eef_pose \
+        movensys_manipulator_moveit_config/srv/GetEefPose '"{}"'
 
-      sudo --preserve-env=PATH \
-           --preserve-env=AMENT_PREFIX_PATH \
-           --preserve-env=COLCON_PREFIX_PATH \
-           --preserve-env=PYTHONPATH \
-           --preserve-env=LD_LIBRARY_PATH \
-           --preserve-env=ROS_DISTRO \
-           --preserve-env=ROS_VERSION \
-           --preserve-env=ROS_PYTHON_VERSION \
-           --preserve-env=ROS_DOMAIN_ID \
-           --preserve-env=RMW_IMPLEMENTATION \
-           bash -c "source /opt/ros/\${ROS_DISTRO}/setup.bash && \
-                    source ~/wmx_ros2_ws/install/setup.bash && \
-                    ros2 launch wmx_ros2_package \
-                      wmx_ros2_cr3a_manipulator.launch.py \
-                      use_sim_time:=false"
+Absolute Cartesian move (base frame):
 
-2. Launch MoveIt2 with your robot's MoveIt configuration package.
+.. code-block:: bash
 
-3. Plan and execute trajectories through the MoveIt2 interface (RViz plugin
-   or programmatic API).
+   mros ros2 service call /wmx/moveit2/absolute_base_eef_cartesian \
+        movensys_manipulator_moveit_config/srv/MovePose \
+        '"{pos: [-0.158, -0.071, 0.346], ori: [3.14159265, 0.0, -3.14159265]}"'
 
-Trajectory Execution Details
------------------------------
+Absolute joint move:
 
-When MoveIt2 sends a trajectory, the ``follow_joint_trajectory_server``
-processes it as described in the :doc:`../api_reference/ros2_actions` page:
+.. code-block:: bash
 
-- Maximum 1000 waypoints per trajectory
-- Cubic spline interpolation via ``AdvancedMotion::StartCSplinePos()``
-- The server blocks until motion completes
-- Returns ``error_code = 0`` on success
+   mros ros2 service call /wmx/moveit2/joint_movement \
+        movensys_manipulator_moveit_config/srv/MoveJoints \
+        '"{joint_names: [joint1, joint2, joint3, joint4, joint5, joint6], joint_values: [0.0, 0.0, -1.57, 0.0, 1.57, 0.0]}"'
 
+Open or close the gripper:
+
+.. code-block:: bash
+
+   mros ros2 service call /wmx/set_gripper std_srvs/srv/SetBool '"{data: true}"'
+
+Trajectory Execution
+--------------------
+
+Planned trajectories are streamed to the WMX ``joint_trajectory_controller``,
+which executes them with cubic spline interpolation
+(``AdvancedMotion::StartCSplinePos()``) on a deterministic real-time cycle.
+See :doc:`../api_reference/ros2_actions` for the execution details and limits.
+
+See Also
+--------
+
+- :doc:`cumotion_integration` -- GPU-accelerated planning with Isaac cuMotion
+- :doc:`custom_application` -- drive the ``/wmx/moveit2/*`` services from your
+  own code
+- The `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
+  repository for the full trajectory, AprilTag, Nvblox, and YOLO walkthroughs

@@ -710,7 +710,7 @@ How It Connects to WMX ROS2
 -----------------------------
 
 The Isaac manipulator workspace is designed to work alongside the core WMX ROS2
-packages (:doc:`../packages/packages`). The connection point is the
+packages (:doc:`../api_reference/wmx_ros2_package`). The connection point is the
 ``FollowJointTrajectory`` action interface and the ``/joint_states`` topic.
 
 .. list-table:: Mode Comparison

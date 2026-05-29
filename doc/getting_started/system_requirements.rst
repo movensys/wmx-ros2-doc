@@ -72,10 +72,13 @@ Supported Robot Models and Platforms
      - 6
      - 16.5 kg
      - Fully supported. Configuration files and WMX parameters included.
+   * - Dobot CR5A
+     - 6
+     - 25 kg
+     - Tested only in simulation and hardware-in-loop
 
 The architecture is robot-agnostic for any 6-DOF manipulator with EtherCAT
-servo drives. See :doc:`../integration/integration` for details on adapting
-to other robots.
+servo drives. 
 
 .. list-table::
    :header-rows: 1

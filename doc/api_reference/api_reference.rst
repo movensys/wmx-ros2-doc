@@ -39,6 +39,9 @@ robot via WMX spline interpolation.
 .. toctree::
    :maxdepth: 2
 
+   communication
+   wmx_ros2_message
+   wmx_ros2_package
    ros2_services
    ros2_topics
    ros2_actions

@@ -593,5 +593,5 @@ See Also
 
 - :doc:`ros2_services` -- Service API for engine management and axis control
 - :doc:`ros2_actions` -- FollowJointTrajectory action for MoveIt2 integration
-- :doc:`../packages/wmx_ros2_message` -- Custom message type definitions
-- :doc:`../packages/wmx_ros2_package` -- Node documentation with parameters
+- :doc:`wmx_ros2_message` -- Custom message type definitions
+- :doc:`wmx_ros2_package` -- Node documentation with parameters

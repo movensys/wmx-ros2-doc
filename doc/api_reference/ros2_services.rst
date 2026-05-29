@@ -981,4 +981,4 @@ See Also
 
 - :doc:`ros2_actions` -- FollowJointTrajectory action for MoveIt2 integration
 - :doc:`ros2_topics` -- Motion command topics and state feedback
-- :doc:`../packages/wmx_ros2_message` -- Custom message type definitions
+- :doc:`wmx_ros2_message` -- Custom message type definitions
