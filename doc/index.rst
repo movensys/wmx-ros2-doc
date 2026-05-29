@@ -10,7 +10,7 @@ stack runs on a single industrial PC (IPC) or edge device with no
 separate motion controller. A Real-Time OS is required
 so that motion timing stays predictable under load.
 
-wmx-ros2 integrates with widely used projects in the ROS2 ecosystem:
+WMX ROS2 integrates with widely used projects in the ROS2 ecosystem:
 
 * `MoveIt2 <https://moveit.ai/>`_ for manipulator motion planning
 * `NVIDIA Isaac Sim <https://developer.nvidia.com/isaac/sim>`_ and
@@ -26,74 +26,60 @@ wmx-ros2 integrates with widely used projects in the ROS2 ecosystem:
 
 
 .. figure:: /_static/images/wmx-ros2_overview.drawio.png
-   :alt: wmx-ros2 architecture overview
+   :alt: WMX ROS2 architecture overview
    :align: center
    :width: 100%
 
-   wmx-ros2 architecture overview.
+   WMX ROS2 architecture overview.
 
 Why need a Real-Time OS?
 ----------------------------------------
 
-Industrial automation requires deterministic and high precision motion
-as a baseline. The drives that move a robot expect a new command at a
-fixed interval. If a command arrives
-late the motion stutters, accuracy drops, and on a production line the
-drives can fault and stop the machine in the middle of process. A
-standard Linux kernel is built for throughput rather than keeping a
-strict schedule, so it can pause the program for a few milliseconds
-to handle a network packet or a background task. Those few
-milliseconds are exactly what causes a missed cycle. A Real-Time OS
-such as Linux with the PREEMPT_RT patch
-guarantees that high priority threads for motion control
-thread run when they need to, even if the rest of the system is busy.
-That is why every industrial motion stack runs on top of a Real-Time
-OS.
+Servo drivers expect a command every fixed cycle. Standard Linux
+optimizes for throughput rather than keeping a strict deterministic
+schedule, so it may pause the program for a few milliseconds to handle
+a packet or a background task. That delay makes the next command arrive
+late and miss its cycle. A missed cycle makes motion stutter and drops
+accuracy, and on a production line it can even fault the drivers and
+stop the machine. A Real-Time OS such as Linux with the PREEMPT_RT
+patch guarantees motion threads run on time even under load, which is
+why every industrial motion stack runs on one.
 
-Why wmx-ros2?
+Why WMX ROS2?
 ----------------------------------------
 
-A Real-Time OS handles the kernel-level guarantees, but the motion
-pipeline still has a step that ROS2 alone does not cover. A planner
-such as MoveIt2 or Nav2 produces a trajectory and
-`ros2_control <https://control.ros.org/>`_ hands joint commands to the
-hardware. Those commands still need to be translated into the precisely
-timed signals that drives execute on a fixed cycle. Most ROS2 setups
-close this execution gap with a closed industrial controller over
-TCP/IP. That choice adds latency the planner can never recover. The
-other common option sends raw EtherCAT commands and leaves smoothing
-and coordination to ROS2 which is not built for hard real-time work.
-Either approach becomes the limiting factor once a line needs the cycle
-accuracy that production equipment depends on. The wmx-ros2 package closes the gap
-by bringing the WMX motion control engine into ROS2 so the planner's
-output runs as smooth and deterministic motion without leaving the ROS2
-ecosystem.
+A Real-Time OS covers the kernel-level guarantees, but ROS2 still
+leaves one step uncovered. A planner such as MoveIt2 or Nav2 produces a
+trajectory and `ros2_control <https://control.ros.org/>`_ sends joint
+commands to the hardware. Those commands still need to become the
+precisely timed signals servo drivers execute on a fixed cycle. Most
+ROS2 setups bridge this execution gap with a closed industrial
+controller over TCP/IP, which adds latency the planner can never
+recover. The other common option sends raw EtherCAT commands and leaves
+smoothing and coordination to ROS2, which is not built for hard
+real-time work. Both approaches become the limiting factor once a line
+needs production-grade cycle accuracy. The WMX ROS2 package closes the
+gap by bringing the WMX motion control engine into ROS2, so the
+planner's output runs as smooth and deterministic motion without
+leaving the ROS2 ecosystem.
 
-What is wmx-ros2?
+What is WMX ROS2?
 ----------------------------------------
 
-The wmx-ros2 is the open source MIT-licensed ROS2 package layer that owns
-the timing-sensitive part of that pipeline. It smooths trajectories,
-coordinates multiple joints, and emits commands at the rate the drives
-expect. It runs in simulation, in hardware-in-the-loop configurations,
-and on real EtherCAT hardware. Supported platforms include x86
-industrial PCs and NVIDIA Jetson boards running a real-time Linux
-kernel (PREEMPT_RT). The same package moves from a developer's bench to
-a production cell without rewriting the motion layer.
-
-What is WMX?
-----------------------------------------
-
-WMX is the motion control engine underneath wmx-ros2 and the reason it
-can hold an industrial cycle on top of the Real-Time OS. It exposes
-more than 200 APIs covering trajectory conversion, EtherCAT network
-configuration, I/O, and engine control on a deterministic real-time
-cycle. It supports motion profiles such as Position Velocity Time (PVT)
-and multi-axis coordinated motion. WMX has over a decade of deployment
-in semiconductor equipment, manufacturing lines, and precision
-robotics. The free license runs in 1-hour
-sessions and continues by restarting EtherCAT communication. A separate
-commercial license removes this limit for business and production use.
+WMX ROS2 is an open source MIT-licensed ROS2 package layer that owns
+the timing-sensitive step, smoothing trajectories, coordinating joints,
+and emitting commands at the rate servo drivers expect. It runs in
+simulation, in hardware-in-the-loop, and on real EtherCAT hardware
+across x86 industrial PCs and NVIDIA Jetson boards on a real-time Linux
+kernel (PREEMPT_RT). It is built on the WMX motion control engine,
+which keeps motion on a deterministic cycle. WMX exposes more than 200 APIs
+for trajectory conversion, EtherCAT configuration, I/O, and engine
+control on a deterministic real-time cycle, with profiles such as
+Position Velocity Time (PVT) and multi-axis coordinated motion. Proven
+over a decade in semiconductor equipment, manufacturing lines, and
+precision robotics, WMX runs free in 1-hour sessions that continue by
+restarting EtherCAT, while a commercial license removes the limit for
+production use.
 
 
 

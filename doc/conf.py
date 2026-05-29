@@ -52,7 +52,7 @@ html_theme_options = {
         },
     ],
     "navbar_align": "left",
-    "navigation_depth": 4,
+    "navigation_depth": 2,
     "show_nav_level": 1,
     "show_toc_level": 2,
     "collapse_navigation": True,
