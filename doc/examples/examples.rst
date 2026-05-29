@@ -1,10 +1,7 @@
-:orphan:
-
 Example Applications
 ====================
 
-Overview
---------
+.. rubric:: Overview
 
 This section contains complete application examples showing how to use the
 WMX ROS2 packages with different frameworks and hardware setups. Each example
@@ -30,8 +27,7 @@ WMX XML parameters, and launch files) differ between setups.
      - Intel x86_64
      - Manipulator control with Gazebo integration
 
-Requirements
--------------
+.. rubric:: Requirements
 
 All examples require:
 

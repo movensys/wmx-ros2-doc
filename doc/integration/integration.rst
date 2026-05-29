@@ -4,8 +4,7 @@ Integration Scenarios
 WMX ROS2 supports multiple motion planning backends and can be extended with
 custom planners and applications.
 
-Supported Configurations
-------------------------
+.. rubric:: Supported Configurations
 
 **Framework support:**
 
@@ -99,8 +98,7 @@ Supported Configurations
 **Future development:**
 
 
-Planning Backend Selection
---------------------------
+.. rubric:: Planning Backend Selection
 
 Use the decision tree below to find the right integration for your use case,
 then follow the corresponding guide.

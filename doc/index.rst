@@ -7,8 +7,10 @@ engine over EtherCAT. It targets industrial applications that require
 deterministic and high precision motion, such as semiconductor
 equipment, manufacturing automation, and precision robotics. The entire
 stack runs on a single industrial PC (IPC) or edge device with no
-separate motion controller. A Real-Time OS is required
-so that motion timing stays predictable under load.
+separate motion controller. It combines perception and deterministic
+motion into edge physical AI so a machine can sense and act in the real
+world on one device. A Real-Time OS is required so that motion timing
+stays predictable under load.
 
 WMX ROS2 integrates with widely used projects in the ROS2 ecosystem:
 
@@ -66,23 +68,22 @@ leaving the ROS2 ecosystem.
 What is WMX ROS2?
 ----------------------------------------
 
-WMX ROS2 is an open source MIT-licensed ROS2 package layer that owns
-the timing-sensitive step, smoothing trajectories, coordinating joints,
-and emitting commands at the rate servo drivers expect. It runs in
-simulation, in hardware-in-the-loop, and on real EtherCAT hardware
-across x86 industrial PCs and NVIDIA Jetson boards on a real-time Linux
-kernel (PREEMPT_RT). It is built on the WMX motion control engine,
-which keeps motion on a deterministic cycle. WMX exposes more than 200 APIs
-for trajectory conversion, EtherCAT configuration, I/O, and engine
-control on a deterministic real-time cycle, with profiles such as
-Position Velocity Time (PVT) and multi-axis coordinated motion. Proven
-over a decade in semiconductor equipment, manufacturing lines, and
-precision robotics, WMX runs free in 1-hour sessions that continue by
-restarting EtherCAT, while a commercial license removes the limit for
-production use.
-
-
-
+WMX ROS2 is an open source MIT-licensed ROS2 package layer that owns the
+timing-sensitive step: smoothing trajectories, coordinating joints, and
+emitting commands at the rate servo drivers expect. It runs in
+simulation, in hardware-in-the-loop, and on real EtherCAT hardware across
+x86 industrial PCs and NVIDIA Jetson boards on a real-time Linux kernel
+(PREEMPT_RT). It also brings AI to the edge as physical AI, hosting
+workloads such as `NVIDIA Isaac ROS <https://developer.nvidia.com/isaac/ros>`_,
+`YOLO <https://docs.ultralytics.com/>`_,
+`Intel OpenVINO <https://docs.openvino.ai/2026/index.html>`_, and
+vision-language models on the same device that drives the servo. It is
+built on the WMX motion control engine, which keeps motion on a
+deterministic cycle and exposes more than 200 APIs for trajectory
+conversion, EtherCAT, I/O, and engine control. Proven over a decade in
+semiconductor, manufacturing, and precision robotics. WMX runs free in
+renewable 1-hour sessions that you extend by restarting the engine, and a
+commercial license removes the limit for production.
 
 Where to go next
 ----------------------------------------
@@ -103,6 +104,7 @@ Where to go next
 
    getting_started/index
    integration/integration
+   examples/examples
    packages/packages
    api_reference/api_reference
    support
