@@ -154,7 +154,7 @@ tracked below.
        
      - - Add Differential node
        - Add movensys-navigation
-       - Add Isaac GR00T
+       - Add VLA example
        - Add Diffbot in isaacsim
        - Add differential drive controller node
        - Add robot option node
