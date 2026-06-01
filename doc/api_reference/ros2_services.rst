@@ -209,7 +209,7 @@ These services manage the WMX engine lifecycle. They are hosted by
      - ``true`` to create device, ``false`` to close device
    * - ``path``
      - ``string``
-     - LMX(WMX Runtime) installation path (typically ``/opt/wmx3/``)
+     - WMX Runtime installation path (typically ``/opt/wmx3/``)
    * - ``name``
      - ``string``
      - Device name assigned via ``SetDeviceName()``

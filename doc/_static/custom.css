@@ -450,3 +450,11 @@ code.literal {
         margin: 0 0.75rem;
     }
 }
+
+/* ---------- Left nav: pages only, not in-page section anchors ---------- */
+/* Section headings belong in the right "On this page" list. Hide any left-
+   sidebar entry that points to a heading anchor (href containing "#"), while
+   keeping real page links and the current-page self-link (href="#"). */
+.bd-sidebar-primary .bd-docs-nav li:has(> a.reference.internal[href*="#"]:not([href="#"])) {
+    display: none;
+}

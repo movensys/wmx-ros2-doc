@@ -1,8 +1,8 @@
 Example Applications
 ====================
 
-Runnable, end-to-end examples that build on the WMX ROS2 stack. The
-**manipulator scenarios** come from the
+This section provides complete examples that you can run from start to finish
+on the WMX ROS2 stack. The **manipulator scenarios** come from the
 `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
 repository (Dobot CR3A / CR5A arms with MoveIt2 / Isaac cuMotion planning and
 Nvblox / YOLO / AprilTag perception). The **Robopoly game** is a voice-driven
@@ -16,10 +16,30 @@ Every manipulator scenario runs in three execution modes:
 - **HIL** -- hardware-in-the-loop: simulator visuals with the real WMX runtime
 - **Real** -- the real robot via WMX over EtherCAT
 
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Manipulator scenarios
+
+   isaacsim_setup
+   movensys_manipulator_setup
+   trajectory_planning
+   apriltag_pick_and_place
+   obstacle_avoidance
+   yolo_pick_and_place
+   apriltag_obstacle_avoidance
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Intelligence
+
+   robopoly_game
+
 Common Requirements
 -------------------
 
-- The core WMX ROS2 packages built and the LMX (WMX Runtime) at ``/opt/wmx3/``
+- The core WMX ROS2 packages built and the WMX Runtime at ``/opt/wmx3/``
   (see :doc:`../getting_started/index`)
 - Docker with ``docker compose`` (the examples run inside containers)
 - An NVIDIA GPU and Isaac ROS prerequisites for the ``isaac-ros_*`` images
@@ -27,37 +47,8 @@ Common Requirements
 - The `movensys-simulation <https://github.com/movensys/movensys-simulation>`_
   repo for the Isaac Sim scenes
 
-Manipulator Setup
------------------
-
-Clone ``movensys-manipulator`` and configure the host environment, then build
-and start the container and enter it with the ``mros`` helper (host setup is in
-``doc/1_setup.md``, container setup in ``doc/2_docker.md``). Key environment
-variables:
-
-.. code-block:: bash
-
-   export ROS_DISTRO=jazzy                    # {jazzy, humble}
-   export MANIPULATOR_MODEL=dobot_cr3a        # {dobot_cr3a, dobot_cr5a}
-   export MOVENSYS_ROS_VERSION=isaac-ros_4.1  # {isaac-ros_4.1, isaac-ros_3.2, general}
-   export CPU_ARCH=amd64                       # {amd64, arm64}
-
-All scenario commands run through ``mros``, which executes inside the
-``movensys_manipulator_container``. Isaac Sim scenes load from
-``~/workspaces/movensys-simulation/<MANIPULATOR_MODEL>/<scenario>.usd``. For
-HIL and Real modes, the manipulator is brought up with WMX ROS2 (see
-``wmx-ros2/doc/launch_<MANIPULATOR_MODEL>_manipulator.md`` and
-:doc:`../getting_started/testing_wmx_ros2`).
-
-.. note:: **Isaac Sim scenes**
-
-   The ready-to-open USD scenes come from the
-   `movensys-simulation <https://github.com/movensys/movensys-simulation>`_
-   repository, organized under ``dobot_cr3a/`` and ``dobot_cr5a/``. Scenes are
-   named ``<n><mode>_<example>.usd`` where the mode suffix is ``a`` =
-   simulation, ``b`` = HIL, ``c`` = real. Running them requires NVIDIA Isaac
-   Sim 5.0.0+ with the ``isaacsim.ros2.bridge`` extension enabled. See the
-   repository README for the full Isaac Sim setup.
+Before running any manipulator scenario, set up the stack once — see
+:doc:`movensys_manipulator_setup`.
 
 Supported Configurations
 ------------------------
@@ -93,6 +84,11 @@ Supported Configurations
      -
      - ✓
      - ✓
+   * - Robopoly game
+     - ✓
+     - ✓
+     - ✓
+     - ✓
 
 **Robot platform support:**
 
@@ -115,36 +111,51 @@ Supported Configurations
    * - AprilTag pick and place with obstacle avoidance
      - ✓
      -
+   * - Robopoly game
+     - ✓
+     -
 
 Development Roadmap
 -------------------
 
-The examples are under active development. Planned and in-progress work
-includes:
+The examples are under active development. Planned and in-progress work is
+tracked below.
 
-- **Dobot CR5A scenario coverage** -- extending AprilTag pick-and-place,
-  obstacle avoidance, and YOLO detection to the CR5A, which currently supports
-  trajectory planning only.
-- **Framework portability** -- bringing the obstacle-avoidance scenarios to the
-  ``general`` (non-Isaac-ROS) build, in addition to the Isaac ROS images.
-- **Mobile-base support** -- a differential-drive base driven by the same WMX
-  ROS2 stack (the WMX parameter set is already staged in the repository).
-- **Intelligence applications** -- further VLM/LLM-driven applications building
-  on the natural-language and vision control stack beyond the
-  :doc:`robopoly_game`.
+.. list-table::
+   :header-rows: 1
+   :widths: 33 33 34
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Manipulator scenarios
+   * - 2026 Q1
+     - 2026 Q2
+     - 2026 Q3
+   * - - Add WMX3 general node
+       - Add trajectory example
+       - Add Apriltag example
+       - Add movensys_isaac_manipulator
+       - Add movensys_intel_manipulator
+       - Add movensys_thor_manipulator
+       - Add robotic_isaac_sim
+       - Add Apriltag example
 
-   trajectory_planning
-   apriltag_pick_and_place
-   obstacle_avoidance
-   yolo_pick_and_place
-   apriltag_obstacle_avoidance
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Intelligence
-
-   robopoly_game
+     - - Support arm64/amd64
+       - Suport ROS2 humble/jazzy
+       - Support dobot cr3a/cr5a
+       - Add Joint Trajectory Controller node
+       - Add Gripper Controller node
+       - Add movensys-manipulator
+       - Add movensys-simulation
+       - Add movensys-intelligence
+       - Add Apriltag + Obstacle avoidance example
+       - Add Robopoly example
+       - Delete robotic_isaac_sim
+       - Delete movensys_isaac_manipulator
+       - Delete movensys_intel_manipulator
+       - Delete movensys_thor_manipulator
+       
+     - - Add Differential node
+       - Add movensys-navigation
+       - Add Isaac GR00T
+       - Add Diffbot in isaacsim
+       - Add differential drive controller node
+       - Add robot option node
+       - ros2_control integration

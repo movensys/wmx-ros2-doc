@@ -48,7 +48,7 @@ that follow.
       **Prerequisites**
 
       - The WMX ROS2 workspace is built and sourced
-      - LMX (WMX Runtime) is installed at ``/opt/wmx3/``
+      - The WMX Runtime is installed at ``/opt/wmx3/``
       - EtherCAT cable is connected between compute platform and first EtherCAT device
       - The hardware and all servo drives are powered on
       - You have ``sudo`` privileges
