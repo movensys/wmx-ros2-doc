@@ -138,7 +138,7 @@ tracked below.
        - Add Apriltag example
 
      - - Support arm64/amd64
-       - Suport ROS2 humble/jazzy
+       - Support ROS2 humble/jazzy
        - Support dobot cr3a/cr5a
        - Add Joint Trajectory Controller node
        - Add Gripper Controller node

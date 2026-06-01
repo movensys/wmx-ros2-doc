@@ -84,4 +84,6 @@ intersphinx_mapping = {
 # that the linkcheck HEAD probe cannot satisfy, so skip them.
 linkcheck_ignore = [
     r'^http://download\.movensys\.com:8111/.*',
+    # SharePoint download links require authentication; linkcheck cannot reach them.
+    r'^https://softservogroup.*\.sharepoint\.com/.*',
 ]
