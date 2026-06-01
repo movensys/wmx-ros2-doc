@@ -73,31 +73,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
 
    .. tab-item:: isaac-ros_4.1 (Ubuntu 24.04 / Jazzy)
 
-      **1. Install Ubuntu 24.04 Server**, then add the desktop:
-
-      .. code-block:: bash
-
-         sudo apt-get update
-         sudo apt-get upgrade
-         sudo apt install ubuntu-desktop -y
-         sudo reboot
-
-      Download: `Ubuntu 24.04 (Noble Numbat)
-      <https://releases.ubuntu.com/24.04/>`_.
-
-      **2. Install the NVIDIA driver** (RTX 5070 → ``nvidia-driver-570-open``,
-      RTX 5090 → ``nvidia-driver-580-open``):
-
-      .. code-block:: bash
-
-         ubuntu-drivers devices
-         sudo apt install nvidia-driver-580-open
-         sudo reboot
-
-      **3. Install ROS 2** — see the `ROS 2 Jazzy installation guide
-      <https://docs.ros.org/en/jazzy/Installation.html>`_.
-
-      **4. Set up the NVIDIA workspace:**
+      **1. Set up the NVIDIA workspace:**
 
       .. code-block:: bash
 
@@ -135,7 +111,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
          pip install termcolor --break-system-packages
          sudo apt-get install isaac-ros-cli
 
-      **5. Install Docker** — see `Install Docker Engine on Ubuntu
+      **2. Install Docker** — see `Install Docker Engine on Ubuntu
       <https://docs.docker.com/engine/install/ubuntu/>`_, then allow Docker
       without ``sudo``:
 
@@ -146,7 +122,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
          sudo chmod 666 /var/run/docker.sock
          sudo systemctl restart docker
 
-      **6. Install the NVIDIA Container Toolkit** — install and configure per the
+      **3. Install the NVIDIA Container Toolkit** — install and configure per the
       `NVIDIA Container Toolkit guide
       <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>`_,
       install `Git LFS <https://git-lfs.com/>`_, and restart Docker:
@@ -157,7 +133,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
          git lfs install --skip-repo
          sudo systemctl daemon-reload && sudo systemctl restart docker
 
-      **7. Initialize and activate the Isaac ROS container:**
+      **4. Initialize and activate the Isaac ROS container:**
 
       .. code-block:: bash
 
@@ -166,28 +142,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
 
    .. tab-item:: isaac-ros_3.2 (Ubuntu 22.04 / Humble)
 
-      **1. Install Ubuntu 22.04 Server**, then add the desktop:
-
-      .. code-block:: bash
-
-         sudo apt-get update
-         sudo apt-get upgrade
-         sudo apt install ubuntu-desktop -y
-         sudo reboot
-
-      Download: `Ubuntu 22.04.5 LTS (Jammy Jellyfish)
-      <https://releases.ubuntu.com/22.04/>`_.
-
-      **2. Install the NVIDIA driver** (RTX 5070 → ``nvidia-driver-570-open``,
-      RTX 5090 → ``nvidia-driver-580-open``):
-
-      .. code-block:: bash
-
-         ubuntu-drivers devices
-         sudo apt install nvidia-driver-570-open
-         sudo reboot
-
-      **3. Install Docker** — see `Install Docker Engine on Ubuntu
+      **1. Install Docker** — see `Install Docker Engine on Ubuntu
       <https://docs.docker.com/engine/install/ubuntu/>`_, then allow Docker
       without ``sudo``:
 
@@ -197,7 +152,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
          newgrp docker
          sudo chmod 666 /var/run/docker.sock
 
-      **4. Install the NVIDIA Container Toolkit** — install and configure per the
+      **2. Install the NVIDIA Container Toolkit** — install and configure per the
       `NVIDIA Container Toolkit guide
       <https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>`_,
       then restart Docker and install `Git LFS <https://git-lfs.com/>`_:
@@ -208,10 +163,7 @@ driver is not supported by the Ubuntu *desktop* installer, install Ubuntu
          sudo apt-get install git-lfs
          git lfs install --skip-repo
 
-      **5. Install ROS 2** — see the `ROS 2 Humble installation guide
-      <https://docs.ros.org/en/humble/Installation.html>`_.
-
-      **6. Set up and test the Isaac ROS container:**
+      **3. Set up and test the Isaac ROS container:**
 
       .. code-block:: bash
 

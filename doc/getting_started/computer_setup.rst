@@ -11,41 +11,13 @@ the WMX Runtime.
 
    The kernel-build, flash, and WMX Runtime installer files are distributed on
    the internal MOVENSYS setup share — ask your MOVENSYS contact for access.
-   The literal ``lmx`` paths and binaries below (e.g. ``/opt/lmx/``) are the
+   The literal ``wmx`` paths and binaries below (e.g. ``/opt/wmx3/``) are the
    on-disk names installed by the WMX Runtime package and must be typed as
    shown.
 
-Supported platforms
--------------------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 22 18 22 18 20
-
-   * - Platform
-     - Ubuntu
-     - RT kernel
-     - Arch
-     - Setup bundle
-   * - MIC-713
-     - 22.04
-     - ``5.15.148-rt``
-     - arm64
-     - ``mic713_ubuntu2204_setup``
-   * - MIC-733ao
-     - 22.04
-     - ``5.15.148-rt``
-     - arm64
-     - ``mic733_ubuntu2204_setup``
-   * - MIC-743
-     - 24.04 (JetPack 7.0)
-     - ``6.8.12-rt``
-     - arm64
-     - ``mic743_ubuntu2404_setup``
-
 .. note:: **MIC-733ao only**
 
-   Install an M.2 NVMe SSD in the board before starting.
+   Install an additional M.2 NVMe SSD in the board before starting due to limited storage capacity.
 
 1. Prepare the setup files [Desktop]
 ------------------------------------
@@ -120,8 +92,8 @@ Make the bundle scripts executable and build the kernel:
       .. code-block:: bash
 
          sudo chmod +x *.sh
-         sudo ./code_MIC743.sh
-         sudo ./build_eval_743.sh
+         ./code_MIC743.sh
+         ./build_eval_743.sh
 
 In the kernel ``menuconfig`` that opens, set:
 
@@ -160,7 +132,7 @@ In the kernel ``menuconfig`` that opens, set:
 
       .. code-block:: bash
 
-         sudo ./flash_743.sh
+         ./flash_743.sh
 
 Then remove the build artifacts:
 
@@ -209,8 +181,8 @@ Confirm the RT kernel is running, then build and run ``cyclictest``:
 
 .. code-block:: bash
 
-   sudo hostnamectl set-hostname <new-host-name>   # e.g. baymax-kr
-   sudo reboot                                      # reconnect over ssh with the new name
+   sudo hostnamectl set-hostname <new-host-name>   
+   sudo reboot                                      
 
 7. Jetson clocks and power [IPC]
 --------------------------------
@@ -222,15 +194,9 @@ Lock the Jetson to maximum performance:
    sudo /usr/bin/jetson_clocks
    sudo /usr/sbin/nvpmodel -m 0
 
-8. Install the WMX Runtime [IPC]
+
+8. NIC driver config [IPC]
 --------------------------------
-
-Download the WMX Runtime installer for your board from the MOVENSYS setup share
-and install it:
-
-.. code-block:: bash
-
-   sudo dpkg -i ./<installer-name>.deb
 
 Find the EtherCAT NIC's PCI address and record it as ``Location`` in
 ``/opt/lmx/platform/ethercat/LmxTcpip.ini``:
@@ -241,44 +207,3 @@ Find the EtherCAT NIC's PCI address and record it as ``Location`` in
 
 - x86 example: ``Location=2;1;0``
 - arm64 example: ``Location=8;1;0;0``
-
-9. Modify the NIC driver [IPC]
-------------------------------
-
-- **Option 1** — use the prebuilt module(s) and make them executable:
-
-  .. code-block:: bash
-
-     sudo chmod 755 lmx_r8168.ko          # MIC-733ao also: lmx_igb.ko
-
-- **Option 2** — build from source with ``build_nic.sh`` from
-  `lmx_nic_driver_open
-  <https://bitbucket.org/mvs_app/lmx_nic_driver_open/src/master/>`_.
-
-10. Isolate CPU cores [IPC]
----------------------------
-
-Isolate cores for the WMX real-time threads using the Linux core-isolation
-method. On MIC-743, run the provided ``linux_scripts.zip`` scripts and use the
-same ``Location`` as in ``/opt/lmx/platform/ethercat/LmxTcpip.ini``.
-
-11. Set up the software license [IPC]
--------------------------------------
-
-Get the computer ID and request an activation key for it:
-
-.. code-block:: bash
-
-   /opt/lmx/bin/lmx-get-computerid
-
-Ask the responsible MOVENSYS contact for the license code matching that ID,
-then save it:
-
-.. code-block:: bash
-
-   mkdir -p /opt/lmx/reg/
-   cd /opt/lmx/reg/
-   # create a file named SecurityCode and paste the activation key into it
-
-With the real-time kernel verified and the WMX Runtime licensed, continue to
-:doc:`install_wmx3`.
