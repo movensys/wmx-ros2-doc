@@ -1,0 +1,7 @@
+[codespell]
+# Skip generated / vendored / binary-ish dirs.
+skip = ./.git,./venv,./doc/_build,./doc/_static
+# Domain-specific words that are real terms, not typos.
+ignore-words-list = ros,ans,ist,nd,te,wel,doc,fo,fro,bu,ot,thi
+quiet-level = 3
+check-filenames =

@@ -1,17 +1,15 @@
 About Us
 ========
 
-MOVENSYS is a robotics and motion control company specializing in high-performance
-EtherCAT-based servo drive solutions. Our WMX platform provides real-time motion
-control for industrial robotic manipulators.
-
-The WMX ROS2 project brings MOVENSYS motion control technology into the ROS2
-ecosystem, enabling seamless integration with MoveIt2 motion planning, NVIDIA
-Isaac cuMotion GPU-accelerated planning, and standard ROS2 tools. The system
-supports the Dobot CR3A collaborative robot and is designed to be extended to
-any 6-DOF manipulator with EtherCAT servo drives.
+MOVENSYS is a motion control company specializing in high-performance
+EtherCAT-based solutions. Our main product is the WMX motion control
+engine, a software platform that drives robot arms, servo drives, I/O
+modules, and other EtherCAT devices with real-time determinism.
+The WMX ROS2 project brings this technology into the ROS2 ecosystem and
+integrates with tools such as MoveIt2 motion planning and NVIDIA Isaac
+cuMotion GPU-accelerated planning. 
 
 **Contact:**
 
-- Website: `movensys.com <https://www.movensys.com>`_
-- Documentation issues: `GitHub Issues <https://github.com/movensys/wmx_ros2_doc/issues>`_
+- Website: `movensys.com <https://www.movensys.com/en/>`_
+- Documentation issues: `GitHub Issues <https://github.com/movensys/wmx-ros2-doc/issues>`_

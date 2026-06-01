@@ -12,7 +12,7 @@ and build errors. Each problem includes symptoms, likely causes, and
 step-by-step solutions.
 
 For additional help, contact your MOVENSYS representative or visit
-`movensys.com <https://www.movensys.com>`_.
+`movensys.com <https://www.movensys.com/en/>`_.
 
 .. toctree::
    :maxdepth: 2

@@ -38,6 +38,7 @@ pip install -r doc/requirements.txt
 
 ```bash
 cd doc
+make clean
 make html
 ```
 

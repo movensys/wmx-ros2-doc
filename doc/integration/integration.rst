@@ -2,8 +2,12 @@ Integration Scenarios
 =====================
 
 WMX ROS2 supports multiple motion planning backends and can be extended with
-custom planners and applications. Use the decision tree below to find the right
-integration for your use case, then follow the corresponding guide.
+custom planners and applications.
+
+.. rubric:: Planning Backend Selection
+
+Use the decision tree below to find the right integration for your use case,
+then follow the corresponding guide.
 
 .. mermaid::
    :caption: Integration — which scenario fits your use case?
@@ -66,6 +70,8 @@ Available integrations:
 - **Isaac cuMotion** -- NVIDIA GPU-accelerated collision-aware planning
 - **Custom Planner** -- Integrate your own planning algorithm
 - **Custom Application** -- Build standalone ROS2 apps using WMX services
+- **Natural-Language and Vision Control** -- drive the robot with a VLM/LLM
+  through a FastAPI service (an application layer on top of MoveIt2)
 
 .. toctree::
    :maxdepth: 2
@@ -74,3 +80,4 @@ Available integrations:
    cumotion_integration
    custom_planner
    custom_application
+   intelligence_integration

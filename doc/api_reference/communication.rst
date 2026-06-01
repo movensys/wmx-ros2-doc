@@ -58,6 +58,6 @@ The diagram below shows how the three layers stack and which libraries and buses
 
 For the full list of ROS2 interfaces, see:
 
-- :doc:`../api_reference/ros2_topics` -- Published and subscribed topics
-- :doc:`../api_reference/ros2_services` -- Engine, axis, I/O, and EtherCAT services
-- :doc:`../api_reference/ros2_actions` -- FollowJointTrajectory action
+- :doc:`ros2_topics` -- Published and subscribed topics
+- :doc:`ros2_services` -- Engine, axis, I/O, and EtherCAT services
+- :doc:`ros2_actions` -- FollowJointTrajectory action

@@ -16,7 +16,7 @@ custom ``.action`` files are defined -- the system uses the standard
      - Status
    * - ``/movensys_manipulator_arm_controller/follow_joint_trajectory``
      - ``control_msgs/action/FollowJointTrajectory``
-     - ``follow_joint_trajectory_server``
+     - ``joint_trajectory_controller``
      - Active
 
 FollowJointTrajectory
@@ -30,11 +30,11 @@ FollowJointTrajectory
    * - **Action Type**
      - ``control_msgs/action/FollowJointTrajectory``
    * - **Server Node**
-     - ``follow_joint_trajectory_server``
+     - ``joint_trajectory_controller``
    * - **Configurable**
      - Name set via ``joint_trajectory_action`` parameter
    * - **Source File**
-     - ``follow_joint_trajectory_server.cpp``
+     - ``joint_trajectory_controller.cpp``
 
 This action server receives a joint-space trajectory (a sequence of waypoints
 with timestamps) and executes it on the physical robot using the WMX
@@ -92,9 +92,10 @@ Result
 Feedback
 ^^^^^^^^^
 
-No intermediate feedback is published during execution. The action server
-blocks on ``CoreMotion::Wait()`` until the spline motion completes or an error
-occurs.
+No intermediate feedback is published during execution. After starting the
+spline motion, the server runs a polling loop (10 ms interval) that checks
+each axis's ``inPos`` status via ``CoreMotion::GetStatus()`` until all joints
+have reached position, or until the goal is canceled.
 
 Execution Details
 ^^^^^^^^^^^^^^^^^^
@@ -118,23 +119,26 @@ The server processes the trajectory as follows:
 
 5. **Spline construction** -- For each trajectory point, positions are packed
    into a ``CSplinePosData`` structure and timestamps are converted to
-   milliseconds. The ``dimensionCount`` and ``axis[]`` array are set to the
-   ``joint_number`` parameter (typically 6).
+   milliseconds. The ``dimensionCount`` and ``axis[]`` array are set from the
+   ``joint_axes`` parameter (``dimensionCount = jointAxes_.size()``, typically
+   6 joints).
 
 6. **Execution** -- ``AdvancedMotion::StartCSplinePos(0, ...)`` begins the
    interpolated motion on buffer index 0 across all joints simultaneously.
 
-7. **Wait** -- The server blocks on ``CoreMotion::Wait()`` for all axes
-   in the selection.
+7. **Poll until done** -- The server loops every 10 ms, reading
+   ``CoreMotion::GetStatus()`` and checking the ``inPos`` flag of each axis in
+   ``joint_axes``. The loop exits once all joints are in position.
 
 8. **Result** -- On success, ``error_code = 0`` and the goal succeeds.
    On failure, the WMX error code is returned and the goal is aborted.
 
 .. note::
 
-   Cancel requests are accepted by the ``handle_cancel()`` callback, but the
-   blocking ``Wait()`` call does not currently check ``goal_handle->is_canceling()``.
-   A ``TODO`` in the source code notes this limitation.
+   Cancellation is supported. The ``handle_cancel()`` callback accepts the
+   request, and the polling loop checks ``goal_handle->is_canceling()`` each
+   iteration -- on cancel it calls ``CoreMotion::Stop()`` then ``Wait()``,
+   reports ``error_code = 0``, and marks the goal ``canceled``.
 
 Example Usage
 ^^^^^^^^^^^^^^
@@ -188,8 +192,8 @@ The typical workflow is:
 1. MoveIt2 reads the current robot state from ``/joint_states``
 2. The planner computes a collision-free trajectory
 3. MoveIt2 sends the trajectory as a ``FollowJointTrajectory`` goal
-4. The ``follow_joint_trajectory_server`` executes it via WMX cubic spline
-5. The ``manipulator_state`` node publishes real-time encoder feedback back
+4. The ``joint_trajectory_controller`` executes it via WMX cubic spline
+5. The ``joint_state_broadcaster`` node publishes real-time encoder feedback back
    to ``/joint_states`` at 500 Hz
 
 The action server name must match the controller configuration in MoveIt2.
@@ -200,5 +204,6 @@ See Also
 ^^^^^^^^
 
 - :doc:`ros2_topics` -- ``/joint_states`` topic details
-- :doc:`ros2_services` -- ``/wmx/set_gripper`` service on the same node
+- :doc:`ros2_services` -- ``/wmx/set_gripper`` service (hosted by the
+  ``gripper_controller`` node)
 - :doc:`../integration/moveit2_integration` -- MoveIt2 setup

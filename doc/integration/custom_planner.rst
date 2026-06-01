@@ -24,7 +24,7 @@ The architecture is:
                │
                ▼
    ┌──────────────────────────────────────────────────────────┐
-   │  follow_joint_trajectory_server                          │
+   │  joint_trajectory_controller                          │
    │                                                          │
    │  - Validates trajectory (max 1000 points)                │
    │  - Converts to WMX3 CSplinePos command                   │
@@ -42,7 +42,7 @@ MoveIt2 is the default planner, but you can replace it entirely. Any node
 that implements the following two-step pattern can control the robot:
 
 1. **Read current joint state** from ``/joint_states``
-   (``sensor_msgs/msg/JointState``) -- published by ``manipulator_state``
+   (``sensor_msgs/msg/JointState``) -- published by ``joint_state_broadcaster``
    at 500 Hz
 
 2. **Send trajectory goals** to the ``FollowJointTrajectory`` action server
@@ -66,7 +66,7 @@ The trajectory goal must contain:
 Constraints and Limitations
 ----------------------------
 
-These constraints are enforced by the ``follow_joint_trajectory_server``
+These constraints are enforced by the ``joint_trajectory_controller``
 source code:
 
 .. list-table::
@@ -93,12 +93,13 @@ source code:
      - All goals are accepted unconditionally (``ACCEPT_AND_EXECUTE``).
        No kinematic or collision validation is performed by the server.
    * - Cancellation
-     - Cancel requests are accepted but **not acted upon** during motion.
-       The server blocks on ``CoreMotion::Wait()`` and does not check
-       cancellation status. (``TODO`` noted in source code.)
+     - Supported. The execution loop checks ``is_canceling()`` each cycle and,
+       on cancel, stops the motion (``CoreMotion::Stop()`` then ``Wait()``)
+       and marks the goal canceled.
    * - Feedback
-     - No intermediate feedback is published. The action completes only
-       when the full trajectory has been executed or an error occurs.
+     - No intermediate feedback is published. The server polls each axis's
+       ``inPos`` status every 10 ms until the trajectory completes or an
+       error occurs.
    * - Concurrency
      - The execute callback runs in a detached thread, but only one
        trajectory can be executed at a time on the same set of axes.
