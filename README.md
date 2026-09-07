@@ -10,7 +10,7 @@ Technical documentation for **WMX R2**, a complete real-time robotics solution f
 
 ## Overview
 
-WMX R2 combines a ROS 2 interface with the MOVENSYS WMX3 EtherCAT-based motion engine in a single solution, enabling control of robotic manipulators (e.g., Dobot CR3A) with motion planning through MoveIt2 and NVIDIA Isaac cuMotion.
+WMX R2 combines a ROS 2 interface with the MOVENSYS WMX3 EtherCAT-based motion engine in a single solution, enabling control of robotic manipulators with motion planning through MoveIt2 and NVIDIA Isaac cuMotion.
 
 ## Documentation Contents
 
