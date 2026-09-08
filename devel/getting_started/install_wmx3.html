@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Aug 26, 2026"/>
+    <meta name="docbuild:last-update" content="Sep 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -412,17 +412,25 @@ runtime in place), build the WMX R2 packages.</p>
 <section id="install-required-ros2-dependencies">
 <h2>Install Required ROS2 Dependencies<a class="headerlink" href="#install-required-ros2-dependencies" title="Link to this heading">#</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<span class="c1"># Install colcon and rosdep</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>python3-colcon-common-extensions<span class="w"> </span>python3-rosdep
+<span class="c1"># Install ROS2 dependencies for WMX R2 packages</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-graph-msgs<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-ros<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-planners<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-plugins<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-setup-assistant<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-configs-utils<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-task-constructor-core<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-control<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-controllers<span class="w"> </span><span class="se">\</span>
-<span class="w">                 </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-rmw-cyclonedds-cpp
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-colcon-common-extensions<span class="w"> </span>python3-rosdep
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-ros<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-planners<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-plugins<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-setup-assistant<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-configs-utils<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-moveit-task-constructor-core<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-control<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-controllers<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-controller-manager<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-diff-drive-controller<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-joint-trajectory-controller<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-joint-state-broadcaster<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-xacro<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-topic-tools<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-rmw-cyclonedds-cpp
 </pre></div>
 </div>
 </section>
@@ -430,9 +438,22 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 <h2>Create Workspace and Build<a class="headerlink" href="#create-workspace-and-build" title="Link to this heading">#</a></h2>
 <p><strong>Create workspace</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>~/workspaces/movensys_ws/src
-<span class="nb">cd</span><span class="w"> </span>~/workspaces/movensys_ws/src<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="nb">cd</span><span class="w"> </span>~/workspaces/movensys_ws/src
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/movensys/wmx-r2.git
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The manipulator and navigation descriptions are optional. If you only need
+motor control in a ROS 2 environment, you can safely ignore the missing
+<code class="docutils literal notranslate"><span class="pre">movensys_manipulator_description</span></code> and <code class="docutils literal notranslate"><span class="pre">movensys_navigation_description</span></code>
+dependency errors.</p>
+<p>To resolve them, clone both repositories into your workspace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/workspaces/movensys_ws/src
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/movensys/movensys-manipulator.git
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/movensys/movensys-navigation.git
+</pre></div>
+</div>
 </div>
 <p><strong>Rosdep update</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rosdep<span class="w"> </span>init<span class="w">   </span><span class="c1"># only needed once per system</span>
@@ -466,7 +487,7 @@ wmx_r2_message
 wmx_r2_package
 wmx_r2_package differential_drive_controller
 wmx_r2_package gripper_controller
-wmx_r2_package joint_position_controller
+wmx_r2_package jog_keyboard_node
 wmx_r2_package joint_state_broadcaster
 wmx_r2_package joint_trajectory_controller
 wmx_r2_package wmx_core_motion_node
@@ -558,7 +579,7 @@ wmx_r2_package wmx_io_node
   <div class="movensys-footer__info">
     <p>&copy; 2026, MOVENSYS MOVENSYS. All rights reserved.</p>
     
-      <p>Last updated: Aug 26, 2026</p>
+      <p>Last updated: Sep 08, 2026</p>
     
   </div>
   <div class="movensys-footer__links">

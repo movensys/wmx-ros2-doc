@@ -10,13 +10,17 @@ setup. All commands run through ``nros``.
 
    .. tab-item:: Simulation
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQAqEkNTOJfcRKWZoqsdvS3FAWN06pDGTDrk5i4WAimhqGE?e=s2avzR&download=1
-         :alt: SLAM mapping on simulation
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQAqEkNTOJfcRKWZoqsdvS3FAWN06pDGTDrk5i4WAimhqGE?e=s2avzR&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         SLAM mapping on simulation
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/hKkE_LSzPPE"
+                  title="SLAM mapping on simulation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
+
+         
 
       1. Open the scene:
 
@@ -70,13 +74,15 @@ setup. All commands run through ``nros``.
 
    .. tab-item:: HIL
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQAqEkNTOJfcRKWZoqsdvS3FAWN06pDGTDrk5i4WAimhqGE?e=s2avzR&download=1
-         :alt: SLAM examples on HIL
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQAqEkNTOJfcRKWZoqsdvS3FAWN06pDGTDrk5i4WAimhqGE?e=s2avzR&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         SLAM Mapping on HIL
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/hKkE_LSzPPE"
+                  title="SLAM Mapping on HIL"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
       1. Open the scene:
 

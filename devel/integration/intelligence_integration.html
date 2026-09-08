@@ -49,6 +49,8 @@
 
 
 
+
+
 const initStyles = () => {
     const defaultStyle = document.createElement('style');
     defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
@@ -206,7 +208,7 @@ const runMermaid = async (rerun) => {
                                     // Apply zoom to the now-rendered diagram, matching
                                     // the decoration visible diagrams receive.
                                     if (true) {
-                                        addZoomToSvgs(d3.selectAll(".mermaid[data-zoom-id=id-e637a5a7-2608-4058-b1db-7b6b69a23be6]").select(function() {
+                                        addZoomToSvgs(d3.selectAll(".mermaid[data-zoom-id=id-c02534b9-fa2b-4d72-baf1-c74090f235c0]").select(function() {
                                             return this.querySelector("svg");
                                         }));
                                     }
@@ -232,7 +234,7 @@ const runMermaid = async (rerun) => {
     if (true) {
         const mermaids_to_add_zoom = 1 === -1 ? mermaids_active.length : 1;
         if(mermaids_to_add_zoom > 0) {
-            var svgs = d3.selectAll(".mermaid[data-zoom-id=id-e637a5a7-2608-4058-b1db-7b6b69a23be6]").select(function() {
+            var svgs = d3.selectAll(".mermaid[data-zoom-id=id-c02534b9-fa2b-4d72-baf1-c74090f235c0]").select(function() {
                 return this.querySelector("svg");
             });
             // Wait until every active (visible) diagram has rendered. Deferred
@@ -412,7 +414,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Aug 26, 2026"/>
+    <meta name="docbuild:last-update" content="Sep 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -760,7 +762,7 @@ backend. It runs above a planning backend (MoveIt2) and calls the
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
 <figure class="align-default" id="id1">
-<pre data-zoom-id="id-e637a5a7-2608-4058-b1db-7b6b69a23be6" class="mermaid">
+<pre data-zoom-id="id-c02534b9-fa2b-4d72-baf1-c74090f235c0" class="mermaid">
         flowchart LR
     USER[&quot;Voice / text&lt;br/&gt;instruction&quot;]
     WHISPER[&quot;Whisper STT&quot;]
@@ -1028,7 +1030,7 @@ guide and the latest model configuration.</p>
   <div class="movensys-footer__info">
     <p>&copy; 2026, MOVENSYS MOVENSYS. All rights reserved.</p>
     
-      <p>Last updated: Aug 26, 2026</p>
+      <p>Last updated: Sep 08, 2026</p>
     
   </div>
   <div class="movensys-footer__links">

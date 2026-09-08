@@ -9,13 +9,16 @@ commands run through ``mros``.
 
    .. tab-item:: Simulation
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBDy7fKRqEHS6WtRdGWA2spAWCsNFQFLkBLEJ-Nm9x33PI?e=fgaStE&download=1
-         :alt: Collision-aware Planning
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBDy7fKRqEHS6WtRdGWA2spAWCsNFQFLkBLEJ-Nm9x33PI?e=fgaStE&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Collision-aware planning on simulation
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/7bK1Ivz4x1g"
+                  title="Collision-aware planning on simulation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
+         
 
       1. Open the Isaac Sim scene:
          ``~/workspaces/movensys-simulation/<MANIPULATOR_MODEL>/5a_obstacle_avoidance_simulation.usd``
@@ -47,13 +50,15 @@ commands run through ``mros``.
 
    .. tab-item:: HIL
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBDy7fKRqEHS6WtRdGWA2spAWCsNFQFLkBLEJ-Nm9x33PI?e=fgaStE&download=1
-         :alt: Collision-aware Planning
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBDy7fKRqEHS6WtRdGWA2spAWCsNFQFLkBLEJ-Nm9x33PI?e=fgaStE&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Collision-aware planning on hardware-in-the-loop (HIL).
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/7bK1Ivz4x1g"
+                  title="Collision-aware planning on hardware-in-the-loop (HIL)"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
       1. Open the Isaac Sim scene:
          ``~/workspaces/movensys-simulation/<MANIPULATOR_MODEL>/5b_obstacle_avoidance_hil.usd``
@@ -82,13 +87,17 @@ commands run through ``mros``.
 
    .. tab-item:: Real
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBqv6h5EUGYTJB-dRHjfKofAUlEsq091eGRNrTB96h25hs?e=XbZhLd&download=1
-         :alt: Collision-aware Planning
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBqv6h5EUGYTJB-dRHjfKofAUlEsq091eGRNrTB96h25hs?e=XbZhLd&download=1
-         :align: center
-         :width: 60%
+      .. raw:: html
 
-         Collision-aware planning on real-world scenario.
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/1rNdSziHcbc"
+                  title="Collision-aware planning on real-world scenario"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
+
+         
 
       1. Open the Isaac Sim scene:
          ``~/workspaces/movensys-simulation/<MANIPULATOR_MODEL>/5c_obstacle_avoidance_real.usd``

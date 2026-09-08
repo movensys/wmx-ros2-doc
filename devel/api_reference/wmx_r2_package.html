@@ -49,6 +49,8 @@
 
 
 
+
+
 const initStyles = () => {
     const defaultStyle = document.createElement('style');
     defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
@@ -206,7 +208,7 @@ const runMermaid = async (rerun) => {
                                     // Apply zoom to the now-rendered diagram, matching
                                     // the decoration visible diagrams receive.
                                     if (true) {
-                                        addZoomToSvgs(d3.selectAll(".mermaid[data-zoom-id=id-9aeae282-63e4-4b65-859e-44d45c679e18]").select(function() {
+                                        addZoomToSvgs(d3.selectAll(".mermaid[data-zoom-id=id-f31c383e-18b4-466b-80dc-dc6f6165f29a]").select(function() {
                                             return this.querySelector("svg");
                                         }));
                                     }
@@ -232,7 +234,7 @@ const runMermaid = async (rerun) => {
     if (true) {
         const mermaids_to_add_zoom = 1 === -1 ? mermaids_active.length : 1;
         if(mermaids_to_add_zoom > 0) {
-            var svgs = d3.selectAll(".mermaid[data-zoom-id=id-9aeae282-63e4-4b65-859e-44d45c679e18]").select(function() {
+            var svgs = d3.selectAll(".mermaid[data-zoom-id=id-f31c383e-18b4-466b-80dc-dc6f6165f29a]").select(function() {
                 return this.querySelector("svg");
             });
             // Wait until every active (visible) diagram has rendered. Deferred
@@ -412,7 +414,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Aug 26, 2026"/>
+    <meta name="docbuild:last-update" content="Sep 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -752,7 +754,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">wmx_r2_package</span></code> is the main application package of the WMX R2
 system. It contains all executable nodes, launch files, and configuration
-files for driving robots — such as the Dobot CR3A and CR5A manipulators —
+files for driving robots — such as the manipulators —
 through the WMX motion control engine over EtherCAT.</p>
 <p>The package provides two groups of nodes:</p>
 <ul class="simple">
@@ -956,7 +958,7 @@ Each node links only the libraries it needs:</p>
 topics so that dependent nodes only activate once the engine and motion
 layers are live:</p>
 <figure class="align-default" id="id1">
-<pre data-zoom-id="id-9aeae282-63e4-4b65-859e-44d45c679e18" class="mermaid">
+<pre data-zoom-id="id-f31c383e-18b4-466b-80dc-dc6f6165f29a" class="mermaid">
         sequenceDiagram
     participant E as wmx_engine_node
     participant C as wmx_core_motion_node
@@ -1355,7 +1357,7 @@ manipulator controllers.</p>
 </section>
 <section id="wmx-r2-cr3a-manipulator-launch-py">
 <h3>wmx_r2_cr3a_manipulator.launch.py<a class="headerlink" href="#wmx-r2-cr3a-manipulator-launch-py" title="Link to this heading">#</a></h3>
-<p>Full Dobot CR3A manipulator launch. Includes
+<p>Full manipulator launch. Includes
 <code class="docutils literal notranslate"><span class="pre">wmx_r2_general_nodes.launch.py</span></code> and then starts the manipulator
 controllers.</p>
 <p><strong>Nodes launched:</strong> the four general nodes (via include), plus
@@ -1372,7 +1374,7 @@ launch time).</p>
 </section>
 <section id="wmx-r2-cr5a-manipulator-launch-py">
 <h3>wmx_r2_cr5a_manipulator.launch.py<a class="headerlink" href="#wmx-r2-cr5a-manipulator-launch-py" title="Link to this heading">#</a></h3>
-<p>Full Dobot CR5A manipulator launch. Includes the general nodes and starts
+<p>Full manipulator launch. Includes the general nodes and starts
 <code class="docutils literal notranslate"><span class="pre">joint_state_broadcaster</span></code> and <code class="docutils literal notranslate"><span class="pre">joint_trajectory_controller</span></code>.</p>
 <p><strong>Arguments:</strong> <code class="docutils literal notranslate"><span class="pre">use_sim_time</span></code> (default <code class="docutils literal notranslate"><span class="pre">false</span></code>).
 <strong>Config:</strong> <code class="docutils literal notranslate"><span class="pre">config/cr5a_manipulator_config.yaml</span></code> and
@@ -1394,7 +1396,7 @@ see <a class="reference internal" href="../getting_started/install_wmx3.html"><s
 <h2>Configuration Files<a class="headerlink" href="#configuration-files" title="Link to this heading">#</a></h2>
 <section id="cr3a-manipulator-config-yaml">
 <h3>cr3a_manipulator_config.yaml<a class="headerlink" href="#cr3a-manipulator-config-yaml" title="Link to this heading">#</a></h3>
-<p>Parameters for the Dobot CR3A manipulator, shared by the three manipulator
+<p>Parameters for the manipulator, shared by the three manipulator
 controllers:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">joint_state_broadcaster</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">ros__parameters</span><span class="p">:</span>
@@ -1597,7 +1599,7 @@ wmx_r2_package wmx_io_node
   <div class="movensys-footer__info">
     <p>&copy; 2026, MOVENSYS MOVENSYS. All rights reserved.</p>
     
-      <p>Last updated: Aug 26, 2026</p>
+      <p>Last updated: Sep 08, 2026</p>
     
   </div>
   <div class="movensys-footer__links">

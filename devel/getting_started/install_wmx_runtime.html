@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Aug 26, 2026"/>
+    <meta name="docbuild:last-update" content="Sep 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -524,7 +524,7 @@ sudo<span class="w"> </span>reboot
 <input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-4">
 arm64 (Jetson)</label><div class="sd-tab-content docutils">
-<p>The Jetson boards boot via U-Boot/extlinux, not GRUB. Append the same
+<p>The Jetson boards boot via U-Boot/extlinux, not GRUB. <strong>Append</strong> the same
 isolation parameters to the <code class="docutils literal notranslate"><span class="pre">APPEND</span></code> line in
 <code class="docutils literal notranslate"><span class="pre">/boot/extlinux/extlinux.conf</span></code>:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>isolcpus=2,3 nohz_full=2,3 rcu_nocbs=2,3 irqaffinity=0,1 acpi_irq_nobalance noirqbalance
@@ -560,7 +560,7 @@ run the engine.</p>
 <input checked="checked" id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-5">
 EtherCAT</label><div class="sd-tab-content docutils">
-<p>Drive real servo drives over EtherCAT — enable the EtherCAT platform and
+<p>Drive real servo drives over EtherCAT. Enable the EtherCAT platform and
 disable the simulation platform:</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[Platform 0]</span>
 <span class="na">Location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">./platform/ethercat</span>
@@ -579,7 +579,7 @@ disable the simulation platform:</p>
 <input id="sd-tab-item-6" name="sd-tab-set-2" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-6">
 Simulation</label><div class="sd-tab-content docutils">
-<p>Run the engine against a simulated bus with no hardware attached — enable
+<p>Run the engine against a simulated bus with no hardware attached. Enable
 the simulation platform and disable the EtherCAT platform:</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[Platform 0]</span>
 <span class="na">Location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">./platform/ethercat</span>
@@ -607,8 +607,12 @@ the simulation platform and disable the EtherCAT platform:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Jetson developer kit (arm64).</strong></p>
-<p>Several Jetson developer kit NICs have been tested and cannot sustain the
-shortest cycles; the minimum period on that hardware is <code class="docutils literal notranslate"><span class="pre">CommCycle=2000</span></code>.</p>
+<ol class="arabic simple">
+<li><p>Reduce the cycle time to <code class="docutils literal notranslate"><span class="pre">CommCycle=2000</span></code>. Several Jetson developer kit
+NICs cannot sustain the shortest cycles.</p></li>
+<li><p>Increase the transmission timeout to <code class="docutils literal notranslate"><span class="pre">TransmitTimeout=1500</span></code>. Several
+Jetson developer kit boards are slower to transmit EtherCAT packets.</p></li>
+</ol>
 </div>
 </section>
 <section id="configure-the-ethercat-nic">
@@ -647,40 +651,44 @@ a NIC-driver DLL. Pick the driver that matches your transport:</p>
 </tbody>
 </table>
 </div>
-<p>Configure the driver in the section for the real-time network device
-(<code class="docutils literal notranslate"><span class="pre">[rtnd0]</span></code> for the first device) of
+<p>Set the driver configuration of the real-time network device (<code class="docutils literal notranslate"><span class="pre">[rtnd0]</span></code> for the first device) in
 <code class="docutils literal notranslate"><span class="pre">/opt/wmx3/platform/ethercat/PrtTcpip.ini</span></code>. The <code class="docutils literal notranslate"><span class="pre">UseNicDrvDll</span></code> key selects
 the driver; each driver reads its own keys from the same section.</p>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-7">
 sock_raw</label><div class="sd-tab-content docutils">
-<p>Bind the driver to a kernel network interface. <code class="docutils literal notranslate"><span class="pre">ifname</span></code> is required (the
-<code class="docutils literal notranslate"><span class="pre">NIC_DRV_DLL_IFNAME</span></code> environment variable overrides it):</p>
+<p><code class="docutils literal notranslate"><span class="pre">ndd_sock_raw.so</span></code> sends and receives EtherCAT frames through a standard
+Linux <code class="docutils literal notranslate"><span class="pre">AF_PACKET</span></code> / <code class="docutils literal notranslate"><span class="pre">SOCK_RAW</span></code> socket, so the NIC keeps its normal
+kernel driver and needs no extra setup.</p>
+<p>Configure the port in <code class="docutils literal notranslate"><span class="pre">PrtTcpip.ini</span></code>:</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[rtnd0]</span>
 <span class="na">UseNicDrvDll</span><span class="o">=</span><span class="s">ndd_sock_raw.so</span>
-<span class="na">ifname</span><span class="o">=</span><span class="s">enp3s0</span><span class="w">            </span><span class="c1">; kernel interface to bind (required)</span>
+<span class="na">ifname</span><span class="o">=</span><span class="s">enp4s0</span><span class="w">           </span><span class="c1">; kernel interface to bind (required)</span>
 <span class="na">rxprio</span><span class="o">=</span><span class="s">97</span><span class="w">               </span><span class="c1">; RX thread SCHED_FIFO priority (&lt;=0 = default sched)</span>
-<span class="na">rxcore</span><span class="o">=</span><span class="s">2</span>
+<span class="na">rxcore</span><span class="o">=</span><span class="s">2</span><span class="w">                </span><span class="c1">; pin RX poll loop to an ISOLATED core</span>
 </pre></div>
 </div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">ifname</span></code> to the interface name reported by <code class="docutils literal notranslate"><span class="pre">ifconfig</span></code>; the
+<code class="docutils literal notranslate"><span class="pre">NIC_DRV_DLL_IFNAME</span></code> environment variable overrides it.</p>
 <p>Opening the raw socket needs <code class="docutils literal notranslate"><span class="pre">CAP_NET_RAW</span></code>, so run the nodes as root.</p>
 </div>
 <input id="sd-tab-item-8" name="sd-tab-set-3" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-8">
 af_xdp</label><div class="sd-tab-content docutils">
-<p>AF_XDP is a kernel fast path: the NIC keeps its normal kernel driver (no
-vfio bind, no hugepages). Bind to a kernel interface and a single RX
-queue. AF_XDP receives only on the bound queue, so collapse the NIC to one
-queue first:</p>
+<p><code class="docutils literal notranslate"><span class="pre">ndd_af_xdp.so</span></code> sends and receives EtherCAT frames through an AF_XDP
+socket (XSK), a kernel fast path: the NIC keeps its normal kernel driver,
+so no vfio bind and no hugepages are needed.</p>
+<p>An XSK receives only on the RX queue it is bound to, so collapse the NIC
+to a single queue first:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>ethtool<span class="w"> </span>-L<span class="w"> </span>enp3s0<span class="w"> </span>combined<span class="w"> </span><span class="m">1</span><span class="w">     </span><span class="c1"># one queue -&gt; use queue=0</span>
 </pre></div>
 </div>
 <p>Configure the port in <code class="docutils literal notranslate"><span class="pre">PrtTcpip.ini</span></code>:</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[rtnd0]</span>
 <span class="na">UseNicDrvDll</span><span class="o">=</span><span class="s">ndd_af_xdp.so</span>
-<span class="na">ifname</span><span class="o">=</span><span class="s">enp3s0</span><span class="w">            </span><span class="c1">; kernel interface to bind (required)</span>
-<span class="na">queue</span><span class="o">=</span><span class="s">0</span><span class="w">                  </span><span class="c1">; XSK binds to this RX queue</span>
+<span class="na">ifname</span><span class="o">=</span><span class="s">enp3s0</span><span class="w">           </span><span class="c1">; kernel interface to bind (required)</span>
+<span class="na">queue</span><span class="o">=</span><span class="s">0</span><span class="w">                 </span><span class="c1">; XSK binds to this RX queue</span>
 <span class="na">xdpmode</span><span class="o">=</span><span class="s">skb</span><span class="w">             </span><span class="c1">; skb=generic | drv=native | zerocopy=native+ZC</span>
 <span class="na">rxprio</span><span class="o">=</span><span class="s">97</span><span class="w">               </span><span class="c1">; RX thread SCHED_FIFO priority</span>
 <span class="na">rxcore</span><span class="o">=</span><span class="s">2</span><span class="w">                </span><span class="c1">; pin RX poll loop to an ISOLATED core</span>
@@ -688,6 +696,8 @@ queue first:</p>
 <span class="w">                        </span><span class="c1">; 1 = busy-poll (needs a dedicated isolated core)</span>
 </pre></div>
 </div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">ifname</span></code> to the interface name reported by <code class="docutils literal notranslate"><span class="pre">ifconfig</span></code>; the
+<code class="docutils literal notranslate"><span class="pre">NIC_DRV_DLL_IFNAME</span></code> environment variable overrides it.</p>
 <p>Creating the XSK needs <code class="docutils literal notranslate"><span class="pre">CAP_NET_RAW</span></code> + <code class="docutils literal notranslate"><span class="pre">CAP_NET_ADMIN</span></code> (<code class="docutils literal notranslate"><span class="pre">CAP_BPF</span></code> on
 newer kernels), so run the nodes as root.</p>
 </div>
@@ -746,8 +756,10 @@ sudo<span class="w"> </span>./wmx3-ec-scan<span class="w">          </span><span
 sudo<span class="w"> </span>./wmx3-ec-state<span class="w">         </span><span class="c1"># show the EtherCAT master/slave state</span>
 sudo<span class="w"> </span>./wmx3-clear-alarm<span class="w">      </span><span class="c1"># clear any drive alarms</span>
 sudo<span class="w"> </span>./wmx3-servo-on<span class="w">         </span><span class="c1"># enable the servos</span>
-sudo<span class="w"> </span>./wmx3-axis-state<span class="w"> </span><span class="m">0</span><span class="w">     </span><span class="c1"># show the state of axis 0</span>
-sudo<span class="w"> </span>./wmx3-stop-engine<span class="w">      </span><span class="c1"># stop the engine when done</span>
+</pre></div>
+</div>
+<p>If you can heard the brizz of the servo, the engine is running and the EtherCAT bus is up.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>./wmx3-stop-engine<span class="w">      </span><span class="c1"># stop the engine when done</span>
 </pre></div>
 </div>
 </section>
@@ -843,7 +855,7 @@ sudo<span class="w"> </span>./wmx3-stop-engine<span class="w">      </span><span
   <div class="movensys-footer__info">
     <p>&copy; 2026, MOVENSYS MOVENSYS. All rights reserved.</p>
     
-      <p>Last updated: Aug 26, 2026</p>
+      <p>Last updated: Sep 08, 2026</p>
     
   </div>
   <div class="movensys-footer__links">
