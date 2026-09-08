@@ -65,6 +65,32 @@ See WMX R2 in action:
 To show how these pieces fit together, four companion repositories are provided
 as working examples and reference implementations built on WMX R2:
 
+.. mermaid::
+   :caption: The five repositories and what each one owns
+
+   flowchart TB
+       INT["<b>movensys-intelligence</b><br/>VLM · Whisper · Robopoly<br/><i>speaks and reasons</i>"]
+
+       subgraph APP["Application layer"]
+           direction LR
+           MAN["<b>movensys-manipulator</b><br/>MoveIt2 · cuMotion<br/>Nvblox · YOLO · AprilTag<br/><i>plans arm motion</i>"]
+           NAV["<b>movensys-navigation</b><br/>Nav2 · EKF · SLAM<br/><i>plans base motion</i>"]
+       end
+
+       SIM["<b>movensys-simulation</b><br/>Isaac Sim USD scenes<br/><i>the digital twin</i>"]
+
+       WMX["<b>wmx-r2</b><br/>ROS2 interface + WMX engine<br/><i>executes, in real time</i>"]
+       HW["Servo drives and I/O<br/>over EtherCAT"]
+
+       INT -->|"/wmx/moveit2/* services"| MAN
+       MAN -->|"FollowJointTrajectory"| WMX
+       NAV -->|"/cmd_vel_safe"| WMX
+       WMX --> HW
+       HW -->|"encoder"| WMX
+       WMX -->|"/joint_states, /odom_enc"| APP
+       SIM -.->|"scenes for Simulation and HIL"| APP
+       WMX -.->|"mirror topics"| SIM
+
 * `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_ :
   manipulator scenarios with MoveIt2 / Isaac cuMotion
   planning and Nvblox / YOLO / AprilTag perception
@@ -75,6 +101,10 @@ as working examples and reference implementations built on WMX R2:
   manipulator stack
 * `movensys-simulation <https://github.com/movensys/movensys-simulation>`_ :
   the Isaac Sim scenes used by the manipulator and navigation scenarios
+
+Each application repository runs in its own container and talks to WMX R2 over
+DDS, so the planning stack and the real-time stack stay separate processes on
+the same machine.
 
 See :doc:`examples/examples` to run these scenarios from start to finish.
 

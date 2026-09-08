@@ -7,7 +7,7 @@ Overview
 NVIDIA Isaac cuMotion provides GPU-accelerated trajectory planning as an
 alternative to the default MoveIt2 OMPL planners. It plugs into MoveIt2 as the
 planning pipeline, so the rest of the stack is unchanged: planned trajectories
-still flow through the ``trajectory_api`` services and execute on the WMX
+still flow through the ``moveit2_api`` services and execute on the WMX
 ``joint_trajectory_controller``. cuMotion is provided by the
 ``movensys_manipulator_isaac_ros_config`` package in the
 `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
@@ -30,18 +30,24 @@ container workflow.
 Running cuMotion
 ----------------
 
-cuMotion runs alongside the MoveIt2 stack. Start ``move_group`` and the
-trajectory services as usual, then launch the cuMotion planner. Commands run
-through the ``mros`` container helper.
+.. important::
+
+   ``isaac_cumotion.launch.py`` **replaces** ``moveit.launch.py``. It starts
+   its own ``move_group``, ``robot_state_publisher``, RViz, MoveIt Servo, and
+   the ``moveit2_api`` services, with the cuMotion planner in place of OMPL.
+   Do not run both — they would fight over ``move_group``.
+
+   Every walkthrough in ``movensys-manipulator`` offers them as step **3a**
+   (OMPL) or step **3b** (cuMotion), never both.
+
+Commands run through the ``mros`` container helper.
 
 **Real robot:**
 
 .. code-block:: bash
 
-   # MoveIt2 (move_group + trajectory_api services)
-   mros ros2 launch movensys_manipulator_moveit_config moveit.launch.py
-
-   # Isaac cuMotion planner
+   # Isaac cuMotion: move_group with the cuMotion planner, plus the
+   # moveit2_api services
    mros ros2 launch movensys_manipulator_isaac_ros_config isaac_cumotion.launch.py
 
    # Run a trajectory
@@ -53,10 +59,13 @@ through the ``mros`` container helper.
 .. code-block:: bash
 
    mros ros2 launch movensys_manipulator_moveit_config sim_bridge.launch.py use_sim_time:=true
-   mros ros2 launch movensys_manipulator_moveit_config moveit.launch.py \
-        use_sim_time:=true
    mros ros2 launch movensys_manipulator_isaac_ros_config isaac_cumotion.launch.py \
         use_sim_time:=true
+   mros ros2 launch movensys_manipulator_moveit_config trajectory_test.launch.py \
+        use_sim_time:=true
+
+Add ``rsp:=false`` when the robot description is already published by Gazebo
+or by ``ros2_control``.
 
 Obstacle Avoidance (Nvblox)
 ---------------------------
@@ -87,7 +96,7 @@ cuMotion vs. MoveIt2 OMPL
    * - Planning pipeline
      - GPU-accelerated planner that replaces OMPL inside MoveIt2
    * - Execution
-     - Same ``trajectory_api`` services and WMX ``joint_trajectory_controller``
+     - Same ``moveit2_api`` services and WMX ``joint_trajectory_controller``
    * - Best for
      - Collision-constrained planning, obstacle avoidance with Nvblox
    * - Hardware

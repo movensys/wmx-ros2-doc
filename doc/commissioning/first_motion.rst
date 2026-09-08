@@ -64,16 +64,24 @@ feedback.
      bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && source $HOME/workspaces/movensys_ws/install/setup.bash && \
      ros2 launch wmx_r2_package wmx_r2_general_nodes.launch.py"
 
+Wait for the lifecycle manager to bring the nodes up — the ``/wmx/axes/*``
+services do not exist until ``wmx_core_motion_node`` is ``active``:
+
+.. code-block:: bash
+
+   ros2 service call /wmx/lifecycle/get_node_states \
+        wmx_r2_message/srv/GetNodeStates "{}"
+
 Confirm the engine and the bus, then read back the parameters the engine
 actually holds:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/get_status std_srvs/srv/Trigger      # expect "Communicating"
-   ros2 service call /wmx/ecat/get_network_state \
-        wmx_r2_message/srv/EcatGetNetworkState                        # expect every drive present
-   ros2 service call /wmx/params/get wmx_r2_message/srv/GetWmxParams \
-        "{index: [0,1,2,3,4,5]}"                                      # gear ratio, polarity, mode
+   ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"   # expect "Communicating"
+   ros2 service call /wmx/ecat/get_master_info \
+        wmx_r2_message/srv/EcatGetMasterInfo "{master_id: 0}"     # expect every drive present
+   ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
+        "{axis: [0,1,2,3,4,5]}"                                      # gear ratio, polarity, mode
 
 **Checkpoint.** The gear ratio, polarity, and command mode in the response
 must match the table you built in :doc:`robot_parameters`. Stop here if they
@@ -84,7 +92,7 @@ hand** where the mechanics allow it:
 
 .. code-block:: bash
 
-   ros2 topic echo /wmx/axis/state
+   ros2 topic echo /wmx/axes/status
 
 .. list-table:: What to confirm before enabling a servo
    :header-rows: 1
@@ -120,10 +128,10 @@ Enable **one** axis only. Leave every other axis off.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axis/clear_alarm wmx_r2_message/srv/SetAxis \
-        "{index: [0], data: [0]}"
-   ros2 service call /wmx/axis/set_on wmx_r2_message/srv/SetAxis \
-        "{index: [0], data: [1]}"
+   ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
+        "{axis: [0], data: [0]}"
+   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+        "{axis: [0], data: [1]}"
 
 Command a small relative move. The units are radians, and the velocity and
 acceleration are rad/s and rad/s² (this holds only because
@@ -132,13 +140,13 @@ acceleration are rad/s and rad/s² (this holds only because
 .. code-block:: bash
 
    # +0.05 rad (≈2.9°) at 0.05 rad/s with gentle ramps
-   ros2 topic pub --once /wmx/axis/position/relative wmx_r2_message/msg/AxisPose \
-     "{index: [0], target: [0.05], velocity: [0.05], acc: [0.1], dec: [0.1]}"
+   ros2 service call /wmx/axes/start_mov wmx_r2_message/srv/StartAxesPose \
+     "{axis: [0], target: [0.05], velocity: [0.05], acc: [0.1], dec: [0.1]}"
 
 .. warning::
 
-   The examples in :doc:`../api_reference/ros2_topics` use values such as
-   ``velocity: [5.0]`` to illustrate the message format. Those are **not**
+   The examples in :doc:`../api_reference/ros2_services` use values such as
+   ``velocity: [10]`` to illustrate the request format. Those are **not**
    commissioning values. For a first move use velocity ≤ 0.05 rad/s and
    acceleration ≤ 0.1 rad/s², and increase only after each check below
    passes.
@@ -155,7 +163,7 @@ directions:
      - How
    * - 1
      - **Joint numbering**
-     - Command ``index: [0]``. Confirm that the joint you mapped to axis 0
+     - Command ``axis: [0]``. Confirm that the joint you mapped to axis 0
        moves and that nothing else does. Repeat for every axis before
        continuing.
    * - 2
@@ -190,8 +198,8 @@ Disable the axis before moving to the next one:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axis/set_on wmx_r2_message/srv/SetAxis \
-        "{index: [0], data: [0]}"
+   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+        "{axis: [0], data: [0]}"
 
 **Checkpoint.** Do not proceed to multi-axis motion until every axis has
 passed checks 1–6 individually.
@@ -226,7 +234,7 @@ Keyboard jogging — speeds, steps, and stopping behavior
 ``keyboard_teleop`` is a convenience tool for driving MoveIt Servo. It is
 **not** a commissioning tool: it needs the whole planner stack up, it moves the
 end effector rather than one axis, and its speeds are set in ``servo.yaml``
-rather than per command. Use the ``/wmx/axis/position/relative`` procedure
+rather than per command. Use the ``/wmx/axes/start_mov`` procedure
 above for stages 4A and 4B, and keyboard jogging afterwards.
 
 The key mappings are in :ref:`keyboard-jogging`. The quantities that matter
@@ -318,8 +326,8 @@ controlled stop, still not an emergency stop:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axis/set_on wmx_r2_message/srv/SetAxis \
-        "{index: [0,1,2,3,4,5], data: [0,0,0,0,0,0]}"
+   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+        "{axis: [0,1,2,3,4,5], data: [0,0,0,0,0,0]}"
 
 .. warning:: **Known limitation — ``keyboard_teleop`` forces simulated time.**
 
@@ -328,7 +336,7 @@ controlled stop, still not an emergency stop:
    robot run without a ``/clock`` publisher, the node's clock does not advance,
    so the timestamps on its jog messages are not real time. Confirm the arm
    responds as expected in HIL before relying on keyboard jogging on hardware,
-   and prefer the ``/wmx/axis/position/relative`` procedure above for
+   and prefer the ``/wmx/axes/start_mov`` procedure above for
    commissioning.
 
 Record what you verified

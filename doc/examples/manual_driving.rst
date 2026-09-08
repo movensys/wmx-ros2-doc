@@ -97,7 +97,7 @@ commands run through ``nros``.
 
       2. Start WMX R2 for the navigation base (real WMX runtime) with
          ``use_sim_time:=true`` (see
-         ``~/workspaces/movensys_ws/src/wmx-r2/doc/launch_<NAVIGATION_MODEL>_navigation.md``).
+         ``~/workspaces/movensys_ws/src/wmx-r2/doc/launch_differential.md``).
 
       3. Run the EKF + robot state publisher:
 
@@ -118,3 +118,39 @@ commands run through ``nros``.
                  -p frame_id:=base_link \
                  -p use_sim_time:=true \
                  -r cmd_vel:=/cmd_vel_safe
+
+   .. tab-item:: Real
+
+      .. danger:: **This drives the physical base.**
+
+         Complete :doc:`../commissioning/index` first, keep the area clear,
+         and keep a hand on the emergency stop. Start at the lowest speed the
+         teleop allows.
+
+      1. Start WMX R2 for the differential base (see
+         ``~/workspaces/movensys_ws/src/wmx-r2/doc/launch_differential.md``).
+         No ``use_sim_time`` on real hardware.
+
+      2. Run the EKF + robot state publisher:
+
+         .. code-block:: bash
+
+            nros ros2 launch movensys_navigation_nav2_config base.launch.py
+
+         Add ``rsp:=false`` if using ``ros2_control``, which already publishes
+         ``/robot_description``. Add ``use_cuvslam:=true`` to use cuVSLAM.
+
+      3. Drive with the teleop keyboard:
+
+         .. code-block:: bash
+
+            ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args \
+                 -p turn:=0.5 \
+                 -p stamped:=true \
+                 -p frame_id:=base_link \
+                 -r cmd_vel:=/cmd_vel_safe
+
+         Keep this terminal focused to send keystrokes to the base. Releasing
+         the keys stops the base: ``differential_drive_controller`` forces the
+         wheel target to zero after ``cmd_vel_timeout`` (0.25 s) without a
+         command.

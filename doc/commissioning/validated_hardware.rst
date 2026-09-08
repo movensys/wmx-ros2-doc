@@ -166,7 +166,7 @@ Homing, absolute position, brakes, and safety
    * - **Homing**
      - Not used on any shipped robot. ``AbsoluteEncoderMode = 1`` on every
        axis, so position is known at power-on. The homing service
-       (``/wmx/axis/homing``) and the ``HomeParam`` block exist and are
+       (``/wmx/axes/start_home``) and the ``HomeParam`` block exist and are
        populated with defaults, but no shipped configuration exercises them.
        A robot with incremental encoders requires a homing strategy that this
        project does not provide.
@@ -232,9 +232,9 @@ There is no supported path that consists only of editing configuration. At
 minimum you need:
 
 1. **EtherCAT compatibility.** Drives reachable by the WMX EtherCAT master,
-   with an ENI file present in ``wmx-r2/eni/`` for each slave, in a supported
-   CoE mode (position mode for the manipulators, velocity mode for the
-   differential-drive base).
+   with a matching ESI file in ``/opt/wmx3/ESI/`` for each slave, in a
+   supported CoE mode (position mode for the manipulators, velocity mode for
+   the differential-drive base).
 2. **A parameter file.** Gear ratio numerator and denominator, polarity,
    command mode, and limits for every axis, derived from the drive and
    mechanical specifications — see :doc:`robot_parameters`.

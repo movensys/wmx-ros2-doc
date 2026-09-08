@@ -16,9 +16,8 @@ Warm-up
 
 2. Open the **Robopoly game** at ``localhost:7999``.
 
-   - After following the
-     `setup guide <https://movensys.atlassian.net/wiki/spaces/AL/pages/2739732481>`_,
-     open Chrome and go to ``localhost:7999``.
+   - After following :doc:`robopoly_game`, open Chrome and go to
+     ``localhost:7999``.
    - Click the **Game mode** button in the upper-right corner.
    - Hold down the **X** key and say something to warm up the LLM and
      Text-to-Speech (TTS) AI models.

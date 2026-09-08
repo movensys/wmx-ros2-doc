@@ -16,15 +16,23 @@ WMX R2 combines a ROS 2 interface with the MOVENSYS WMX3 EtherCAT-based motion e
 
 | Section | Description |
 |---------|-------------|
-| **Getting Started** | System requirements, ROS2 installation, workspace setup, mock & physical hardware, architecture |
+| **Getting Started** | Computer setup, WMX Runtime install, and building the WMX R2 packages (container or native) |
+| **Example Applications** | Testing WMX R2 on the general nodes, Isaac Sim setup, and the manipulator, navigation, and Robopoly walkthroughs in Simulation / HIL / Real modes |
+| **Integration** | MoveIt2, NVIDIA Isaac cuMotion, Nav2, custom planner, custom application, and the VLM/LLM layer |
 | **Commissioning** | Robot parameter configuration and validation, first-motion procedure, safety responsibilities, validated-hardware matrix |
-| **Packages** | `wmx_r2_message` and `wmx_r2_package` node documentation |
-| **Integration** | MoveIt2, NVIDIA Isaac cuMotion, custom planner & application guides |
-| **API Reference** | ROS2 services, topics, and actions |
-| **Demo application** | NVIDIA Jetson Orin and Intel x86_64 setups |
-| **Deployment** | Source build, Debian package, and Docker options |
-| **Troubleshooting** | Common issues and solutions |
+| **API Reference** | ROS2 services, topics, and actions, plus `wmx_r2_message`, `wmx_r2_package`, and `wmx_r2_control` |
+| **Support** | Troubleshooting by symptom |
 | **Licensing** | Boundary between the MIT-licensed ROS 2 interface and the proprietary WMX engine |
+
+The documentation tracks these repositories:
+
+| Repository | Role |
+|------------|------|
+| [wmx-r2](https://github.com/movensys/wmx-r2) | ROS2 interface to the WMX3 motion engine |
+| [movensys-manipulator](https://github.com/movensys/movensys-manipulator) | MoveIt2 / cuMotion planning and Nvblox / YOLO / AprilTag perception |
+| [movensys-navigation](https://github.com/movensys/movensys-navigation) | Nav2 planning, EKF odometry, and SLAM for a differential-drive base |
+| [movensys-intelligence](https://github.com/movensys/movensys-intelligence) | VLM / Whisper layer and the Robopoly sample application |
+| [movensys-simulation](https://github.com/movensys/movensys-simulation) | Isaac Sim USD scenes used by the examples |
 
 ## Building Locally
 

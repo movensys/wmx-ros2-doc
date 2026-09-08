@@ -137,25 +137,69 @@ The FastAPI service exposes (among others):
 Running It
 ----------
 
-Movensys Intelligence runs as a set of Docker Compose services. Select your
-accelerator with the ``XPU_CORE`` environment variable
-(``nvidia-gpu`` or ``intel-xpu``), then bring up the stack:
+Movensys Intelligence runs as a set of Docker Compose services.
+
+.. list-table:: Services and ports
+   :header-rows: 1
+   :widths: 26 12 62
+
+   * - Service
+     - Port
+     - Purpose
+   * - ``movensys_vlm``
+     - 8000
+     - FastAPI REST/WebSocket API and the ROS2 bridge
+   * - ``vllm``
+     - 9000
+     - OpenAI-compatible inference server
+   * - ``whisper``
+     - 9010
+     - Speech-to-text
+   * - ``vectordb`` (Qdrant)
+     - 6333
+     - Long-term vector memory
+   * - ``movensys_robopoly``
+     - 7999
+     - The Robopoly sample application
+   * - ``phoenix`` (optional)
+     - 6006
+     - LLM trace UI
+
+.. important::
+
+   Local model weights must already be under ``movensys_vlm/models/`` —
+   Gemma 4 E2B/E4B, Whisper large-v3, and the embedding model. Nothing is
+   downloaded for you.
+
+Set the accelerator and architecture, then bring the stack up **in this
+order** — each service depends on the one before it:
 
 .. code-block:: bash
 
-   export XPU_CORE=nvidia-gpu        # or intel-xpu
+   export XPU_CORE=nvidia-gpu        # {nvidia-gpu, intel-xpu}
+   export CPU_ARCH=amd64             # {amd64, arm64}
 
    cd ~/workspaces/movensys-intelligence/movensys_vlm/docker
 
    # 1. Serve the VLM/LLM with vLLM
    COMPOSE_PROFILES=$XPU_CORE docker compose -f vllm.yaml up -d --build
 
-   # 2. Start the vector-DB memory
-   COMPOSE_PROFILES=$XPU_CORE docker compose -f vectordb.yaml up -d --build
+   # 2. Vector-DB memory (profile is CPU_ARCH, not XPU_CORE)
+   COMPOSE_PROFILES=$CPU_ARCH docker compose -f vectordb.yaml up -d --build
 
-   # 3. Start the FastAPI service (+ Whisper)
-   COMPOSE_PROFILES=$XPU_CORE docker compose -f movensys_vlm.yaml up -d --build
+   # 3. Speech-to-text
    COMPOSE_PROFILES=$XPU_CORE docker compose -f whisper.yaml up -d --build
+
+   # 4. The FastAPI service and ROS2 bridge
+   COMPOSE_PROFILES=$XPU_CORE docker compose -f movensys_vlm.yaml up -d --build
+
+Intel Panther Lake builds vLLM on a separate path:
+
+.. code-block:: bash
+
+   cd ~/workspaces/movensys-intelligence/movensys_vlm/docker
+   ./vllm-intel-build.sh
+   ./vllm-intel-run.sh
 
 Wait until the vLLM container logs ``application startup complete`` before
 sending requests. A pick-and-place example is included in the repository:
@@ -173,7 +217,13 @@ sending requests. A pick-and-place example is included in the repository:
    :doc:`../getting_started/install_wmx3`.
 
 Supported accelerators include NVIDIA desktop GPUs and Jetson Thor
-(``nvidia-gpu``) and Intel B60 / Core Ultra Series 3 (``intel-xpu``). See the
-`Movensys Intelligence repository
-<https://github.com/movensys/movensys-intelligence>`_ for the full setup
-guide and the latest model configuration.
+(``nvidia-gpu``) and Intel B60 / Panther Lake (``intel-xpu``).
+
+.. tip::
+
+   On Jetson Thor or Intel Panther Lake, drop kernel caches between restarts
+   if memory pressure builds up: ``sync && sudo sysctl vm.drop_caches=3``
+
+The full bring-up, teardown, and Phoenix-tracing options are in
+``movensys_vlm/doc/running.md``. See :doc:`../examples/robopoly_game` for the
+sample application end to end.

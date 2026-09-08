@@ -267,32 +267,42 @@ result.
 Standalone Axis Control
 -----------------------
 
-For applications that don't use trajectory-based planning, the
-``wmx_core_motion_node`` provides direct axis control through:
+For applications that do not use trajectory-based planning,
+``wmx_core_motion_node`` provides direct axis control through **services**:
 
-- **Velocity commands** via ``/wmx/axis/velocity``
-  (``wmx_r2_message/msg/AxisVelocity``)
-- **Absolute position commands** via ``/wmx/axis/position``
-  (``wmx_r2_message/msg/AxisPose``)
-- **Relative position commands** via ``/wmx/axis/position/relative``
-  (``wmx_r2_message/msg/AxisPose``)
+- ``/wmx/axes/start_pos`` — absolute move
+  (``wmx_r2_message/srv/StartAxesPose``)
+- ``/wmx/axes/start_mov`` — relative move
+  (``wmx_r2_message/srv/StartAxesPose``)
+- ``/wmx/axes/start_vel`` — constant velocity
+  (``wmx_r2_message/srv/StartAxesVelocity``)
+- ``/wmx/axes/start_jog`` — dead-man jog
+  (``wmx_r2_message/srv/StartAxesVelocity``)
+- ``/wmx/axes/stop`` — controlled stop (``wmx_r2_message/srv/SetAxes``)
 
-These topics bypass the action server and control motors directly using
-``CoreMotion::StartVel()``, ``CoreMotion::StartPos()``, and
-``CoreMotion::StartMov()`` respectively. All commands use trapezoidal
-velocity profiles.
+These bypass the action server and drive the motors through
+``CoreMotion::StartPos()``, ``StartMov()``, ``StartVel()``, and
+``StartJog()``, with trapezoidal velocity profiles.
 
-See :doc:`custom_application` for Python examples using direct axis control
-and :doc:`../api_reference/ros2_topics` for message field details.
+.. important::
 
-The full setup sequence for standalone axis control is documented in
-:doc:`../api_reference/ros2_services` (Service Call Workflow section).
+   They are **mutually exclusive with a running controller.** While
+   ``joint_trajectory_controller``, ``joint_position_controller``, or
+   ``differential_drive_controller`` is ``active``, every one of these except
+   ``stop`` answers ``success: false``. If your planner drives the axes
+   directly, do not also run the trajectory controller — either deactivate it
+   through ``/wmx/lifecycle/set_node_state``, or drop it from
+   ``managed_nodes`` in the config YAML.
+
+See :doc:`custom_application` for Python examples using direct axis control,
+and :doc:`../api_reference/ros2_services` for every field and the startup
+sequence.
 
 See Also
 --------
 
-- :doc:`../api_reference/ros2_actions` -- Complete action interface reference
-- :doc:`../api_reference/ros2_topics` -- Topic message formats
-- :doc:`../api_reference/ros2_services` -- Service call workflow
+- :doc:`../api_reference/ros2_actions` -- the ``FollowJointTrajectory`` contract
+- :doc:`../api_reference/ros2_topics` -- topic formats, QoS, and rates
+- :doc:`../api_reference/ros2_services` -- every service and the startup sequence
 - :doc:`custom_application` -- Building custom applications with code examples
 - :doc:`moveit2_integration` -- MoveIt2 configuration

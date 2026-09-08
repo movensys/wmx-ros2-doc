@@ -85,6 +85,10 @@ Available integrations:
 - **Natural-Language and Vision Control** -- drive the robot with a VLM/LLM
   through a FastAPI service (an application layer on top of MoveIt2)
 
+Either arm route can also run through ``ros2_control``: the
+``wmx_r2_control/WmxSystemHardware`` plugin exposes WMX3 axes to the standard
+``controller_manager``. See :doc:`../api_reference/wmx_r2_control`.
+
 .. toctree::
    :maxdepth: 2
 

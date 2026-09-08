@@ -27,29 +27,29 @@ The diagram below shows how the three layers stack and which libraries and buses
    flowchart TB
        subgraph L1["Layer 1: ROS2 DDS"]
            direction LR
-           N1["manipulator_state"]
-           N2["follow_joint_trajectory_server"]
-           N3["wmx_engine_node"]
-           N4["wmx_core_motion_node"]
-           N5["wmx_io_node"]
-           N6["wmx_ethercat_node"]
+           N1["wmx_engine_node"]
+           N2["wmx_lifecycle_manager_node"]
+           N3["wmx_core_motion_node"]
+           N4["wmx_io_node"]
+           N5["wmx_ethercat_node"]
+           N6["joint_state_broadcaster<br/>joint_trajectory_controller<br/>joint_position_controller<br/>gripper_controller<br/>differential_drive_controller"]
        end
 
        subgraph L2["Layer 2: WMX API"]
            direction LR
-           A1["libcoremotionapi<br/>Axis position & velocity"]
-           A2["libadvancedmotionapi<br/>Cubic spline execution"]
-           A3["libioapi<br/>Digital I/O"]
+           A1["libcoremotionapi<br/>axis status, servo, position &amp; velocity"]
+           A2["libadvancedmotionapi<br/>C-spline execution"]
+           A3["libioapi<br/>digital I/O"]
            A4["libecapi<br/>EtherCAT diagnostics"]
-           A5["libwmx3api<br/>Device lifecycle"]
+           A5["libwmx3api<br/>device lifecycle"]
        end
 
        subgraph L3["Layer 3: EtherCAT"]
            direction LR
-           E1["WMX3 Motion Engine"]
-           E2["EtherCAT Master"]
-           E3["Servo Drives  J1 → J2 → ... → J6  (daisy-chained)"]
-           E4["I/O Module  (gripper digital output)"]
+           E1["WMX3 motion engine"]
+           E2["EtherCAT master"]
+           E3["Servo drives, daisy-chained"]
+           E4["I/O module<br/>(gripper output bit)"]
        end
 
        L1 -->|"C++ library calls  (same machine, shared memory)"| L2
@@ -58,6 +58,7 @@ The diagram below shows how the three layers stack and which libraries and buses
 
 For the full list of ROS2 interfaces, see:
 
-- :doc:`ros2_topics` -- Published and subscribed topics
-- :doc:`ros2_services` -- Engine, axis, I/O, and EtherCAT services
-- :doc:`ros2_actions` -- FollowJointTrajectory action
+- :doc:`ros2_services` -- engine, lifecycle, axis, I/O, and EtherCAT services
+- :doc:`ros2_topics` -- published and subscribed topics
+- :doc:`ros2_actions` -- the ``FollowJointTrajectory`` action
+- :doc:`wmx_r2_control` -- the ``ros2_control`` route to the same engine

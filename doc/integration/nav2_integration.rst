@@ -62,6 +62,18 @@ Execution modes
 The WMX side drives the base in either of two ways. Both consume ``/cmd_vel_safe``
 and publish the same encoder odometry, so the Nav2 side is identical either way.
 
+.. note::
+
+   WMX R2 runs in its own container and is launched with ``wros``; the Nav2
+   stack runs in the ``movensys-navigation`` container and is launched with
+   ``nros``. The two helpers are not interchangeable — ``wros`` runs as root,
+   which the real-time launches require. Both containers must share the same
+   ``ROS_DOMAIN_ID`` and ``RMW_IMPLEMENTATION``.
+
+   The full launch arguments are in `wmx-r2/doc/launch_differential.md
+   <https://github.com/movensys/wmx-r2/blob/main/doc/launch_differential.md>`_
+   and :doc:`../api_reference/wmx_r2_package`.
+
 .. tab-set::
 
    .. tab-item:: Native controller
@@ -73,7 +85,7 @@ and publish the same encoder odometry, so the Nav2 side is identical either way.
 
       .. code-block:: bash
 
-         nros ros2 launch wmx_r2_package wmx_r2_diffbot_navigation.launch.py
+         wros ros2 launch wmx_r2_package wmx_r2_differential.launch.py
 
    .. tab-item:: ros2_control
 
@@ -85,7 +97,7 @@ and publish the same encoder odometry, so the Nav2 side is identical either way.
 
       .. code-block:: bash
 
-         nros ros2 launch wmx_r2_control wmx_r2_control_diffbot_navigation.launch.py
+         wros ros2 launch wmx_r2_control wmx_r2_control_differential.launch.py
 
 Setup
 -----
@@ -118,10 +130,14 @@ real base:
 
 .. code-block:: bash
 
-   # WMX base (native controller shown; use_sim_time omitted for real hardware)
-   nros ros2 launch wmx_r2_package wmx_r2_diffbot_navigation.launch.py
+   # 1. WMX base, from the WMX R2 container
+   wros ros2 launch wmx_r2_package wmx_r2_differential.launch.py \
+       use_sim_time:=false \
+       'config_file:=$(ros2 pkg prefix --share wmx_r2_package)/example/diffbot_differential_config.yaml' \
+       'wmx_param_file:=$(ros2 pkg prefix --share wmx_r2_package)/example/diffbot_wmx_parameters.xml'
 
-   # Nav2: map_server + AMCL + planner/controller/BT servers + EKF + RViz
+   # 2. Nav2, from the navigation container:
+   #    map_server + AMCL + planner/controller/BT servers + EKF + RViz
    nros ros2 launch movensys_navigation_nav2_config navigation.launch.py
 
 For simulation or hardware-in-the-loop, start the simulator bridge first and
@@ -130,8 +146,14 @@ pass ``use_sim_time:=true`` to each command:
 .. code-block:: bash
 
    nros ros2 launch movensys_navigation_nav2_config sim_bridge.launch.py use_sim_time:=true
-   nros ros2 launch wmx_r2_package wmx_r2_diffbot_navigation.launch.py use_sim_time:=true
+   wros ros2 launch wmx_r2_package wmx_r2_differential.launch.py use_sim_time:=true ...
    nros ros2 launch movensys_navigation_nav2_config navigation.launch.py use_sim_time:=true
+
+Add ``rsp:=false`` to the Nav2 launch when the robot description is already
+published by Gazebo or by ``ros2_control``, and ``use_cuvslam:=true`` to use
+cuVSLAM. To drive manually rather than plan, use ``base.launch.py`` (EKF and
+robot_state_publisher only) with ``teleop_twist_keyboard`` remapped onto
+``/cmd_vel_safe``.
 
 To build a map instead of navigating a known one, launch ``mapping.launch.py``
 (SLAM Toolbox) in place of ``navigation.launch.py`` and drive the base manually.

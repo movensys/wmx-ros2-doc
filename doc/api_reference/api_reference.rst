@@ -1,40 +1,88 @@
 API Reference
 =============
 
-Complete reference for all ROS2 interfaces exposed by the WMX R2 packages.
-The interfaces are provided by the general nodes in ``wmx_r2_package`` —
-``wmx_engine_node``, ``wmx_core_motion_node``, ``wmx_ethercat_node``, and
-``wmx_io_node`` — together with the manipulator controllers
-(joint state broadcaster, gripper controller, and joint trajectory
-controller). All custom message and service types are defined in
-``wmx_r2_message``.
+Complete reference for the ROS2 interfaces of the WMX R2 packages.
 
-**ROS2 Services** documents the request/response interfaces:
+Three packages make up WMX R2:
 
-- **Engine management** (``wmx_engine_node``) -- device creation/teardown
-  (``/wmx/engine/set_device``), communication start/stop
-  (``/wmx/engine/set_comm``), status query (``/wmx/engine/get_status``), and
-  EtherCAT network scan (``/wmx/engine/scan_network``).
-- **Axis control** (``wmx_core_motion_node``) -- servo on/off, clear alarm,
-  set command mode, set polarity, set gear ratio, and homing
-  (``/wmx/axis/*``), plus loading and reading axis parameters from XML
-  (``/wmx/params/load``, ``/wmx/params/get``).
-- **I/O** (``wmx_io_node``) -- read and write digital input/output bits and
-  bytes (``/wmx/io/*``). Gripper open/close (``/wmx/set_gripper``) is layered
-  on top of digital output bit 0.
-- **EtherCAT** (``wmx_ethercat_node``) -- network state, register read,
-  statistics reset, and hot-connect (``/wmx/ecat/*``).
+.. list-table::
+   :header-rows: 1
+   :widths: 24 76
 
-**ROS2 Topics** covers the streamed data: ``/joint_states`` for MoveIt2 and
-RViz feedback (rate set by ``joint_feedback_rate``, plus Isaac Sim and Gazebo
-variants), ``/wmx/axis/state`` for detailed per-axis status (``AxisState`` at
-100 Hz), the motion-command inputs ``/wmx/axis/position``,
-``/wmx/axis/position/relative`` and ``/wmx/axis/velocity``, and the per-node
-``ready`` heartbeats.
+   * - Package
+     - Contents
+   * - :doc:`wmx_r2_message`
+     - One message (``AxesStatus``) and 22 services. Interfaces only — no
+       nodes, and no dependency on the WMX3 SDK.
+   * - :doc:`wmx_r2_package`
+     - The ten nodes that talk to the WMX3 SDK, three launch files, and the
+       per-robot example configurations.
+   * - :doc:`wmx_r2_control`
+     - The ``ros2_control`` hardware interface
+       (``wmx_r2_control/WmxSystemHardware``), URDF xacros, controller
+       YAMLs, and launch files.
 
-**ROS2 Actions** describes the ``FollowJointTrajectory`` action server that
-receives multi-waypoint trajectories from MoveIt2 and executes them on the
-robot via WMX spline interpolation.
+How to read this section
+------------------------
+
+Two facts explain most of the interface layout.
+
+**Commands are services; only streamed data is a topic.** Servo power, axis
+configuration, homing, manual motion, I/O, and EtherCAT diagnostics are all
+request/response. The topics carry feedback out and trajectory or velocity
+streams in, nothing else. Multi-waypoint trajectories are the one action.
+
+**Most nodes are lifecycle nodes, and their interfaces exist only while they
+are** ``active``. ``wmx_lifecycle_manager_node`` brings them up when the
+engine starts communicating and takes them down when it stops. If
+``ros2 topic list`` or ``ros2 service list`` looks empty, check the node
+states before anything else:
+
+.. code-block:: bash
+
+   ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
+
+Interfaces by node
+------------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 14 56
+
+   * - Node
+     - Lifecycle
+     - Interfaces
+   * - ``wmx_engine_node``
+     - no
+     - ``/wmx/engine/set_engine``, ``set_communication``,
+       ``get_engine_status``, ``import_and_set_all``, ``get_axis_param``
+   * - ``wmx_lifecycle_manager_node``
+     - no
+     - ``/wmx/lifecycle/set_node_state``, ``get_node_states``
+   * - ``wmx_core_motion_node``
+     - yes
+     - ``/wmx/axes/*`` services; publishes ``/wmx/axes/status``
+   * - ``wmx_io_node``
+     - yes
+     - ``/wmx/io/*`` — input and output, by bit and by byte
+   * - ``wmx_ethercat_node``
+     - yes
+     - ``/wmx/ecat/*`` — master info, register read, scan, hot-connect
+   * - ``joint_state_broadcaster``
+     - yes
+     - Publishes ``/joint_states`` and the simulator mirrors
+   * - ``joint_trajectory_controller``
+     - yes
+     - ``FollowJointTrajectory`` action server
+   * - ``joint_position_controller``
+     - yes
+     - Subscribes to the MoveIt Servo trajectory stream
+   * - ``gripper_controller``
+     - yes
+     - ``/wmx/set_gripper``
+   * - ``differential_drive_controller``
+     - yes
+     - ``/cmd_vel_safe`` in; ``/odom_enc``, ``/omega_enc``, ``/omega_cmd`` out
 
 .. toctree::
    :maxdepth: 2
@@ -45,3 +93,4 @@ robot via WMX spline interpolation.
    ros2_actions
    wmx_r2_message
    wmx_r2_package
+   wmx_r2_control

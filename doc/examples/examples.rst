@@ -12,11 +12,67 @@ mapping). The **Robopoly game** is a voice-driven VLM/LLM application from the
 `movensys-intelligence <https://github.com/movensys/movensys-intelligence>`_
 repository, built on top of the manipulator stack.
 
-Every manipulator and navigation scenario runs in three execution modes:
+Every manipulator and navigation scenario runs in three execution modes. The
+difference between them is *where the motion actually happens*:
 
-- **Simulation** -- pure simulation (Isaac Sim or Gazebo), no hardware
-- **HIL** -- hardware-in-the-loop: simulator visuals with the real WMX runtime
-- **Real** -- the real robot via WMX over EtherCAT
+.. mermaid::
+   :caption: What is real in each execution mode
+
+   flowchart LR
+       subgraph S["Simulation"]
+           direction TB
+           S1["Planner<br/>MoveIt2 / Nav2"] --> S2["Simulator physics<br/>Isaac Sim or Gazebo"]
+           S2 --> S3["Rendered robot"]
+       end
+
+       subgraph H["HIL"]
+           direction TB
+           H1["Planner<br/>MoveIt2 / Nav2"] --> H2["<b>Real WMX engine</b><br/>simulated EtherCAT platform"]
+           H2 --> H3["Simulator<br/>mirrors the engine"]
+       end
+
+       subgraph R["Real"]
+           direction TB
+           R1["Planner<br/>MoveIt2 / Nav2"] --> R2["<b>Real WMX engine</b><br/>EtherCAT platform"]
+           R2 --> R3["<b>Physical servos</b>"]
+           R2 -.-> R4["Simulator<br/>visualization only"]
+       end
+
+       S -->|"engine is real from here on"| H -->|"motors are real from here on"| R
+
+.. list-table::
+   :header-rows: 1
+   :widths: 14 20 22 22 22
+
+   * - Mode
+     - Planner
+     - WMX engine
+     - EtherCAT
+     - Motion
+   * - **Simulation**
+     - real
+     - not used
+     - not used
+     - simulated physics
+   * - **HIL**
+     - real
+     - **real**
+     - simulated platform
+     - simulated, driven by the engine
+   * - **Real**
+     - real
+     - **real**
+     - **real bus**
+     - **physical servos**
+
+HIL is the step that catches configuration errors: the engine, the axis
+parameters, the gear ratios, and the whole WMX R2 node graph are exactly what
+the real robot will use — only the motors are not. An axis that moves the
+wrong way in HIL would have moved the wrong way on the robot.
+
+The mode is selected in ``/opt/wmx3/Module.ini`` (simulation platform versus
+EtherCAT platform) and by which USD scene you open. See
+:doc:`testing_wmx_r2` for the ``Module.ini`` switch.
 
 .. warning:: **Run the modes in order Simulation, then HIL, then Real.**
 
@@ -38,7 +94,7 @@ Every manipulator and navigation scenario runs in three execution modes:
    :hidden:
    :caption: Application stacks
 
-   Testing WMX R2
+   testing_wmx_r2
    isaacsim_setup
    movensys_manipulator
    movensys_navigation

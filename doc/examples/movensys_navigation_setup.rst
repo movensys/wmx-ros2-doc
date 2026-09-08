@@ -10,34 +10,30 @@ through the ``nros`` helper (the navigation counterpart of ``mros``).
 1. Host environment
 -------------------
 
-Add the following to your ``~/.bashrc`` (source it afterwards). The variables
-select the ROS distro, the build flavor, the CPU architecture, and the robot
-model, and define the ``nros`` helper used to run commands inside the container.
+Add the following to your ``~/.bashrc``, then source it. The variables select
+the ROS distro, the build flavor, the CPU architecture, and the robot model.
+The last line sources ``docker/nros.bash``, which defines the ``nros`` helper
+used to run commands inside the container.
 
 .. code-block:: bash
 
    export ROS_DOMAIN_ID=73                         # use any number
    export ROS_DISTRO=jazzy                         # {jazzy, humble}
-   export MOVENSYS_ROS_VERSION=isaac-ros_4.1       # {isaac-ros_4.1, isaac-ros_3.2, general}
    export CPU_ARCH=amd64                           # {amd64, arm64}
-   export NAVIGATION_MODEL=diffbot                 # {diffbot}
-
-   export HOST_USER_UID=$(id -u)
-   export HOST_USER_GID=$(id -g)
    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
-   export MOVENSYS_NAVIGATION_PACKAGES=~/workspaces/movensys_ws/src/movensys-navigation
-   export ISAAC_ROS_WS=~/workspaces/isaac_ros-dev
+   export MOVENSYS_ROS_VERSION=isaac-ros_4.1       # {general, isaac-ros_4.1, isaac-ros_3.2}
+   export NAVIGATION_MODEL=diffbot                 # {diffbot}
 
-   nros() {
-     if [ $# -eq 0 ]; then
-       docker exec -it -u admin movensys_navigation_container \
-         bash -lc 'source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/admin/workspaces/movensys_ws/install/setup.bash && exec bash -i'
-     else
-       docker exec -it -u admin movensys_navigation_container \
-         bash -lc "source /opt/ros/\${ROS_DISTRO}/setup.bash && source /home/admin/workspaces/movensys_ws/install/setup.bash && $*"
-     fi
-   }
+   source ~/workspaces/movensys_ws/src/movensys-navigation/docker/nros.bash
+
+.. note::
+
+   The host paths the compose files need — ``MOVENSYS_NAVIGATION_PACKAGES``,
+   ``ISAAC_ROS_WS``, the container and image names — come from
+   ``docker/.env``, relative to the ``docker/`` directory. Do not export them
+   in ``~/.bashrc``; edit ``docker/.env`` if your layout differs from the
+   default ``~/workspaces`` one.
 
 Allow the container to reach the host X server and reload the shell:
 
@@ -89,7 +85,7 @@ navigation layer:
 
 .. code-block:: bash
 
-   cd ${MOVENSYS_NAVIGATION_PACKAGES}/docker
+   cd ~/workspaces/movensys_ws/src/movensys-navigation/docker
    docker compose -f ${MOVENSYS_ROS_VERSION}.yaml -f movensys_navigation.${CPU_ARCH}.yaml down
    docker compose -f ${MOVENSYS_ROS_VERSION}.yaml -f movensys_navigation.${CPU_ARCH}.yaml build
    docker compose -f ${MOVENSYS_ROS_VERSION}.yaml -f movensys_navigation.${CPU_ARCH}.yaml up -d
@@ -116,9 +112,11 @@ Verify the build by launching the robot description in RViz:
 
    nros ros2 launch movensys_navigation_description movensys_navigation_rviz.launch.py
 
-For HIL mode, the base is brought up with WMX R2 (see
-``wmx-r2/doc/launch_<NAVIGATION_MODEL>_navigation.md`` and
-:doc:`../getting_started/install_wmx3`).
+For HIL and Real modes, the base is brought up with WMX R2 — see
+`wmx-r2/doc/launch_differential.md
+<https://github.com/movensys/wmx-r2/blob/main/doc/launch_differential.md>`_,
+:doc:`../api_reference/wmx_r2_package`, and
+:doc:`../getting_started/install_wmx3`.
 
 .. note:: **Isaac Sim scenes**
 

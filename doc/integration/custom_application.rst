@@ -16,7 +16,7 @@ only the configuration files and WMX parameter files are robot-specific.
 There are three approaches to controlling the robot:
 
 1. **High-level pose/joint services** -- Call the ``/wmx/moveit2/*`` services
-   provided by the ``trajectory_api`` node in
+   provided by the ``moveit2_api`` node in
    `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
    for MoveIt2-planned Cartesian and joint moves (see
    :doc:`moveit2_integration`). This is the simplest option when MoveIt2 is
@@ -63,15 +63,36 @@ Available Interfaces
    * - Name
      - Type
      - Purpose
-   * - ``/wmx/engine/get_status``
+   * - ``/wmx/engine/get_engine_status``
      - ``std_srvs/srv/Trigger``
      - Query engine state
+   * - ``/wmx/lifecycle/get_node_states``
+     - ``wmx_r2_message/srv/GetNodeStates``
+     - Check which nodes are ``active``
    * - ``/wmx/set_gripper``
      - ``std_srvs/srv/SetBool``
      - Open/close gripper
-   * - ``/wmx/axis/set_on``
-     - ``wmx_r2_message/srv/SetAxis``
+   * - ``/wmx/axes/set_servo_on``
+     - ``wmx_r2_message/srv/SetAxes``
      - Enable/disable servos
+   * - ``/wmx/axes/start_pos`` / ``start_mov``
+     - ``wmx_r2_message/srv/StartAxesPose``
+     - Absolute / relative single-axis move
+   * - ``/wmx/axes/start_vel`` / ``start_jog``
+     - ``wmx_r2_message/srv/StartAxesVelocity``
+     - Constant velocity / dead-man jog
+   * - ``/wmx/axes/stop``
+     - ``wmx_r2_message/srv/SetAxes``
+     - Decelerate to a stop; never blocked
+
+.. important::
+
+   **Single-axis motion is a service call, not a topic publish.** There is no
+   motion topic. And while a controller listed in ``motion_controllers`` is
+   ``active``, ``start_pos``, ``start_mov``, ``start_vel``, ``start_jog``, and
+   ``start_home`` all answer ``success: false`` — the controller owns the
+   axes. An application that plans should go through the
+   ``FollowJointTrajectory`` action, not through these.
 
 .. list-table:: Key Topics
    :header-rows: 1
@@ -85,22 +106,14 @@ Available Interfaces
      - ``sensor_msgs/msg/JointState``
      - 100 Hz
      - Current joint positions and velocities
-   * - ``/wmx/axis/state``
-     - ``wmx_r2_message/msg/AxisState``
+   * - ``/wmx/axes/status``
+     - ``wmx_r2_message/msg/AxesStatus``
      - 100 Hz
      - Detailed axis status (alarms, limits, torques)
-   * - ``/wmx/axis/velocity``
-     - ``wmx_r2_message/msg/AxisVelocity``
-     - On demand
-     - Velocity commands
-   * - ``/wmx/axis/position``
-     - ``wmx_r2_message/msg/AxisPose``
-     - On demand
-     - Absolute position commands
-   * - ``/wmx/axis/position/relative``
-     - ``wmx_r2_message/msg/AxisPose``
-     - On demand
-     - Relative position commands
+   * - ``/moveit2_trajectory/execution_active``
+     - ``std_msgs/msg/Bool``
+     - On change
+     - Latched: true while a planned goal is running
 
 For complete field-level documentation, see :doc:`../api_reference/ros2_actions`,
 :doc:`../api_reference/ros2_services`, and :doc:`../api_reference/ros2_topics`.
@@ -402,7 +415,7 @@ diagnostics, and control the gripper -- combining services and topics.
        def __init__(self):
            super().__init__('robot_controller')
            self._status_client = self.create_client(
-               Trigger, '/wmx/engine/get_status'
+               Trigger, '/wmx/engine/get_engine_status'
            )
            self._gripper_client = self.create_client(
                SetBool, '/wmx/set_gripper'
@@ -523,88 +536,95 @@ result to the ``joint_trajectory_controller`` via the
 Direct Axis Control
 --------------------
 
-For applications that need real-time velocity or position control without
-trajectory planning, publish directly to the motion topics. This requires
-the ``wmx_core_motion_node`` to be running.
+For applications that need single-axis motion without trajectory planning,
+call the ``/wmx/axes/*`` services on ``wmx_core_motion_node``.
+
+.. important::
+
+   **These are services, not topics.** Every one of them returns
+   ``success`` and a per-axis ``message``, and every one of them is refused
+   while a controller listed in ``motion_controllers`` is ``active``. Read
+   the response — a silent publish that does nothing is not a failure mode
+   here, but a ``success: false`` you ignored is.
 
 .. code-block:: python
 
    #!/usr/bin/env python3
-   """Direct axis velocity control via topic publishing."""
+   """Direct axis control through the /wmx/axes/* services."""
 
    import rclpy
    from rclpy.node import Node
-   from wmx_r2_message.msg import AxisVelocity, AxisPose
+   from wmx_r2_message.srv import SetAxes, StartAxesPose, StartAxesVelocity
 
 
    class DirectAxisControl(Node):
        def __init__(self):
            super().__init__('direct_axis_control')
-           self._vel_pub = self.create_publisher(
-               AxisVelocity, '/wmx/axis/velocity', 1
-           )
-           self._pos_pub = self.create_publisher(
-               AxisPose, '/wmx/axis/position', 1
-           )
-           self._rel_pub = self.create_publisher(
-               AxisPose, '/wmx/axis/position/relative', 1
-           )
+           self._pos = self.create_client(StartAxesPose, '/wmx/axes/start_pos')
+           self._mov = self.create_client(StartAxesPose, '/wmx/axes/start_mov')
+           self._vel = self.create_client(StartAxesVelocity, '/wmx/axes/start_vel')
+           self._stop = self.create_client(SetAxes, '/wmx/axes/stop')
 
-       def send_velocity(self, axis_indices, velocities, acc=10.0, dec=10.0):
-           """Command velocity motion on specified axes.
+           for client in (self._pos, self._mov, self._vel, self._stop):
+               if not client.wait_for_service(timeout_sec=10.0):
+                   raise RuntimeError(
+                       f'{client.srv_name} not available. '
+                       'Is wmx_core_motion_node active?'
+                   )
 
-           The axes must be in velocity mode (set via /wmx/axis/set_mode
-           with data=[1]).
-           """
-           msg = AxisVelocity()
-           msg.index = axis_indices
-           msg.velocity = velocities
-           msg.acc = [acc] * len(axis_indices)
-           msg.dec = [dec] * len(axis_indices)
-           self._vel_pub.publish(msg)
-           self.get_logger().info(
-               f'Velocity command: axes={axis_indices}, vel={velocities}'
-           )
+       def _call(self, client, request):
+           future = client.call_async(request)
+           rclpy.spin_until_future_complete(self, future)
+           response = future.result()
+           if not response.success:
+               self.get_logger().error(
+                   f'{client.srv_name} refused: {response.message}'
+               )
+           return response.success
 
-       def send_position(self, axis_indices, targets, vel=5.0, acc=10.0, dec=10.0):
-           """Command absolute position motion on specified axes."""
-           msg = AxisPose()
-           msg.index = axis_indices
-           msg.target = targets
-           msg.velocity = [vel] * len(axis_indices)
-           msg.acc = [acc] * len(axis_indices)
-           msg.dec = [dec] * len(axis_indices)
-           self._pos_pub.publish(msg)
-           self.get_logger().info(
-               f'Position command: axes={axis_indices}, targets={targets}'
-           )
+       def move_absolute(self, axes, targets, vel=5.0, acc=10.0, dec=10.0):
+           """Move to an absolute target, in axis user units."""
+           req = StartAxesPose.Request()
+           req.axis = axes
+           req.target = targets
+           req.velocity = [vel] * len(axes)
+           req.acc = [acc] * len(axes)
+           req.dec = [dec] * len(axes)
+           return self._call(self._pos, req)
 
-       def send_relative_position(self, axis_indices, displacements,
-                                   vel=5.0, acc=10.0, dec=10.0):
-           """Command relative position motion on specified axes."""
-           msg = AxisPose()
-           msg.index = axis_indices
-           msg.target = displacements
-           msg.velocity = [vel] * len(axis_indices)
-           msg.acc = [acc] * len(axis_indices)
-           msg.dec = [dec] * len(axis_indices)
-           self._rel_pub.publish(msg)
-           self.get_logger().info(
-               f'Relative move: axes={axis_indices}, disp={displacements}'
-           )
+       def move_relative(self, axes, displacements, vel=5.0, acc=10.0, dec=10.0):
+           """Move by a displacement from wherever the axes are now."""
+           req = StartAxesPose.Request()
+           req.axis = axes
+           req.target = displacements
+           req.velocity = [vel] * len(axes)
+           req.acc = [acc] * len(axes)
+           req.dec = [dec] * len(axes)
+           return self._call(self._mov, req)
+
+       def move_velocity(self, axes, velocities, acc=10.0, dec=10.0):
+           """Run at constant velocity until stopped. Sign selects direction."""
+           req = StartAxesVelocity.Request()
+           req.axis = axes
+           req.velocity = velocities
+           req.acc = [acc] * len(axes)
+           req.dec = [dec] * len(axes)
+           return self._call(self._vel, req)
+
+       def stop(self, axes):
+           """Decelerate to a stop. Never blocked by a controller."""
+           req = SetAxes.Request()
+           req.axis = axes
+           req.data = [0] * len(axes)
+           return self._call(self._stop, req)
 
 
    def main():
        rclpy.init()
        ctrl = DirectAxisControl()
 
-       # Move axis 0 to 1.0 radian absolute
-       ctrl.send_position([0], [1.0])
-
-       import time; time.sleep(5.0)
-
-       # Move axis 0 by +0.5 radian relative
-       ctrl.send_relative_position([0], [0.5])
+       ctrl.move_relative([0], [10.0])    # +10 user units on axis 0
+       ctrl.stop([0])
 
        ctrl.destroy_node()
        rclpy.shutdown()
@@ -613,25 +633,46 @@ the ``wmx_core_motion_node`` to be running.
    if __name__ == '__main__':
        main()
 
-.. important::
+Taking the axes from a controller
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   Direct axis commands require the axes to be properly initialized first
-   (servo enabled, mode set, homed). When using the manipulator launch file,
-   this is handled automatically by ``joint_state_broadcaster``. When using the
-   general launch, call the setup services first as described in the
-   :doc:`../api_reference/ros2_services` workflow section.
+If these calls return ``success: false`` with a message about a controller,
+a motion controller is active and owns the axes. Deactivate it first:
+
+.. code-block:: python
+
+   from wmx_r2_message.srv import SetNodeState
+
+   client = node.create_client(SetNodeState, '/wmx/lifecycle/set_node_state')
+   req = SetNodeState.Request()
+   req.node_name = 'joint_trajectory_controller'
+   req.transition = 'deactivate'
 
 .. warning::
 
-   Publishing to motion topics causes **immediate physical motion**. These
-   commands bypass MoveIt2 collision checking.
+   Do **not** deactivate ``joint_state_broadcaster`` to free the axes. It
+   switches the servos **off** when it deactivates, which drops an arm's
+   holding torque. Deactivate the motion controller instead.
+
+.. important::
+
+   Direct axis commands require the axes to be initialized first: servo
+   enabled, command mode set, and homed. The manipulator launch does this
+   through ``joint_state_broadcaster``; from the general nodes alone, run the
+   startup sequence in :doc:`../api_reference/ros2_services` first.
+
+.. warning::
+
+   These service calls cause **immediate physical motion** and bypass MoveIt2
+   collision checking.
 
 Adapting for Different Robots
 -------------------------------------
 
-The WMX R2 system is designed to be robot-agnostic. Supporting a new 
-manipulator with EtherCAT servo drives requires changes to configuration files
-only -- no source code modifications are needed.
+WMX R2 is robot-agnostic by construction: no robot is baked into any launch
+file. Supporting a new EtherCAT manipulator means writing two files — a ROS
+parameter YAML and a WMX parameter XML — and passing them as launch
+arguments. No source changes, and no new launch file.
 
 Configuration files to create or modify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -648,18 +689,20 @@ Configuration files to create or modify
    * - **WMX XML parameters** (e.g., ``new_robot_wmx_parameters.xml``)
      - Define gear ratios, axis polarities, encoder modes, homing parameters,
        and limit switch settings for each servo axis
-   * - **Launch file** (e.g., ``wmx_r2_new_robot.launch.py``)
-     - Point to the new YAML config and launch the 3 standard nodes
-   * - **ENI files** (in ``eni/`` directory)
-     - Add EtherCAT Network Information files for any new servo drive models
-       not already supported
+   * - **Launch file**
+     - Nothing to write. ``wmx_r2_manipulator.launch.py`` and
+       ``wmx_r2_differential.launch.py`` take the YAML and XML as arguments,
+       so a new robot is a new pair of files, not a new launch file.
+   * - **ESI files** (``/opt/wmx3/ESI/``)
+     - Add the EtherCAT Slave Information file for any servo drive model the
+       WMX Runtime does not already ship
 
 Steps to adapt
 ^^^^^^^^^^^^^^^
 
 1. **Identify your servo drives** -- Determine the vendor and product IDs of
-   each EtherCAT servo drive in your robot. Check if matching ENI files exist
-   in the ``eni/`` directory.
+   each EtherCAT servo drive in your robot, and check that a matching ESI file
+   is present in ``/opt/wmx3/ESI/``.
 
 2. **Create the WMX parameter file** -- Copy ``cr3a_wmx_parameters.xml`` and
    modify gear ratios, polarities, and encoder settings for your servo drives.
@@ -667,8 +710,9 @@ Steps to adapt
    ``numerator = encoder_counts_per_revolution``,
    ``denominator = 2 * pi (6.28319)``.
 
-3. **Create the YAML config** -- Copy ``cr3a_manipulator_config.yaml``
-   and update:
+3. **Create the YAML config** -- Copy ``example/cr3a_manipulator_config.yaml``
+   and update. ``joint_axes`` and ``joint_name`` must be the **same lists, in
+   the same order**, in all three motion nodes:
 
    .. code-block:: yaml
 
@@ -677,25 +721,55 @@ Steps to adapt
           joint_axes: [0, 1, 2, 3, 4, 5]   # WMX axis indices
           joint_feedback_rate: 100         # Hz
           joint_name: ["joint1", "joint2", "joint3",
-                        "joint4", "joint5", "joint6"]
+                       "joint4", "joint5", "joint6"]
           gripper_joint_name: ["picker_1_joint", "picker_2_joint"]
-          wmx_param_file_path: /path/to/new_robot_wmx_parameters.xml
+          encoder_joint_topic: /joint_states
 
-4. **Create a launch file** -- Copy an existing launch file and reference your
-   new YAML config.
+      joint_trajectory_controller:
+        ros__parameters:
+          joint_axes: [0, 1, 2, 3, 4, 5]
+          joint_name: ["joint1", "joint2", "joint3",
+                       "joint4", "joint5", "joint6"]
+          joint_trajectory_action: /my_robot_arm_controller/follow_joint_trajectory
+
+      wmx_lifecycle_manager_node:
+        ros__parameters:
+          managed_nodes:                   # device-level nodes first
+            - wmx_core_motion_node
+            - wmx_io_node
+            - wmx_ethercat_node
+            - joint_state_broadcaster
+            - joint_trajectory_controller
+            - joint_position_controller
+
+   The XML path is **not** set here — it is passed to the launch file as
+   ``wmx_param_file``, which injects it as ``wmx_param_file_path``.
+
+4. **Launch it** -- No new launch file. Pass your two files as arguments:
+
+   .. code-block:: bash
+
+      wros ros2 launch wmx_r2_package wmx_r2_manipulator.launch.py \
+          use_sim_time:=false \
+          config_file:=/abs/path/to/new_robot_config.yaml \
+          wmx_param_file:=/abs/path/to/new_robot_wmx_parameters.xml
 
 5. **Update URDF/SRDF** (if using MoveIt2) -- Create a MoveIt2 configuration
    package for your robot with the correct kinematics, joint limits, and
-   collision geometry.
+   collision geometry. ``joint_trajectory_action`` must match the controller
+   name in the MoveIt2 controllers YAML.
+
+6. **Commission it** -- Verify the parameters, then run the low-speed
+   single-axis procedure before any coordinated motion. See
+   :doc:`../commissioning/index`.
 
 What stays the same
 ^^^^^^^^^^^^^^^^^^^^
 
-- All ROS2 node executables (``joint_state_broadcaster``,
-  ``joint_trajectory_controller``, ``wmx_core_motion_node``)
+- Every node executable and every launch file — the robot is data, not code
 - All service and topic names
 - The ``FollowJointTrajectory`` action interface
-- The ``wmx_r2_message`` custom message types
+- The ``wmx_r2_message`` custom interface types
 - The build process
 
 See :doc:`../api_reference/wmx_r2_package` for node and parameter details

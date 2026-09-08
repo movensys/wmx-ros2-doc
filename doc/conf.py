@@ -26,7 +26,17 @@ rst_prolog = """
 """
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '_redirects']
+
+# -- Redirects ---------------------------------------------------------------
+# Copied verbatim into the build output. GitHub Pages is deployed with
+# ``keep_files: true``, so a page that is renamed keeps serving its old, stale
+# HTML at the old URL forever. A stub here overwrites it with a redirect.
+#
+#   examples/Testing WMX R2.html -> examples/testing_wmx_r2.html
+#
+# Add a stub whenever a published page is renamed or moved.
+html_extra_path = ['_redirects']
 
 # -- Mermaid ----------------------------------------------------------------
 # Render diagrams at their natural size instead of clamping every SVG to the

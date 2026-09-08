@@ -9,34 +9,30 @@ described below.
 1. Host environment
 -------------------
 
-Add the following to your ``~/.bashrc`` (source it afterwards). The variables
-select the ROS distro, the build flavor, the CPU architecture, and the robot
-model, and define the ``mros`` helper used to run commands inside the container.
+Add the following to your ``~/.bashrc``, then source it. The variables select
+the ROS distro, the build flavor, the CPU architecture, and the robot model.
+The last line sources ``docker/mros.bash``, which defines the ``mros`` helper
+used to run commands inside the container.
 
 .. code-block:: bash
 
    export ROS_DOMAIN_ID=73                         # use any number
    export ROS_DISTRO=jazzy                         # {jazzy, humble}
-   export MOVENSYS_ROS_VERSION=isaac-ros_4.1       # {intel-xpu, isaac-ros_4.1, isaac-ros_3.2, general}
    export CPU_ARCH=amd64                           # {amd64, arm64}
-   export MANIPULATOR_MODEL=dobot_cr3a             # {dobot_cr3a, dobot_cr5a}
-
-   export HOST_USER_UID=$(id -u)
-   export HOST_USER_GID=$(id -g)
    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
-   export MOVENSYS_MANIPULATOR_PACKAGES=~/workspaces/movensys_ws/src/movensys-manipulator
-   export ISAAC_ROS_WS=~/workspaces/isaac_ros-dev
+   export MOVENSYS_ROS_VERSION=isaac-ros_4.1       # {general, intel-xpu, isaac-ros_4.1, isaac-ros_3.2}
+   export MANIPULATOR_MODEL=dobot_cr3a             # {dobot_cr3a, dobot_cr5a}
 
-   mros() {
-     if [ $# -eq 0 ]; then
-       docker exec -it -u admin movensys_manipulator_container \
-         bash -lc 'source /opt/ros/${ROS_DISTRO}/setup.bash && source /home/admin/workspaces/movensys_ws/install/setup.bash && exec bash -i'
-     else
-       docker exec -it -u admin movensys_manipulator_container \
-         bash -lc "source /opt/ros/\${ROS_DISTRO}/setup.bash && source /home/admin/workspaces/movensys_ws/install/setup.bash && $*"
-     fi
-   }
+   source ~/workspaces/movensys_ws/src/movensys-manipulator/docker/mros.bash
+
+.. note::
+
+   The host paths the compose files need — ``MOVENSYS_MANIPULATOR_PACKAGES``,
+   ``ISAAC_ROS_WS``, the container and image names — come from
+   ``docker/.env``, relative to the ``docker/`` directory. Do not export them
+   in ``~/.bashrc``; edit ``docker/.env`` if your layout differs from the
+   default ``~/workspaces`` one.
 
 Allow the container to reach the host X server and reload the shell:
 
@@ -88,7 +84,7 @@ manipulator layer:
 
 .. code-block:: bash
 
-   cd ${MOVENSYS_MANIPULATOR_PACKAGES}/docker
+   cd ~/workspaces/movensys_ws/src/movensys-manipulator/docker
    docker compose -f ${MOVENSYS_ROS_VERSION}.yaml -f movensys_manipulator.${CPU_ARCH}.yaml down
    docker compose -f ${MOVENSYS_ROS_VERSION}.yaml -f movensys_manipulator.${CPU_ARCH}.yaml build
    docker compose -f ${MOVENSYS_ROS_VERSION}.yaml -f movensys_manipulator.${CPU_ARCH}.yaml up -d
@@ -115,9 +111,13 @@ Verify the build by launching the robot description in RViz:
 
    mros ros2 launch movensys_manipulator_description movensys_manipulator_rviz.launch.py
 
-For HIL and Real modes, the manipulator is brought up with WMX R2 (see
-``wmx-r2/doc/launch_<MANIPULATOR_MODEL>_manipulator.md`` and
-:doc:`../getting_started/install_wmx3`).
+For HIL and Real modes, the manipulator is brought up with WMX R2 — see
+`wmx-r2/doc/launch_manipulator.md
+<https://github.com/movensys/wmx-r2/blob/main/doc/launch_manipulator.md>`_,
+:doc:`../api_reference/wmx_r2_package`, and
+:doc:`../getting_started/install_wmx3`. One launch file serves every
+manipulator; the robot is selected by the ``config_file`` and
+``wmx_param_file`` you pass.
 
 .. note:: **Isaac Sim scenes**
 

@@ -24,7 +24,7 @@ Architecture
    :class: with-border
    :align: center
 
-The ``trajectory_api`` node (in ``movensys_manipulator_moveit_config``) hosts
+The ``moveit2_api`` node (in ``movensys_manipulator_moveit_config``) hosts
 a MoveIt2 ``MoveGroupInterface`` client and exposes simple pose/joint services
 under ``/wmx/moveit2/``. For each request it:
 
@@ -70,16 +70,31 @@ CycloneDDS buffer tuning, and container build steps.
 Running MoveIt2
 ---------------
 
-Bring up the MoveIt2 stack (commands run through the ``mros`` container
-helper). For a real robot:
+Two containers are involved: WMX R2 runs in its own and is launched with
+``wros`` (as root, for real-time scheduling); MoveIt2 runs in the
+``movensys-manipulator`` container and is launched with ``mros``. Both need
+the same ``ROS_DOMAIN_ID`` and ``RMW_IMPLEMENTATION``.
+
+For a real robot:
 
 .. code-block:: bash
 
-   # Start MoveIt2 (move_group + trajectory_api services)
+   # 1. WMX R2, from the WMX R2 container (see launch_manipulator.md)
+   wros ros2 launch wmx_r2_package wmx_r2_manipulator.launch.py \
+       use_sim_time:=false \
+       'config_file:=$(ros2 pkg prefix --share wmx_r2_package)/example/cr3a_manipulator_config.yaml' \
+       'wmx_param_file:=$(ros2 pkg prefix --share wmx_r2_package)/example/cr3a_wmx_parameters.xml' \
+       use_gripper:=true
+
+   # 2. MoveIt2 (move_group + the moveit2_api services), from the
+   #    manipulator container
    mros ros2 launch movensys_manipulator_moveit_config moveit.launch.py
 
-   # Run a trajectory test, or send your own service calls
+   # 3. Run a trajectory test, or send your own service calls
    mros ros2 launch movensys_manipulator_moveit_config trajectory_test.launch.py
+
+Add ``rsp:=false`` to ``moveit.launch.py`` when the robot description is
+already published — by Gazebo, or by the ``ros2_control`` launch.
 
 For simulation or hardware-in-the-loop, start the simulator bridge first and
 pass ``use_sim_time:=true``:
@@ -93,7 +108,7 @@ pass ``use_sim_time:=true``:
 Service API
 -----------
 
-The ``trajectory_api`` node exposes these services. Pose services use
+The ``moveit2_api`` node exposes these services. Pose services use
 ``movensys_manipulator_moveit_config/srv/MovePose`` (``pos`` = XYZ metres,
 ``ori`` = roll/pitch/yaw radians); joint services use ``MoveJoints``.
 
@@ -119,6 +134,9 @@ The ``trajectory_api`` node exposes these services. Pose services use
    * - ``/wmx/moveit2/absolute_base_eef_joint_movement``
      - ``MovePose``
      - Plan to a pose target in joint space (base frame)
+   * - ``/wmx/moveit2/eef_pose`` / ``eef_rpy``
+     - topics
+     - Continuously published end-effector pose and roll/pitch/yaw
    * - ``/wmx/moveit2/joint_movement``
      - ``MoveJoints``
      - Absolute joint-space move

@@ -101,7 +101,7 @@ setup. All commands run through ``nros``.
 
       2. Start WMX R2 for the navigation base (real WMX runtime) with
          ``use_sim_time:=true`` (see
-         ``~/workspaces/movensys_ws/src/wmx-r2/doc/launch_<NAVIGATION_MODEL>_navigation.md``).
+         ``~/workspaces/movensys_ws/src/wmx-r2/doc/launch_differential.md``).
 
       3. Start mapping:
 
@@ -124,6 +124,43 @@ setup. All commands run through ``nros``.
                  -r cmd_vel:=/cmd_vel_safe
 
       5. Save the map once coverage is complete:
+
+         .. code-block:: bash
+
+            nros ros2 run nav2_map_server map_saver_cli \
+                 -f /home/admin/workspaces/movensys_ws/src/movensys-navigation/movensys_navigation_nav2_config/maps/my_map
+
+   .. tab-item:: Real
+
+      .. danger:: **This drives the physical base.**
+
+         Complete :doc:`../commissioning/index` first, keep the area clear,
+         and keep a hand on the emergency stop. Start at the lowest speed the
+         teleop allows.
+
+      1. Start WMX R2 for the differential base (see
+         ``~/workspaces/movensys_ws/src/wmx-r2/doc/launch_differential.md``).
+
+      2. Launch mapping:
+
+         .. code-block:: bash
+
+            nros ros2 launch movensys_navigation_nav2_config mapping.launch.py
+
+         Add ``rsp:=false`` if using ``ros2_control``. Add
+         ``use_cuvslam:=true`` to use cuVSLAM.
+
+      3. Drive with the teleop keyboard to cover the environment:
+
+         .. code-block:: bash
+
+            ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args \
+                 -p turn:=0.5 \
+                 -p stamped:=true \
+                 -p frame_id:=base_link \
+                 -r cmd_vel:=/cmd_vel_safe
+
+      4. Save the map once coverage is complete:
 
          .. code-block:: bash
 
