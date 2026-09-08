@@ -55,7 +55,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Sep 04, 2026"/>
+    <meta name="docbuild:last-update" content="Sep 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -483,14 +483,6 @@ no perception configuration is shipped — see the function matrix.</p></td>
 <td><p>Velocity-mode axes (<code class="docutils literal notranslate"><span class="pre">AxisCommandMode</span> <span class="pre">=</span> <span class="pre">1</span></code>) driven by
 <code class="docutils literal notranslate"><span class="pre">differential_drive_controller</span></code>, with Nav2, EKF, and SLAM Toolbox.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Any other EtherCAT servo system</p></td>
-<td><p>—</p></td>
-<td><p>Not supported</p></td>
-<td><p>—</p></td>
-<td><p>The general nodes expose axis, I/O, engine, and EtherCAT control for
-arbitrary EtherCAT devices, but no robot-level configuration is
-shipped. See <a class="reference internal" href="#bringing-up-an-unlisted-robot"><span class="std std-ref">Bringing up a robot that is not listed</span></a>.</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -596,8 +588,8 @@ shipped. See <a class="reference internal" href="#bringing-up-an-unlisted-robot"
 combination — the launch will fail to find its config file rather than run
 with a wrong one. For the CR5A this covers everything under
 <code class="docutils literal notranslate"><span class="pre">movensys_manipulator_perception/config/</span></code> and
-<code class="docutils literal notranslate"><span class="pre">movensys_manipulator_isaac_ros_config/config/</span></code>, both of which contain
-only <code class="docutils literal notranslate"><span class="pre">dobot_cr3a</span></code> entries.</p>
+<code class="docutils literal notranslate"><span class="pre">movensys_manipulator_isaac_ros_config/config/</span></code>, and for the diffbot this covers everything under
+<code class="docutils literal notranslate"><span class="pre">movensys_navigation/config/</span></code>.</p>
 </div>
 </section>
 <section id="homing-absolute-position-brakes-and-safety">
@@ -801,7 +793,7 @@ robot that is not listed above.</p>
   <div class="movensys-footer__info">
     <p>&copy; 2026, MOVENSYS MOVENSYS. All rights reserved.</p>
     
-      <p>Last updated: Sep 04, 2026</p>
+      <p>Last updated: Sep 08, 2026</p>
     
   </div>
   <div class="movensys-footer__links">

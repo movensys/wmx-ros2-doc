@@ -208,7 +208,7 @@ const runMermaid = async (rerun) => {
                                     // Apply zoom to the now-rendered diagram, matching
                                     // the decoration visible diagrams receive.
                                     if (true) {
-                                        addZoomToSvgs(d3.selectAll(".mermaid[data-zoom-id=id-892f6571-1393-4a77-8818-2ef4878fc558]").select(function() {
+                                        addZoomToSvgs(d3.selectAll(".mermaid[data-zoom-id=id-404f29ac-d987-4b11-b0a0-6b6f322bab94]").select(function() {
                                             return this.querySelector("svg");
                                         }));
                                     }
@@ -234,7 +234,7 @@ const runMermaid = async (rerun) => {
     if (true) {
         const mermaids_to_add_zoom = 1 === -1 ? mermaids_active.length : 1;
         if(mermaids_to_add_zoom > 0) {
-            var svgs = d3.selectAll(".mermaid[data-zoom-id=id-892f6571-1393-4a77-8818-2ef4878fc558]").select(function() {
+            var svgs = d3.selectAll(".mermaid[data-zoom-id=id-404f29ac-d987-4b11-b0a0-6b6f322bab94]").select(function() {
                 return this.querySelector("svg");
             });
             // Wait until every active (visible) diagram has rendered. Deferred
@@ -414,7 +414,7 @@ window.runMermaid = runMermaid;</script>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
-    <meta name="docbuild:last-update" content="Sep 04, 2026"/>
+    <meta name="docbuild:last-update" content="Sep 08, 2026"/>
   
     
     <script src="../_static/searchtools.js"></script>
@@ -764,7 +764,7 @@ communicates with servo drives over EtherCAT.</p>
 </div>
 <p>The diagram below shows how the three layers stack and which libraries and buses connect them:</p>
 <figure class="align-default" id="id1">
-<pre data-zoom-id="id-892f6571-1393-4a77-8818-2ef4878fc558" class="mermaid">
+<pre data-zoom-id="id-404f29ac-d987-4b11-b0a0-6b6f322bab94" class="mermaid">
         %%{init: {&quot;theme&quot;: &quot;base&quot;, &quot;themeVariables&quot;: {&quot;primaryColor&quot;: &quot;#1a73e8&quot;, &quot;primaryTextColor&quot;: &quot;#fff&quot;, &quot;primaryBorderColor&quot;: &quot;#1558b0&quot;, &quot;lineColor&quot;: &quot;#555&quot;}}}%%
 flowchart TB
     subgraph L1[&quot;Layer 1: ROS2 DDS&quot;]
@@ -868,7 +868,7 @@ flowchart TB
   <div class="movensys-footer__info">
     <p>&copy; 2026, MOVENSYS MOVENSYS. All rights reserved.</p>
     
-      <p>Last updated: Sep 04, 2026</p>
+      <p>Last updated: Sep 08, 2026</p>
     
   </div>
   <div class="movensys-footer__links">
