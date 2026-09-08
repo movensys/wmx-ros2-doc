@@ -6,7 +6,7 @@ Overview
 
 The ``wmx_r2_package`` is the main application package of the WMX R2
 system. It contains all executable nodes, launch files, and configuration
-files for driving robots — such as the Dobot CR3A and CR5A manipulators —
+files for driving robots — such as the manipulators —
 through the WMX motion control engine over EtherCAT.
 
 The package provides two groups of nodes:
@@ -481,7 +481,7 @@ manipulator controllers.
 wmx_r2_cr3a_manipulator.launch.py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Full Dobot CR3A manipulator launch. Includes
+Full manipulator launch. Includes
 ``wmx_r2_general_nodes.launch.py`` and then starts the manipulator
 controllers.
 
@@ -502,7 +502,7 @@ launch time).
 wmx_r2_cr5a_manipulator.launch.py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Full Dobot CR5A manipulator launch. Includes the general nodes and starts
+Full manipulator launch. Includes the general nodes and starts
 ``joint_state_broadcaster`` and ``joint_trajectory_controller``.
 
 **Arguments:** ``use_sim_time`` (default ``false``).
@@ -527,7 +527,7 @@ Configuration Files
 cr3a_manipulator_config.yaml
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Parameters for the Dobot CR3A manipulator, shared by the three manipulator
+Parameters for the manipulator, shared by the three manipulator
 controllers:
 
 .. code-block:: yaml

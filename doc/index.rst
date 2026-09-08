@@ -66,7 +66,7 @@ To show how these pieces fit together, four companion repositories are provided
 as working examples and reference implementations built on WMX R2:
 
 * `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_ :
-  manipulator scenarios (Dobot CR3A / CR5A) with MoveIt2 / Isaac cuMotion
+  manipulator scenarios with MoveIt2 / Isaac cuMotion
   planning and Nvblox / YOLO / AprilTag perception
 * `movensys-navigation <https://github.com/movensys/movensys-navigation>`_ :
   a differential-drive mobile base with Nav2 planning, EKF odometry, and SLAM mapping
