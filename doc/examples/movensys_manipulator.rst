@@ -3,7 +3,7 @@ movensys-manipulator
 
 The manipulator scenarios come from the
 `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
-repository: Dobot CR3A / CR5A arms with MoveIt2 / Isaac cuMotion planning and
+repository: manipulator with MoveIt2 / Isaac cuMotion planning and
 Nvblox / YOLO / AprilTag perception. Each scenario runs in Simulation, HIL, and
 Real modes.
 

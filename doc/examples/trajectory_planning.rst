@@ -9,14 +9,16 @@ run through ``mros``. For the programmatic ``/wmx/moveit2/*`` service API, see
 .. tab-set::
 
    .. tab-item:: Simulation
+   
+      .. raw:: html
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQDynSNIn4y0RZB2aSh7GFiCAawZCSJEu-CmLk9Lqay0a7Y?e=mViWWa&download=1
-         :alt: Manipulator executing a planned trajectory
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQDynSNIn4y0RZB2aSh7GFiCAawZCSJEu-CmLk9Lqay0a7Y?e=mViWWa&download=1
-         :align: center
-         :width: 100%
-
-         Basic movements on simulation
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/BcstJiR7Vik"
+                  title="Basic movements on simulation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
       1. Open the scene:
 
@@ -77,13 +79,15 @@ run through ``mros``. For the programmatic ``/wmx/moveit2/*`` service API, see
 
    .. tab-item:: HIL
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQDynSNIn4y0RZB2aSh7GFiCAawZCSJEu-CmLk9Lqay0a7Y?e=mViWWa&download=1
-         :alt: Manipulator executing a planned trajectory
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQDynSNIn4y0RZB2aSh7GFiCAawZCSJEu-CmLk9Lqay0a7Y?e=mViWWa&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Basic movements on hardware-in-the-loop (HIL).
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/BcstJiR7Vik"
+                  title="Basic movements on hardware-in-the-loop (HIL)"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
       1. Open the scene:
 
@@ -142,13 +146,15 @@ run through ``mros``. For the programmatic ``/wmx/moveit2/*`` service API, see
 
    .. tab-item:: Real
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQDcGyFQvgSLQ7O3YVlRJ6TCAYXHtwsd6oNHRKCT5Sx57j0?e=vu6Y1Y&download=1
-         :alt: Manipulator executing a planned trajectory
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQDcGyFQvgSLQ7O3YVlRJ6TCAYXHtwsd6oNHRKCT5Sx57j0?e=vu6Y1Y&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Basic movements on real-world scenario.
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/ShQzq_v2qWE"
+                  title="Basic movements on real-world scenario"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
       1. (optional) Open the matching scene for visualization:
 

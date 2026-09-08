@@ -13,15 +13,16 @@ commands run through ``nros``.
 
    .. tab-item:: Simulation
       
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBa4hLAQQoORahUB6yes5AKAdi1u9Cn1qxHa28TXDpiXzk?e=SK2UWg&download=1
-         :alt: Manual driving on simulation
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBa4hLAQQoORahUB6yes5AKAdi1u9Cn1qxHa28TXDpiXzk?e=SK2UWg&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Manual driving on simulation
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/OPnAxtBSfoU"
+                  title="Manual driving on simulation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
-      
       1. Open the scene:
 
          .. tab-set::
@@ -69,13 +70,15 @@ commands run through ``nros``.
 
    .. tab-item:: HIL
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBa4hLAQQoORahUB6yes5AKAdi1u9Cn1qxHa28TXDpiXzk?e=SK2UWg&download=1
-         :alt: Manual driving on HIL
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBa4hLAQQoORahUB6yes5AKAdi1u9Cn1qxHa28TXDpiXzk?e=SK2UWg&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Manual driving on HIL
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/OPnAxtBSfoU"
+                  title="Manual driving on HIL"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
 
       1. Open the scene:
 

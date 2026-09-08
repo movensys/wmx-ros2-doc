@@ -72,13 +72,6 @@ Robot matrix
      - ``diffbot_wmx_parameters.xml``
      - Velocity-mode axes (``AxisCommandMode = 1``) driven by
        ``differential_drive_controller``, with Nav2, EKF, and SLAM Toolbox.
-   * - Any other EtherCAT servo system
-     - —
-     - Not supported
-     - —
-     - The general nodes expose axis, I/O, engine, and EtherCAT control for
-       arbitrary EtherCAT devices, but no robot-level configuration is
-       shipped. See :ref:`bringing-up-an-unlisted-robot`.
 
 Function matrix
 ---------------
@@ -158,8 +151,8 @@ Function matrix
    combination — the launch will fail to find its config file rather than run
    with a wrong one. For the CR5A this covers everything under
    ``movensys_manipulator_perception/config/`` and
-   ``movensys_manipulator_isaac_ros_config/config/``, both of which contain
-   only ``dobot_cr3a`` entries.
+   ``movensys_manipulator_isaac_ros_config/config/``, and for the diffbot this covers everything under
+   ``movensys_navigation/config/``.
 
 Homing, absolute position, brakes, and safety
 -----------------------------------------------

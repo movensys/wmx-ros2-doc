@@ -163,7 +163,7 @@ are isolated on every platform.
 
    .. tab-item:: arm64 (Jetson)
 
-      The Jetson boards boot via U-Boot/extlinux, not GRUB. Append the same
+      The Jetson boards boot via U-Boot/extlinux, not GRUB. **Append** the same
       isolation parameters to the ``APPEND`` line in
       ``/boot/extlinux/extlinux.conf``:
 
@@ -205,7 +205,7 @@ run the engine.
 
    .. tab-item:: EtherCAT
 
-      Drive real servo drives over EtherCAT — enable the EtherCAT platform and
+      Drive real servo drives over EtherCAT. Enable the EtherCAT platform and
       disable the simulation platform:
 
       .. code-block:: ini
@@ -224,7 +224,7 @@ run the engine.
 
    .. tab-item:: Simulation
 
-      Run the engine against a simulated bus with no hardware attached — enable
+      Run the engine against a simulated bus with no hardware attached. Enable
       the simulation platform and disable the EtherCAT platform:
 
       .. code-block:: ini
@@ -255,8 +255,10 @@ Modify ``/opt/wmx3/platform/ethercat/ec_network.def``:
 
    **Jetson developer kit (arm64).**
 
-   Several Jetson developer kit NICs have been tested and cannot sustain the
-   shortest cycles; the minimum period on that hardware is ``CommCycle=2000``.
+   1. Reduce the cycle time to ``CommCycle=2000``. Several Jetson developer kit
+      NICs cannot sustain the shortest cycles.
+   2. Increase the transmission timeout to ``TransmitTimeout=1500``. Several
+      Jetson developer kit boards are slower to transmit EtherCAT packets.
 
 5. Configure the EtherCAT NIC
 ---------------------------------
@@ -284,8 +286,7 @@ a NIC-driver DLL. Pick the driver that matches your transport:
      - Virtual network (no hardware)
      - None
 
-Configure the driver in the section for the real-time network device
-(``[rtnd0]`` for the first device) of
+Set the driver configuration of the real-time network device (``[rtnd0]`` for the first device) in
 ``/opt/wmx3/platform/ethercat/PrtTcpip.ini``. The ``UseNicDrvDll`` key selects
 the driver; each driver reads its own keys from the same section.
 
@@ -293,25 +294,33 @@ the driver; each driver reads its own keys from the same section.
 
    .. tab-item:: sock_raw
 
-      Bind the driver to a kernel network interface. ``ifname`` is required (the
-      ``NIC_DRV_DLL_IFNAME`` environment variable overrides it):
+      ``ndd_sock_raw.so`` sends and receives EtherCAT frames through a standard
+      Linux ``AF_PACKET`` / ``SOCK_RAW`` socket, so the NIC keeps its normal
+      kernel driver and needs no extra setup.
+
+      Configure the port in ``PrtTcpip.ini``:
 
       .. code-block:: ini
 
          [rtnd0]
          UseNicDrvDll=ndd_sock_raw.so
-         ifname=enp3s0            ; kernel interface to bind (required)
+         ifname=enp4s0           ; kernel interface to bind (required)
          rxprio=97               ; RX thread SCHED_FIFO priority (<=0 = default sched)
-         rxcore=2 
+         rxcore=2                ; pin RX poll loop to an ISOLATED core
+
+      Set ``ifname`` to the interface name reported by ``ifconfig``; the
+      ``NIC_DRV_DLL_IFNAME`` environment variable overrides it.
 
       Opening the raw socket needs ``CAP_NET_RAW``, so run the nodes as root.
 
    .. tab-item:: af_xdp
 
-      AF_XDP is a kernel fast path: the NIC keeps its normal kernel driver (no
-      vfio bind, no hugepages). Bind to a kernel interface and a single RX
-      queue. AF_XDP receives only on the bound queue, so collapse the NIC to one
-      queue first:
+      ``ndd_af_xdp.so`` sends and receives EtherCAT frames through an AF_XDP
+      socket (XSK), a kernel fast path: the NIC keeps its normal kernel driver,
+      so no vfio bind and no hugepages are needed.
+
+      An XSK receives only on the RX queue it is bound to, so collapse the NIC
+      to a single queue first:
 
       .. code-block:: bash
 
@@ -323,17 +332,20 @@ the driver; each driver reads its own keys from the same section.
 
          [rtnd0]
          UseNicDrvDll=ndd_af_xdp.so
-         ifname=enp3s0            ; kernel interface to bind (required)
-         queue=0                  ; XSK binds to this RX queue
+         ifname=enp3s0           ; kernel interface to bind (required)
+         queue=0                 ; XSK binds to this RX queue
          xdpmode=skb             ; skb=generic | drv=native | zerocopy=native+ZC
          rxprio=97               ; RX thread SCHED_FIFO priority
          rxcore=2                ; pin RX poll loop to an ISOLATED core
          rxbusy=0                ; 0 = poll()/sleep (safe on a shared core)
                                  ; 1 = busy-poll (needs a dedicated isolated core)
 
+      Set ``ifname`` to the interface name reported by ``ifconfig``; the
+      ``NIC_DRV_DLL_IFNAME`` environment variable overrides it.
+
       Creating the XSK needs ``CAP_NET_RAW`` + ``CAP_NET_ADMIN`` (``CAP_BPF`` on
       newer kernels), so run the nodes as root.
-      
+
    .. tab-item:: dpdk
 
       DPDK bypasses the kernel network stack, so reserve hugepages and bind the
@@ -397,9 +409,12 @@ line tools to bring the engine up, scan the bus, and enable the servo:
    sudo ./wmx3-ec-state         # show the EtherCAT master/slave state
    sudo ./wmx3-clear-alarm      # clear any drive alarms
    sudo ./wmx3-servo-on         # enable the servos
-   sudo ./wmx3-axis-state 0     # show the state of axis 0
-   sudo ./wmx3-stop-engine      # stop the engine when done
+   
+If you can heard the brizz of the servo, the engine is running and the EtherCAT bus is up.   
 
+.. code-block:: bash
+
+   sudo ./wmx3-stop-engine      # stop the engine when done
 
 7. Uninstall WMX runtime
 ---------------------------

@@ -11,13 +11,17 @@ commands run through ``nros``.
 
    .. tab-item:: Simulation
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBEoMuUUOanToLngEBtM4EPAUVh_AuFLqR-ZRulUVSJkwo?e=DQN4t3&download=1
-         :alt: Autonomous navigation on simulation
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBEoMuUUOanToLngEBtM4EPAUVh_AuFLqR-ZRulUVSJkwo?e=DQN4t3&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Autonomous navigation on simulation
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/ZDK_gjjqmKA"
+                  title="Autonomous navigation on simulation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
+
+         
 
       1. Open the scene:
 
@@ -64,13 +68,17 @@ commands run through ``nros``.
 
    .. tab-item:: HIL
 
-      .. figure:: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBEoMuUUOanToLngEBtM4EPAUVh_AuFLqR-ZRulUVSJkwo?e=DQN4t3&download=1
-         :alt: Autonomous navigation on HIL
-         :target: https://softservogroup.sharepoint.com/:i:/s/Storage/IQBEoMuUUOanToLngEBtM4EPAUVh_AuFLqR-ZRulUVSJkwo?e=DQN4t3&download=1
-         :align: center
-         :width: 100%
+      .. raw:: html
 
-         Autonomous navigation on HIL
+         <div style="position: relative; width: 100%; max-width: 800px; margin: 1em auto; aspect-ratio: 16 / 9;">
+         <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                  src="https://www.youtube-nocookie.com/embed/ZDK_gjjqmKA"
+                  title="Autonomous navigation on HIL"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+         </div>
+
+         
 
       1. Open the scene:
 

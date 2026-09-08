@@ -4,7 +4,7 @@ Example Applications
 This section provides complete examples that you can run from start to finish
 on the WMX R2 stack. The **manipulator scenarios** come from the
 `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
-repository (Dobot CR3A / CR5A arms with MoveIt2 / Isaac cuMotion planning and
+repository (manipulator with MoveIt2 / Isaac cuMotion planning and
 Nvblox / YOLO / AprilTag perception). The **navigation scenarios** come from the
 `movensys-navigation <https://github.com/movensys/movensys-navigation>`_
 repository (a differential-drive base with Nav2 planning, EKF odometry, and SLAM
