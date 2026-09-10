@@ -1,16 +1,36 @@
 # WMX R2 Documentation
 
-**WMX R2™ — The Real-Time Execution Layer for Physical AI**
+**WMX R2™ — turn Physical AI decisions into precise industrial motion.**
 
-Technical documentation for **WMX R2**, a complete real-time robotics solution for Physical AI that integrate a ROS 2 interface with the [MOVENSYS](https://www.movensys.com/) WMX3 motion engine it runs on. ("R2" stands for *Real-time Robotics*.)
+Technical documentation for **WMX R2**, which brings the ROS 2 ecosystem into
+deterministic real-time industrial motion control. It connects a ROS 2 interface
+to the [MOVENSYS](https://www.movensys.com/) WMX3 motion engine and drives
+industrial servos over EtherCAT. ("R2" stands for *Real-time Robotics*.)
+
+**Documentation site:** https://movensys.github.io/wmx-r2-doc/
 
 > ROS is a trademark of Open Robotics.
 
-**Documentation Site:** https://movensys.github.io/wmx-r2-doc/
+## What WMX R2 does
 
-## Overview
-
-WMX R2 combines a ROS 2 interface with the MOVENSYS WMX3 EtherCAT-based motion engine in a single solution, enabling control of robotic manipulators with motion planning through MoveIt2 and NVIDIA Isaac cuMotion.
+- **Turns planner output into servo motion.** MoveIt2 and Nav2 trajectories
+  become precisely timed commands on a fixed cycle over EtherCAT. In the
+  See-Think-Act loop of Physical AI, WMX R2 is the *Act* layer.
+- **Drives any EtherCAT machine, regardless of brand.** It commands the drives
+  directly with CoE and controls axes rather than a specific robot model, so a
+  six-axis arm, a mobile base and a custom multi-axis machine are all driven the
+  same way.
+- **Runs the entire stack on a single edge device.** Motion is software, so no
+  external motion controller and no motion-control card are needed. x86-64 and
+  arm64 alike, from an industrial PC to an NVIDIA Jetson Thor.
+- **Keeps the ROS 2 ecosystem you already use.** MoveIt2, Nav2, ros2_control,
+  Intel OpenVINO, NVIDIA Isaac Sim and Isaac ROS, Gazebo, YOLO, and multimodal
+  LLMs and VLMs.
+- **Is built for production, not the bench.** Deterministic cycle timing,
+  servo-level error handling and direct drive access, with 85% lower mean
+  absolute tracking error than a conventional external controller.
+- **Is free to start with.** The WMX engine runs in free 6-hour sessions, and
+  the ROS 2 interface is MIT-licensed.
 
 ## Documentation Contents
 

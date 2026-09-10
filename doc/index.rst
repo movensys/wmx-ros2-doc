@@ -194,8 +194,8 @@ deterministic cycle timing, servo-level error handling and direct access to the
 drives.
 
 
-Performance comparison
-----------------------------------------
+Cut tracking error by 85% against an external controller
+--------------------------------------------------------------------
 
 .. grid:: 1 1 2 2
    :gutter: 3
@@ -206,8 +206,8 @@ Performance comparison
          :alt: Representative single run, joint-angle tracking
          :width: 100%
 
-         Representative run: joint-angle tracking for the reference, the
-         traditional external controller, and the proposed WMX R2.
+         Representative run: joint-angle tracking for the commanded reference,
+         a traditional external motion controller, and WMX R2.
 
    .. grid-item::
 
@@ -217,11 +217,12 @@ Performance comparison
 
          Per-sample mean absolute error across ten runs.
 
-We executed the same trajectory ten times. The left panel shows a representative run,
-and the right panel presents the per-sample mean absolute tracking error (MAE).
-The overall MAE corresponds to the time average of this curve. WMX R2 reduced
-the MAE by 85% relative to the conventional external controller, thanks to lower
-communication latency from removing the TCP/IP hop and a redundant control stage.
+WMX R2 followed the commanded trajectory with **85% lower mean absolute error
+(MAE)** than a conventional external motion controller. We ran the same
+trajectory ten times on each setup. The left panel shows a representative run,
+and the right panel shows the per-sample MAE across all ten. The gain comes from
+removing the TCP/IP hop and the redundant control stage that an external
+controller adds, which cuts communication latency out of the control path.
 
 
 Customers and Partners
