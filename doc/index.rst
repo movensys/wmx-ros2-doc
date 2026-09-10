@@ -7,6 +7,7 @@ drives industrial servos over EtherCAT. EtherCAT is one of the most widely used
 real-time industrial Ethernet networks, and it links the controller to the servo
 drives and I/O over a single cable.
 
+
 Turn Physical AI decisions into precise industrial motion
 --------------------------------------------------------------------
 
@@ -22,74 +23,97 @@ hardware, in deterministic real time.
    :align: center
    :width: 100%
 
-Drive any EtherCAT robot or machine, whatever the brand
---------------------------------------------------------------------
-
-WMX R2 commands the servo drives directly over EtherCAT using standard CoE. It
-does not go through the robot manufacturer's controller. It controls axes rather
-than a specific robot model, so neither the brand of the robot nor the brand of
-the drives matters. A six-axis arm, a differential-drive mobile base and a
-custom multi-axis machine are all driven the same way.
-
-Run the entire stack on a single edge device
---------------------------------------------------------------------
-
-Perception, planning and deterministic motion all run as software on one
-machine. WMX R2 is hardware agnostic. The motion engine is software and the
-EtherCAT master runs on a standard network port, so no external motion
-controller and no dedicated motion-control hardware are needed. The same stack
-runs on x86-64 and arm64 alike, from an industrial PC or an Intel Core based
-desktop or laptop to an NVIDIA Jetson Thor.
-
-.. figure:: /_static/images/one_ipc.png
-   :alt: Conventional motion control versus WMX software motion on a single PC
-   :align: center
-   :width: 100%
-
-   Conventional motion control routes the PC through a separate dedicated
-   motion controller; WMX software motion drives the servo drives directly
-   from a single edge device over the field network.
-
-Moving the whole stack into a single PC removes an enclosure and its cabling.
-The system becomes smaller, lighter and more efficient while performing better.
-That compact footprint suits robots and mobile machines where space and payload
-are tight.
 
 Bring modern robotics capability to industrial-grade motion
 --------------------------------------------------------------------
 
-Industrial motion controllers execute deterministically, but they have no path
-to modern robotics software for more complex problems. The ROS 2 community has
-that software, including motion planning, navigation and perception, but it does
-not guarantee cycle-accurate execution on real hardware. Between the two is a
-gap. Whatever the intelligent layer decides, whether a MoveIt2 or Nav2
-trajectory, a perception-driven correction or an AI's next move, has to become
-the precisely timed commands that servo drives execute on a fixed cycle.
+Industrial motion controllers execute deterministically but have no path to
+modern robotics software, and ROS 2 has that software but cannot guarantee
+cycle-accurate execution on real hardware. WMX R2 closes the gap. ROS 2 nodes
+reason, plan and control, and the WMX motion engine turns their output into
+precisely timed servo commands on a fixed cycle over EtherCAT.
 
-Most ROS 2 setups bridge that gap in one of two ways, and both cost something:
+.. figure:: /_static/images/the_gap.png
+   :alt: WMX R2 closing the gap between ROS 2 and industrial motion control
+   :align: center
+   :width: 100%
 
-- A **closed industrial controller over TCP/IP** adds latency the planner can
-  never recover.
-- **Raw EtherCAT commands** leave smoothing and coordination to ROS 2, which is
-  not built for hard real time.
+   WMX R2 closing the gap between ROS 2 and industrial motion control.
 
-WMX R2 closes the gap instead. It brings the WMX motion engine into ROS 2, so
-ROS 2 nodes reason, plan and control while the engine runs the servo loop at a
-fixed cycle time over EtherCAT, together on a single edge device.
 
-Take robotics from the laboratory to the production floor
+Drive any EtherCAT robot or machine, regardless of the brand
 --------------------------------------------------------------------
 
-A research robot can tolerate jitter, missed cycles and frequent restarts. An industrial robot on a
-production machine cannot. It has to hold path accuracy, react to I/O within a
-known time and run for long periods without drift. WMX R2 keeps the ROS 2
-development workflow and adds what production needs: deterministic cycle timing,
-servo-level error handling and direct access to the drives.
+WMX R2 commands the servo drives directly over EtherCAT using CoE (CANopen over
+EtherCAT), the standard protocol industrial servo drives already implement. It
+does not go through the robot manufacturer's controller. It controls axes rather
+than a specific robot model, so neither the brand of the robot nor the brand of
+the drives matters. A six-axis arm on an assembly line, a mobile base moving
+material through a plant and a custom multi-axis machine are all driven the same
+way.
+
+
+Free to start with
+--------------------------------------------------------------------
+
+You can evaluate WMX R2 on real industrial hardware at no cost. The WMX motion
+engine runs **free in 6-hour sessions**, renewed by restarting the engine. That
+is enough to commission a machine, work through the examples, and develop and
+test a complete application. A commercial license lifts the session time limit, and is what
+production use requires.
+
+The ROS 2 interface is open source under the MIT license. It handles the
+timing-sensitive step: smoothing trajectories, coordinating joints and emitting
+commands at the rate servo drivers expect. It runs on the WMX motion engine,
+which keeps motion on a deterministic cycle and exposes more than 200 APIs for
+trajectory conversion, EtherCAT, I/O and engine control. The WMX engine, its SDK and
+its binaries are proprietary of `Movensys <https://movensys.com/>`_. :doc:`licensing` sets out the boundary.
+
+
+Start from ready-made examples instead of from scratch
+------------------------------------------------------------------
+
+Four companion repositories show how these pieces fit together on real
+hardware. Each one is a working reference implementation built on WMX R2, and a
+starting point for an industrial application of your own:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Repository
+     - What it provides
+   * - `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
+     - Manipulator scenarios with MoveIt2 / Isaac cuMotion planning and
+       Nvblox / YOLO / AprilTag perception
+   * - `movensys-navigation <https://github.com/movensys/movensys-navigation>`_
+     - A differential-drive mobile base with Nav2 planning, EKF odometry and
+       SLAM mapping
+   * - `movensys-intelligence <https://github.com/movensys/movensys-intelligence>`_
+     - A voice-driven VLM/LLM application (the Robopoly game) built on top of
+       the manipulator stack
+   * - `movensys-simulation <https://github.com/movensys/movensys-simulation>`_
+     - The Isaac Sim scenes used by the manipulator and navigation scenarios
+
+Each application repository runs in its own container and talks to WMX R2 over
+DDS, so the planning stack and the real-time stack stay separate processes on
+the same machine.
+
+See :doc:`examples/examples` to run these scenarios from start to finish.
+
+.. figure:: /_static/images/wmx-r2_overview.drawio.png
+   :alt: WMX R2 architecture overview
+   :align: center
+   :width: 100%
+
+   WMX R2 architecture overview.
+
 
 Integrate with the most popular ROS 2 ecosystem you already use
 -------------------------------------------------------------------------
 
-WMX R2 works with the widely popular projects of the ROS 2 ecosystem:
+WMX R2 works with the widely popular projects of the ROS 2 ecosystem, so an
+industrial machine can reuse what the robotics community already builds:
 
 .. list-table::
    :header-rows: 1
@@ -138,61 +162,40 @@ See WMX R2 in action:
              allowfullscreen></iframe>
    </div>
 
-Start from ready-made examples instead of from scratch
-------------------------------------------------------------------
 
-Four companion repositories show how these pieces fit together. Each one is a
-working reference implementation built on WMX R2:
+Run the entire stack on a single edge device
+--------------------------------------------------------------------
 
-.. list-table::
-   :header-rows: 1
-   :widths: 25 75
+With WMX R2, perception, planning and deterministic motion all run as software
+on one machine. WMX R2 is also hardware agnostic. The motion engine is software
+and the EtherCAT master runs on a standard network port, so no external motion
+controller and no dedicated motion-control hardware are needed. The same stack
+runs on x86-64 and arm64 alike, from an industrial PC or an Intel Core based
+desktop or laptop to an NVIDIA Jetson Thor.
 
-   * - Repository
-     - What it provides
-   * - `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
-     - Manipulator scenarios with MoveIt2 / Isaac cuMotion planning and
-       Nvblox / YOLO / AprilTag perception
-   * - `movensys-navigation <https://github.com/movensys/movensys-navigation>`_
-     - A differential-drive mobile base with Nav2 planning, EKF odometry and
-       SLAM mapping
-   * - `movensys-intelligence <https://github.com/movensys/movensys-intelligence>`_
-     - A voice-driven VLM/LLM application (the Robopoly game) built on top of
-       the manipulator stack
-   * - `movensys-simulation <https://github.com/movensys/movensys-simulation>`_
-     - The Isaac Sim scenes used by the manipulator and navigation scenarios
-
-Each application repository runs in its own container and talks to WMX R2 over
-DDS, so the planning stack and the real-time stack stay separate processes on
-the same machine.
-
-See :doc:`examples/examples` to run these scenarios from start to finish.
-
-.. figure:: /_static/images/wmx-r2_overview.drawio.png
-   :alt: WMX R2 architecture overview
+.. figure:: /_static/images/one_ipc.png
+   :alt: Conventional motion control versus WMX software motion on a single PC
    :align: center
    :width: 100%
 
-   WMX R2 architecture overview.
+   Conventional motion control routes the PC through a separate dedicated
+   motion controller; WMX software motion drives the servo drives directly
+   from a single edge device over the field network.
 
-Free to start with
+
+Take robotics from the laboratory to the production floor
 --------------------------------------------------------------------
 
-The WMX motion engine runs **free in 6-hour sessions**, renewed by restarting
-the engine. That is enough to bring up real hardware, work through the examples,
-and develop and test a complete application. A
-commercial license lifts the session time limit, and is what production use
-requires.
+A research robot can tolerate jitter, missed cycles and frequent restarts. An
+industrial robot on a production machine cannot. It has to hold path accuracy,
+react to I/O within a known time and run for long periods without drift. WMX R2
+keeps the ROS 2 development workflow and adds what production needs:
+deterministic cycle timing, servo-level error handling and direct access to the
+drives.
 
-The ROS 2 interface is open source under the MIT license. It handles the
-timing-sensitive step: smoothing trajectories, coordinating joints and emitting
-commands at the rate servo drivers expect. It runs on the WMX motion engine,
-which keeps motion on a deterministic cycle and exposes more than 200 APIs for
-trajectory conversion, EtherCAT, I/O and engine control. The engine, its SDK and
-its binaries are proprietary. :doc:`licensing` sets out the boundary.
 
 Performance comparison
-~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 .. grid:: 1 1 2 2
    :gutter: 3
@@ -220,16 +223,19 @@ The overall MAE corresponds to the time average of this curve. WMX R2 reduced
 the MAE by 85% relative to the conventional external controller, thanks to lower
 communication latency from removing the TCP/IP hop and a redundant control stage.
 
+
 Customers and Partners
 ----------------------------------------
 
-The WMX motion engine has a long, proven industrial track record:
+WMX R2 is built on the WMX motion engine, which has a long, proven industrial
+track record:
 
 * 25+ years of development with 40+ patents worldwide
 * 40,000+ cumulative licenses sold
 * 500+ customers, mainly in the semiconductor industry
 
 .. Add customer and partner logos or names here.
+
 
 Where to go next
 ----------------------------------------
