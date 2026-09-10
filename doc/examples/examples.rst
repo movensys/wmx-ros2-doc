@@ -16,29 +16,13 @@ Every manipulator and navigation scenario runs in three execution modes. The
 difference between them is *where the motion actually happens*:
 
 .. mermaid::
-   :caption: What is real in each execution mode
+   :caption: Each mode makes one more layer real
 
    flowchart LR
-       subgraph S["Simulation"]
-           direction TB
-           S1["Planner<br/>MoveIt2 / Nav2"] --> S2["Simulator physics<br/>Isaac Sim or Gazebo"]
-           S2 --> S3["Rendered robot"]
-       end
-
-       subgraph H["HIL"]
-           direction TB
-           H1["Planner<br/>MoveIt2 / Nav2"] --> H2["<b>Real WMX engine</b><br/>simulated EtherCAT platform"]
-           H2 --> H3["Simulator<br/>mirrors the engine"]
-       end
-
-       subgraph R["Real"]
-           direction TB
-           R1["Planner<br/>MoveIt2 / Nav2"] --> R2["<b>Real WMX engine</b><br/>EtherCAT platform"]
-           R2 --> R3["<b>Physical servos</b>"]
-           R2 -.-> R4["Simulator<br/>visualization only"]
-       end
-
-       S -->|"engine is real from here on"| H -->|"motors are real from here on"| R
+       S["<b>Simulation</b><br/>planner and simulator physics"]
+       H["<b>HIL</b><br/>plus the real WMX engine"]
+       R["<b>Real</b><br/>plus the physical servos"]
+       S -->|"the engine becomes real"| H -->|"the motors become real"| R
 
 .. list-table::
    :header-rows: 1

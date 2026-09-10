@@ -18,16 +18,8 @@ handles both cyclic process data (PDO) and configuration data (SDO) on the bus.
 
 Running the motion on a single PC removes the separate controller box and the
 cabling that connects it. This shrinks the overall footprint and lowers the
-parts count and cost. Fewer components also mean less to wire, mount, and
-maintain. Performance improves at the same time, because commands no longer take
-an extra hop through external hardware. The smaller size and lighter weight make
-WMX a strong fit for robots and mobile machines where space and payload are
-limited.
-
-The motion runs in software on a real-time kernel instead of on fixed controller
-hardware. This lets it scale far beyond a conventional controller. A typical
-hardware controller handles up to 32 axes on a 250 µs to 1 ms cycle depending the hardware. 
-WMX software motion drives up to 128 axes on a 31.25 µs to 1 ms cycle and keeps
+parts count and cost. The motion runs in software on a real-time kernel instead of on fixed controller
+hardware. WMX software motion drives up to 128 axes on a 31.25 µs to 1 ms cycle and keeps
 deterministic real-time performance.
 
 .. figure:: /_static/images/soft_motion.png
@@ -42,9 +34,6 @@ the highest EtherCAT master. It exposes more than 200
 APIs for trajectory conversion, EtherCAT and fieldbus communication, digital and
 analog I/O, and engine control. Users can build applications in C, C++, C#, or
 Python. This is the same engine that WMX R2 drives underneath the ROS2 layer.
-Planner output such as MoveIt2 and Nav2 trajectories is handed to the engine,
-and the engine turns it into the precisely timed servo commands that the drives
-execute on a fixed cycle.
 
 WMX has been proven over 25 years in demanding industrial fields such as
 semiconductor and precision robotics. The runtime is free to evaluate in renewable 
@@ -57,10 +46,6 @@ at the EtherCAT NIC.
 
 1. Install the WMX runtime
 --------------------------
-
-WMX3 is MOVENSYS's software-defined motion control stack. It connects the PC to
-the servo drives over EtherCAT and provides the deterministic cycle loop. Select
-the tab that matches your hardware.
 
 .. tab-set::
 
@@ -116,8 +101,7 @@ or contact your MOVENSYS representative.
 ------------------------
 
 Determinism comes from dedicating CPU cores to the WMX real-time threads and
-keeping housekeeping work off them. Add the isolation parameters to the boot
-configuration for your platform. The examples below reserve core ``3`` for the
+keeping housekeeping work off them. The examples below reserve core ``3`` for the
 control loop and core ``2`` for the universal NIC kernel driver, so both cores
 are isolated on every platform.
 
@@ -186,11 +170,6 @@ hexadecimal, so use ``08``:
 .. code-block:: ini
 
    CpuAffinity = 08
-
-Pin the WMX control loop to the isolated core; pin AI workloads such as VLM,
-Whisper, or OpenVINO to the remaining cores. A cgroup v2 slice (``cpuset`` +
-``cpu.weight``) keeps the AI stack off the control cores while keeping GPU/NPU
-access simple.
 
 3. Set the WMX3 platform
 ----------------------------
@@ -308,11 +287,6 @@ the driver; each driver reads its own keys from the same section.
          rxprio=97               ; RX thread SCHED_FIFO priority (<=0 = default sched)
          rxcore=2                ; pin RX poll loop to an ISOLATED core
 
-      Set ``ifname`` to the interface name reported by ``ifconfig``; the
-      ``NIC_DRV_DLL_IFNAME`` environment variable overrides it.
-
-      Opening the raw socket needs ``CAP_NET_RAW``, so run the nodes as root.
-
    .. tab-item:: af_xdp
 
       ``ndd_af_xdp.so`` sends and receives EtherCAT frames through an AF_XDP
@@ -339,12 +313,6 @@ the driver; each driver reads its own keys from the same section.
          rxcore=2                ; pin RX poll loop to an ISOLATED core
          rxbusy=0                ; 0 = poll()/sleep (safe on a shared core)
                                  ; 1 = busy-poll (needs a dedicated isolated core)
-
-      Set ``ifname`` to the interface name reported by ``ifconfig``; the
-      ``NIC_DRV_DLL_IFNAME`` environment variable overrides it.
-
-      Creating the XSK needs ``CAP_NET_RAW`` + ``CAP_NET_ADMIN`` (``CAP_BPF`` on
-      newer kernels), so run the nodes as root.
 
    .. tab-item:: dpdk
 
@@ -396,9 +364,16 @@ the driver; each driver reads its own keys from the same section.
 6. Test the WMX runtime
 ---------------------------
 
-Connect the EtherCAT slave hardware (a single servo drive is recommended for a
-first bring-up) to the configured NIC, power it on, then run the WMX3 command
-line tools to bring the engine up, scan the bus, and enable the servo:
+.. warning:: **Use a single, free servo motor for a first bring-up.**
+
+   The motor must not be mounted in anything: no wheel, no robot arm, no
+   gearbox and no load of any kind. The commands below enable the servo, and
+   the shaft can turn at any moment. Leave it free to spin, and keep hands and
+   cables clear of it.
+
+Connect the EtherCAT slave hardware to the configured NIC, power it on, then
+run the WMX3 command line tools to bring the engine up, scan the bus, and
+enable the servo:
 
 .. code-block:: bash
 
@@ -409,8 +384,9 @@ line tools to bring the engine up, scan the bus, and enable the servo:
    sudo ./wmx3-ec-state         # show the EtherCAT master/slave state
    sudo ./wmx3-clear-alarm      # clear any drive alarms
    sudo ./wmx3-servo-on         # enable the servos
-   
-If you can heard the brizz of the servo, the engine is running and the EtherCAT bus is up.   
+
+If you can hear the servo buzz, the engine is running and the EtherCAT bus is
+up.
 
 .. code-block:: bash
 

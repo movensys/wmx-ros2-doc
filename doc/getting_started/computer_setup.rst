@@ -6,7 +6,7 @@ target computer before you install the WMX R2 packages. This page lists the
 system requirements, then walks through preparing the computer step by step.
 
 Hardware Requirements
-~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 .. list-table::
    :header-rows: 1
@@ -30,27 +30,38 @@ Hardware Requirements
    * - GPU
      - Not required for base operation
      - NVIDIA GPU with CUDA for Isaac cuMotion
+   * - Network
+     - One Ethernet port dedicated to EtherCAT
+     - A dedicated port for EtherCAT plus a second port for internet
 
-EtherCAT Communication
-~~~~~~~~~~~~~~~~~~~~~~~
+What is EtherCAT?
+----------------------------
 
-EtherCAT (Ethernet for Control Automation Technology) is a real-time
-industrial Ethernet fieldbus. It links the controller (the *master*) to the
-servo drives and I/O modules (the *slaves*) over a single daisy-chained cable.
-The master sends one frame down the chain. Each slave reads its own data and
-inserts its response as the frame passes through. This updates the whole axis
-network in a single pass. In an industrial EtherCAT carries the  
-cyclic position and torque commands out to serovs and
-returns encoder feedback every control cycle. A typical cycle runs once every
-250 µs to 1 ms depending the hardware. The advantage is deterministic low-latency synchronization,
-distributed clocks align all axes to within nanoseconds, cycle jitter stays
-tiny, and multi-axis motion stays smooth and accurate. EtherCAT also runs over
-standard Ethernet hardware and ordinary cabling. This gives the performance at
-a lower wiring cost than legacy fieldbuses. 
+EtherCAT (Ethernet for Control Automation Technology) is a deterministic
+real-time industrial Ethernet fieldbus. It links the controller (the *master*)
+to the servo drives and I/O modules (the *slaves*) over a single daisy-chained
+cable. On an industrial machine, EtherCAT carries the cyclic position and
+velocity commands out to the servos and returns encoder feedback every control
+cycle. A typical cycle runs once every 250 µs to 1 ms, depending on the
+hardware.
+
+The advantage is deterministic, low-latency synchronization. Distributed clocks
+align all axes to within nanoseconds, cycle jitter stays small, and multi-axis
+motion stays smooth and accurate. EtherCAT also runs over standard Ethernet
+hardware and ordinary cabling, which gives that performance at a lower wiring
+cost than legacy fieldbuses.
+
+.. note:: **If a PC has an RJ45 Ethernet port, it can drive EtherCAT.**
+
+   That is the whole hardware requirement. The master is software, so it uses
+   the same ordinary Ethernet port any PC already has: no fieldbus card, no
+   motion-control card and no special interface board. A desktop, a laptop, an
+   industrial PC and a Jetson board are all equally usable. Give that port to
+   EtherCAT alone, with no IP address assigned to it.
 
 
 Real-Time OS requirements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 A servo drive needs a new command at a fixed interval, for example one
 every millisecond. Regular Linux is built to get as much work done as
@@ -68,42 +79,8 @@ Installing this real-time kernel is covered in the setup steps below,
 and configuring it for use (isolating CPU cores for the WMX real-time
 threads and tuning latency) is covered in :doc:`install_wmx_runtime`.
 
-WMX Motion Control Engine
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The WMX motion control engine is a high-performance, high-accuracy, real-time motion control
-platform developed by MOVENSYS. It provides deterministic servo control over
-EtherCAT fieldbus and serves as the hardware abstraction layer for physical servo drives.
-
-**Key features:**
-
-- **Real-time EtherCAT master** -- manages cyclic communication with servo
-  drives at deterministic update rates
-- **Multi-axis coordination** -- supports synchronized motion across 6+ servo
-  axes with cubic spline interpolation (``CSplinePos``)
-- **Shared-memory architecture** -- multiple ROS2 nodes connect to the same
-  WMX engine instance through independent device handles, bridging the
-  non-real-time ROS2 domain with the real-time WMX engine
-- **Hardware abstraction** -- provides a unified C++ API (``CoreMotion``,
-  ``AdvancedMotion``, ``Io``, ``Ecat``, ``WMX3Api``) so ROS2 nodes remain
-  robot-agnostic; only configuration files differ between robots
-
-The WMX runtime must be installed at ``/opt/wmx3/`` before building or
-running the WMX R2 packages. See :doc:`install_wmx_runtime` for installation and
-verification steps.
-
-.. note::
-
-   Root (sudo) access is required at runtime. The WMX motion control engine
-   and EtherCAT communication require kernel-level access to the network
-   interface.
-
-The C++ standard required is **C++17** (set in ``CMakeLists.txt``).
-
 1. Install the base OS
 ----------------------
-
-Pick your target and install the operating system.
 
 .. tab-set::
 
@@ -144,32 +121,23 @@ Pick your target and install the operating system.
 
    .. tab-item:: Jetson Developer Kit
 
-      The Jetson developer kit's built-in eMMC storage is small — too small
-      for JetPack plus ROS 2, MoveIt2, Docker images, and perception models.
+      The Jetson developer kit's built-in eMMC storage is small.
       To add this storage capacity, install an NVMe SSD card in the Jetson
       developer kit's carrier board (in the M.2 Key M slot) before flashing,
       then flash the OS onto the SSD.
 
-      Flash the board's Board Support Package (BSP) with **NVIDIA SDK
-      Manager**, which installs JetPack (the L4T Linux distribution) for your
-      Jetson model — Jetson Orin NX, Jetson Orin AGX, or Jetson Thor. In SDK
-      Manager, select the NVMe SSD as the storage device so JetPack is
+      In SDK Manager, select the NVMe SSD as the storage device so JetPack is
       installed on the SSD rather than the eMMC.
 
       - `Install Jetson with SDK Manager
         <https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html>`__
 
-      After flashing, record the L4T release — you need it to match the
-      correct real-time kernel in the next step:
-
-      .. code-block:: bash
-
-         cat /etc/nv_tegra_release   # e.g. R38 (release), REVISION: 4.x  ->  L4T r38.4
-
 2. Install the real-time kernel
 -------------------------------
 
-Install a PREEMPT_RT kernel for your target.
+Install a PREEMPT_RT kernel for your target. Configuring it for use (isolating
+CPU cores for the WMX real-time threads and tuning latency) is covered in
+:doc:`install_wmx_runtime`.
 
 .. tab-set::
 
@@ -373,9 +341,16 @@ Install a PREEMPT_RT kernel for your target.
 
    .. tab-item:: Jetson Developer Kit
 
+      First record the L4T release you flashed — you need it to match the
+      correct real-time kernel:
+
+      .. code-block:: bash
+
+         cat /etc/nv_tegra_release   # e.g. R38 (release), REVISION: 4.x  ->  L4T r38.4
+
       The Jetson boards ship without a real-time kernel. Enable PREEMPT_RT by
-      following NVIDIA's real-time kernel guide **for the L4T version you
-      recorded** when flashing the BSP (for example, L4T r38.4):
+      following NVIDIA's real-time kernel guide **for that L4T version** (for
+      example, L4T r38.4):
 
       - `Jetson Real-Time Kernel
         <https://docs.nvidia.com/jetson/archives/r38.4/DeveloperGuide/SD/Kernel/RealTimeKernel.html>`__
@@ -432,43 +407,13 @@ or power-management issues to chase (BIOS C-states, SpeedStep, Turbo).
    sudo hostnamectl set-hostname <new-host-name>
    sudo reboot
 
-5. Install ROS 2
-----------------
-
-Install ROS 2 on the target, matching the Ubuntu version: 1. **Jazzy** on Ubuntu
-24.04, 2. **Humble** on Ubuntu 22.04. Follow the official installation guide, then
-add the CycloneDDS RMW that WMX R2 uses.
-
-.. tab-set::
-
-   .. tab-item:: Jazzy (Ubuntu 24.04)
-
-      Follow the `ROS 2 Jazzy installation guide
-      <https://docs.ros.org/en/jazzy/Installation.html>`_, then install the
-      CycloneDDS RMW:
-
-      .. code-block:: bash
-
-         sudo apt install -y ros-jazzy-rmw-cyclonedds-cpp
-         echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
-
-   .. tab-item:: Humble (Ubuntu 22.04)
-
-      Follow the `ROS 2 Humble installation guide
-      <https://docs.ros.org/en/humble/Installation.html>`_, then install the
-      CycloneDDS RMW:
-
-      .. code-block:: bash
-
-         sudo apt install -y ros-humble-rmw-cyclonedds-cpp
-         echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
-
-6. Install Docker
+5. Install Docker
 -----------------
 
 Docker is used to run the containerized WMX R2 and perception workloads.
-Follow the `Install Docker Engine on Ubuntu<https://docs.docker.com/engine/install/ubuntu/>` instructions from the official Docker documentation, 
-then add your user to the ``docker`` group so you can run Docker without ``sudo``.
+Follow the official `Install Docker Engine on Ubuntu
+<https://docs.docker.com/engine/install/ubuntu/>`__ instructions, then add your
+user to the ``docker`` group so you can run Docker without ``sudo``.
 
 **Run Docker without sudo:**
 
