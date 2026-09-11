@@ -40,7 +40,7 @@ states before anything else:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
+   wros ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
 
 .. note:: **There is a second, non-ROS 2 way into the same engine.**
 

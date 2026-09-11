@@ -36,13 +36,13 @@ industrial servos over EtherCAT. ("R2" stands for *Real-time Robotics*.)
 
 | Section | Description |
 |---------|-------------|
-| **Getting Started** | Computer setup, WMX Runtime install, and building the WMX R2 packages (container or native) |
+| **Getting Started** | Computer setup, WMX Runtime install, and building the WMX R2 packages in the Docker container |
 | **Example Applications** | Testing WMX R2 on the general nodes, Isaac Sim setup, and the manipulator, navigation, and Robopoly walkthroughs in Simulation / HIL / Real modes |
 | **Integration** | MoveIt2, NVIDIA Isaac cuMotion, Nav2, custom planner, custom application, and the VLM/LLM layer |
-| **Commissioning** | Robot parameter configuration and validation, first-motion procedure, safety responsibilities, validated-hardware matrix |
-| **API Reference** | ROS2 services, topics, and actions, plus `wmx_r2_message`, `wmx_r2_package`, and `wmx_r2_control` |
+| **Try Your Robot** | The WMX web tools (WOS, NetConfigurator, MotionScope), robot parameter configuration and validation, first-motion procedure, safety responsibilities, validated-hardware matrix |
+| **API Reference** | ROS2 services, topics, and actions, plus `wmx_r2_message`, `wmx_r2_package`, `wmx_r2_control`, and the WMX3 API underneath them |
 | **Support** | Troubleshooting by symptom |
-| **Licensing** | Boundary between the MIT-licensed ROS 2 interface and the proprietary WMX engine |
+| **Licensing** | Boundary between the MIT-licensed source and documentation and the proprietary WMX engine |
 
 The documentation tracks these repositories:
 

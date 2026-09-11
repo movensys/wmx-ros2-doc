@@ -35,13 +35,12 @@ kinds of file — and to no source code:
 
    * - File
      - Carries
-   * - **EtherCAT network description**
+   * - **ENI file**
 
-       ENI file, ESI files, ``ec_network.def``, ``Module.ini``
-     - The devices on the bus, the communication cycle, and the platform the
-       engine runs on. Part of the WMX Runtime on the host: the ENI file in
-       ``/opt/wmx3/eni/`` describes the network, the ESI files in
-       ``/opt/wmx3/ESI/`` describe the device types on it.
+       The EtherCAT network description
+     - Which slaves are on the bus and how the master communicates with them.
+       Generated from a scan of the real network by NetConfigurator; see
+       :doc:`wmx_web_tools`.
    * - **WMX parameter file**
 
        ``<robot>_wmx_parameters.xml``

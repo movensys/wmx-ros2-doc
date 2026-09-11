@@ -197,7 +197,7 @@ Example Usage
 
 .. code-block:: bash
 
-   ros2 action send_goal \
+   wros ros2 action send_goal \
      /movensys_manipulator_arm_controller/follow_joint_trajectory \
      control_msgs/action/FollowJointTrajectory \
      "{trajectory: {
@@ -214,7 +214,7 @@ Example Usage
 
 .. code-block:: bash
 
-   ros2 action list
+   wros ros2 action list
 
 Expected:
 
@@ -226,7 +226,7 @@ Expected:
 
 .. code-block:: bash
 
-   ros2 action info /movensys_manipulator_arm_controller/follow_joint_trajectory
+   wros ros2 action info /movensys_manipulator_arm_controller/follow_joint_trajectory
 
 .. warning::
 

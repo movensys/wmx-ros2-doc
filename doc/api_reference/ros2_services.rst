@@ -174,7 +174,7 @@ device; the managed nodes follow it down within one ``discovery_period``.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/set_engine std_srvs/srv/SetBool "{data: true}"
+   wros ros2 service call /wmx/engine/set_engine std_srvs/srv/SetBool "{data: true}"
 
 /wmx/engine/set_communication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -183,7 +183,7 @@ Starts or stops EtherCAT communication on an already open device.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/set_communication std_srvs/srv/SetBool "{data: true}"
+   wros ros2 service call /wmx/engine/set_communication std_srvs/srv/SetBool "{data: true}"
 
 /wmx/engine/get_engine_status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -194,7 +194,7 @@ state every controller waits for.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
+   wros ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
 
 /wmx/engine/import_and_set_all
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,7 +204,7 @@ absolute.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/import_and_set_all wmx_r2_message/srv/ImportAndSetAll \
+   wros ros2 service call /wmx/engine/import_and_set_all wmx_r2_message/srv/ImportAndSetAll \
      "{path: '/home/admin/workspaces/movensys_ws/install/wmx_r2_package/share/wmx_r2_package/config/wmx_parameters.xml'}"
 
 The same file is normally imported at startup through the launch argument
@@ -219,7 +219,7 @@ actually has, not what the XML says.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
+   wros ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
      "{axis: [0,1,2,3,4,5]}"
 
 Lifecycle services
@@ -248,11 +248,11 @@ are applied in reverse bring-up order.
 .. code-block:: bash
 
    # one node
-   ros2 service call /wmx/lifecycle/set_node_state wmx_r2_message/srv/SetNodeState \
+   wros ros2 service call /wmx/lifecycle/set_node_state wmx_r2_message/srv/SetNodeState \
      "{node_name: 'wmx_io_node', transition: 'deactivate'}"
 
    # every node
-   ros2 service call /wmx/lifecycle/set_node_state wmx_r2_message/srv/SetNodeState \
+   wros ros2 service call /wmx/lifecycle/set_node_state wmx_r2_message/srv/SetNodeState \
      "{node_name: '', transition: 'bringdown'}"
 
 /wmx/lifecycle/get_node_states
@@ -263,14 +263,14 @@ order.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
+   wros ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
 
 The standard CLI works too and bypasses the manager:
 
 .. code-block:: bash
 
-   ros2 lifecycle get /wmx_io_node
-   ros2 lifecycle set /wmx_io_node activate
+   wros ros2 lifecycle get /wmx_io_node
+   wros ros2 lifecycle set /wmx_io_node activate
 
 .. list-table:: ``wmx_lifecycle_manager_node`` parameters
    :header-rows: 1
@@ -323,15 +323,15 @@ Configuration and power
 .. code-block:: bash
 
    # servo on axes 0 and 1
-   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
      "{axis: [0,1], data: [1,1]}"
 
    # clear amplifier alarms
-   ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
      "{axis: [0,1], data: [0,0]}"
 
    # reverse the direction of axis 2
-   ros2 service call /wmx/axes/set_axis_polarity wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_axis_polarity wmx_r2_message/srv/SetAxes \
      "{axis: [2], data: [-1]}"
 
 ``/wmx/axes/set_gear_ratio`` sets the encoder-count-to-user-unit ratio per
@@ -340,7 +340,7 @@ at the joint:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axes/set_gear_ratio wmx_r2_message/srv/SetAxesGearRatio \
+   wros ros2 service call /wmx/axes/set_gear_ratio wmx_r2_message/srv/SetAxesGearRatio \
      "{axis: [0,1], numerator: [8388608.0, 8388608.0], denominator: [360.0, 360.0]}"
 
 ``/wmx/axes/start_home`` homes with the ``HomeType`` configured **in the WMX
@@ -363,15 +363,15 @@ Manual motion
 .. code-block:: bash
 
    # absolute move
-   ros2 service call /wmx/axes/start_pos wmx_r2_message/srv/StartAxesPose \
+   wros ros2 service call /wmx/axes/start_pos wmx_r2_message/srv/StartAxesPose \
      "{axis: [0,1], target: [45, -90], velocity: [10, 20], acc: [10, 20], dec: [10, 20]}"
 
    # relative move
-   ros2 service call /wmx/axes/start_mov wmx_r2_message/srv/StartAxesPose \
+   wros ros2 service call /wmx/axes/start_mov wmx_r2_message/srv/StartAxesPose \
      "{axis: [0,1], target: [10, -10], velocity: [10, 20], acc: [10, 10], dec: [10, 20]}"
 
    # constant velocity until stopped
-   ros2 service call /wmx/axes/start_vel wmx_r2_message/srv/StartAxesVelocity \
+   wros ros2 service call /wmx/axes/start_vel wmx_r2_message/srv/StartAxesVelocity \
      "{axis: [0,1], velocity: [10, -10], acc: [10, 20], dec: [10, 20]}"
 
 ``/wmx/axes/start_jog`` is a dead-man jog in Position mode: keep calling it
@@ -381,7 +381,7 @@ the direction.
 .. code-block:: bash
 
    while true; do
-     ros2 service call /wmx/axes/start_jog wmx_r2_message/srv/StartAxesVelocity \
+     wros ros2 service call /wmx/axes/start_jog wmx_r2_message/srv/StartAxesVelocity \
        "{axis: [0], velocity: [10], acc: [100], dec: [100]}"
      sleep 0.05
    done
@@ -466,23 +466,23 @@ I/O services
 
 .. code-block:: bash
 
-   ros2 service call /wmx/io/get_in_bit wmx_r2_message/srv/GetIoBit "{addr: 0, bit: 0}"
+   wros ros2 service call /wmx/io/get_in_bit wmx_r2_message/srv/GetIoBit "{addr: 0, bit: 0}"
 
-   ros2 service call /wmx/io/get_in_bits wmx_r2_message/srv/GetIoBits \
+   wros ros2 service call /wmx/io/get_in_bits wmx_r2_message/srv/GetIoBits \
      "{addr: [0, 2], bit: [1, 5]}"
 
-   ros2 service call /wmx/io/get_in_bytes wmx_r2_message/srv/GetIoBytes "{addr: 0, size: 4}"
+   wros ros2 service call /wmx/io/get_in_bytes wmx_r2_message/srv/GetIoBytes "{addr: 0, size: 4}"
 
-   ros2 service call /wmx/io/set_out_bit wmx_r2_message/srv/SetIoBit \
+   wros ros2 service call /wmx/io/set_out_bit wmx_r2_message/srv/SetIoBit \
      "{addr: 0, bit: 0, data: 1}"
 
-   ros2 service call /wmx/io/set_out_bits wmx_r2_message/srv/SetIoBits \
+   wros ros2 service call /wmx/io/set_out_bits wmx_r2_message/srv/SetIoBits \
      "{addr: [0, 2], bit: [1, 5], data: [1, 0]}"
 
    # 15 = 0x0F
-   ros2 service call /wmx/io/set_out_byte wmx_r2_message/srv/SetIoByte "{addr: 2, data: 15}"
+   wros ros2 service call /wmx/io/set_out_byte wmx_r2_message/srv/SetIoByte "{addr: 2, data: 15}"
 
-   ros2 service call /wmx/io/set_out_bytes wmx_r2_message/srv/SetIoBytes \
+   wros ros2 service call /wmx/io/set_out_bytes wmx_r2_message/srv/SetIoBytes \
      "{addr: 2, data: [15, 14]}"
 
 EtherCAT services
@@ -496,7 +496,7 @@ network does not come up.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/ecat/get_master_info wmx_r2_message/srv/EcatGetMasterInfo \
+   wros ros2 service call /wmx/ecat/get_master_info wmx_r2_message/srv/EcatGetMasterInfo \
      "{master_id: 0}"
 
 .. list-table::
@@ -524,7 +524,7 @@ the range ``0x000``–``0xFFF``, with ``reg_addr + len`` ≤ ``0x1000``.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/ecat/register_read wmx_r2_message/srv/EcatRegisterRead \
+   wros ros2 service call /wmx/ecat/register_read wmx_r2_message/srv/EcatRegisterRead \
      "{master_id: 0, slave_id: 0, reg_addr: 16, len: 4}"
 
 /wmx/ecat/reset_statistics
@@ -535,7 +535,7 @@ network.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/ecat/reset_statistics wmx_r2_message/srv/EcatResetStatistics \
+   wros ros2 service call /wmx/ecat/reset_statistics wmx_r2_message/srv/EcatResetStatistics \
      "{master_id: 0}"
 
 /wmx/ecat/scan_network
@@ -545,7 +545,7 @@ Re-scans the network for slaves.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/ecat/scan_network wmx_r2_message/srv/EcatScanNetwork "{master_id: 0}"
+   wros ros2 service call /wmx/ecat/scan_network wmx_r2_message/srv/EcatScanNetwork "{master_id: 0}"
 
 /wmx/ecat/start_hotconnect
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -555,7 +555,7 @@ Enables dynamic slave discovery. Call it once, after the network has reached
 
 .. code-block:: bash
 
-   ros2 service call /wmx/ecat/start_hotconnect wmx_r2_message/srv/EcatStartHotconnect \
+   wros ros2 service call /wmx/ecat/start_hotconnect wmx_r2_message/srv/EcatStartHotconnect \
      "{master_id: 0}"
 
 Gripper service
@@ -571,8 +571,8 @@ a service).
 
 .. code-block:: bash
 
-   ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: true}"   # close
-   ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: false}"  # open
+   wros ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: true}"   # close
+   wros ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: false}"  # open
 
 ``data: true`` drives the configured output bit to 1, ``false`` to 0. The
 bit is set by the ``gripper_address: [byte, bit]`` parameter. The service
@@ -594,22 +594,22 @@ automatically. Run it by hand only when using the general nodes on their own.
 .. code-block:: bash
 
    # 1. Verify the engine is communicating
-   ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
+   wros ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
 
    # 2. Set the gear ratio (encoder counts per user unit)
-   ros2 service call /wmx/axes/set_gear_ratio wmx_r2_message/srv/SetAxesGearRatio \
+   wros ros2 service call /wmx/axes/set_gear_ratio wmx_r2_message/srv/SetAxesGearRatio \
      "{axis: [0, 1], numerator: [8388608.0, 8388608.0], denominator: [360.0, 360.0]}"
 
    # 3. Clear any amplifier alarms
-   ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
      "{axis: [0,1], data: [0,0]}"
 
    # 4. Enable the servos
-   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
      "{axis: [0,1], data: [1,1]}"
 
    # 5. Home the axes
-   ros2 service call /wmx/axes/start_home wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/start_home wmx_r2_message/srv/SetAxes \
      "{axis: [0,1], data: [0,0]}"
 
 .. mermaid::

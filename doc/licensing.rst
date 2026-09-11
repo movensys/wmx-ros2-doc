@@ -5,9 +5,10 @@ Licensing
 
    "WMX R2" names a solution made of two parts with different licenses: an
    open-source ROS 2 interface, and the proprietary WMX motion engine it runs
-   on. The MIT license applies to the ROS 2 interface source code **only**.
-   The WMX motion engine, its SDK, and its binaries are proprietary and
-   require an evaluation or commercial license from MOVENSYS.
+   on. The MIT license applies to the ROS 2 interface source code, the example
+   repositories, and this documentation. The WMX motion engine, its SDK, and
+   its binaries are proprietary and require an evaluation or commercial
+   license from MOVENSYS.
 
    Neither the MIT license nor the WMX license grants rights to the other.
 
@@ -51,8 +52,9 @@ Licensing boundary
      - Proprietary: evaluation or commercial
      - Part of the WMX runtime installation.
    * - **This documentation**
-     - © 2026 MOVENSYS, all rights reserved
-     - Not covered by the MIT license.
+     - MIT
+     - Source in the ``wmx-r2-doc`` repository. Free to use, modify, and
+       redistribute under the MIT terms.
 
 .. note::
 

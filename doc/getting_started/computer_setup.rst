@@ -1,9 +1,10 @@
 Computer Setup
 ==============
 
-WMX R2 needs a real-time Linux kernel, ROS 2, and Docker on the
-target computer before you install the WMX R2 packages. This page lists the
-system requirements, then walks through preparing the computer step by step.
+WMX R2 needs a real-time Linux kernel and Docker on the target computer before
+you install the WMX R2 packages. ROS 2 itself is not installed on the host —
+it lives in the container. This page lists the system requirements, then walks
+through preparing the computer step by step.
 
 Hardware Requirements
 ----------------------------

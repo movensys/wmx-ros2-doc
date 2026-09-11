@@ -25,11 +25,10 @@ launch files take each file as an argument rather than hard-coding it.
 
    * - File
      - Defines
-   * - **1. EtherCAT network description**
+   * - **1. ENI file**
 
-       ``/opt/wmx3/`` — ENI, ESI, ``ec_network.def``, ``Module.ini``
-     - The devices on the bus, the communication cycle, and whether the
-       engine runs on the EtherCAT or the simulation platform.
+       The EtherCAT network description
+     - Which slaves are on the bus and how the master communicates with them.
    * - **2. WMX parameter file**
 
        ``wmx_r2_package/example/<robot>_wmx_parameters.xml``
@@ -47,11 +46,16 @@ launch files take each file as an argument rather than hard-coding it.
      - Joint name ↔ axis index, feedback rate, topic and action names,
        gripper I/O addresses, and the planner and controller settings.
 
-Of the EtherCAT files, the **ENI** is the only one you create — ESI files come
-from the device manufacturer. Both are handled by the NetConfigurator app in
-the WMX web gateway; see :doc:`wmx_web_tools` for the
+The ENI is generated from a scan of the real network by the NetConfigurator
+app in the WMX web gateway; see :doc:`wmx_web_tools` for the
 Scan → Quick Create → Start Communication procedure and for where the
 generated ENI is written.
+
+.. note::
+
+   **ESI** files are not on this list. They are the device descriptions the
+   drive manufacturer supplies, and they are input to ENI generation rather
+   than something you author or edit.
 
 They must agree with each other; nothing in the stack checks that they do.
 The rest of this page is about the values inside them and how to verify each
@@ -418,14 +422,15 @@ trusting any axis index:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/ecat/get_master_info \
+   wros ros2 service call /wmx/ecat/get_master_info \
         wmx_r2_message/srv/EcatGetMasterInfo "{master_id: 0}"
 
 The scan matches each discovered slave against the EtherCAT Slave
 Information (ESI) files installed with the WMX Runtime at ``/opt/wmx3/ESI/``,
 and the network as a whole is described by the EtherCAT Network Information
-(ENI) file in ``/opt/wmx3/eni/``, generated from a scan by **NetConfigurator
-→ ENI File → Quick Create** (see :doc:`wmx_web_tools`). A
+(ENI) file, generated from a scan by **NetConfigurator → ENI File →
+Quick Create** and written to the folder named by that app's **Eni Folder**
+setting (see :doc:`wmx_web_tools`). A
 drive with no matching ESI file will fail the scan, and a chain that is
 re-cabled in a different order shifts every axis index after the change —
 silently, from ROS 2's point of view.
@@ -531,7 +536,7 @@ parameters that the engine currently holds, per axis:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
+   wros ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
         "{axis: [0,1,2,3,4,5]}"
 
 Compare the ``GearRatio``, ``AxisPolarity``, and ``CommandMode`` lines in the
@@ -562,16 +567,16 @@ immediately on a live engine.
 .. code-block:: bash
 
    # Load a different parameter file wholesale
-   ros2 service call /wmx/engine/import_and_set_all wmx_r2_message/srv/ImportAndSetAll \
+   wros ros2 service call /wmx/engine/import_and_set_all wmx_r2_message/srv/ImportAndSetAll \
         "{path: '/abs/path/to/<robot>_wmx_parameters.xml'}"
 
    # Override the gear ratio on selected axes
-   ros2 service call /wmx/axes/set_gear_ratio \
+   wros ros2 service call /wmx/axes/set_gear_ratio \
         wmx_r2_message/srv/SetAxesGearRatio \
         "{axis: [0], numerator: [52953088.0], denominator: [6.283185307179586]}"
 
    # Override the polarity on selected axes (+1 or -1)
-   ros2 service call /wmx/axes/set_axis_polarity wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_axis_polarity wmx_r2_message/srv/SetAxes \
         "{axis: [0], data: [-1]}"
 
 .. warning::

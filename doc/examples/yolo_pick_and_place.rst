@@ -68,7 +68,7 @@ setup. All commands run through ``mros``.
 
          .. code-block:: bash
 
-            ros2 run rqt_image_view rqt_image_view /yolo_cube_detector/debug_image
+            mros ros2 run rqt_image_view rqt_image_view /yolo_cube_detector/debug_image
 
    .. tab-item:: HIL
 
@@ -173,8 +173,8 @@ setup. All commands run through ``mros``.
 
          .. code-block:: bash
 
-            ros2 run rqt_image_view rqt_image_view /yolo_dice_detector/debug_image
-            ros2 run rqt_image_view rqt_image_view /yolo_cube_detector/debug_image
+            mros ros2 run rqt_image_view rqt_image_view /yolo_dice_detector/debug_image
+            mros ros2 run rqt_image_view rqt_image_view /yolo_cube_detector/debug_image
 
       5. (optional) Execute the YOLO pick-and-place:
 

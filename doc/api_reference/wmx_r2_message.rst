@@ -377,17 +377,16 @@ Build the messages before anything that depends on them:
 
 .. code-block:: bash
 
-   colcon build --packages-select wmx_r2_message
-   source install/setup.bash
-   colcon build
+   wros colcon build --packages-select wmx_r2_message
+   wros colcon build
 
 Verify the generated interfaces:
 
 .. code-block:: bash
 
-   ros2 interface list | grep wmx_r2_message
-   ros2 interface show wmx_r2_message/msg/AxesStatus
-   ros2 interface show wmx_r2_message/srv/SetAxes
+   wros ros2 interface list | grep wmx_r2_message
+   wros ros2 interface show wmx_r2_message/msg/AxesStatus
+   wros ros2 interface show wmx_r2_message/srv/SetAxes
 
 See also
 --------

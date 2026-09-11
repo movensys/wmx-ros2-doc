@@ -154,7 +154,7 @@ setup. All commands run through ``nros``.
 
          .. code-block:: bash
 
-            ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args \
+            nros ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args \
                  -p turn:=0.5 \
                  -p stamped:=true \
                  -p frame_id:=base_link \

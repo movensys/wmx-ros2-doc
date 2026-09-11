@@ -22,7 +22,7 @@ RViz and the physical robot move opposite ways.
 
   .. code-block:: bash
 
-     ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
+     wros ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
        "{axis: [0,1,2,3,4,5]}"
 
 - Correct ``AxisPolarity`` for that axis in the robot's WMX parameter XML
@@ -30,7 +30,7 @@ RViz and the physical robot move opposite ways.
 
   .. code-block:: bash
 
-     ros2 service call /wmx/axes/set_axis_polarity wmx_r2_message/srv/SetAxes \
+     wros ros2 service call /wmx/axes/set_axis_polarity wmx_r2_message/srv/SetAxes \
        "{axis: [0], data: [-1]}"
 
 - Confirm the URDF's sign convention for that joint (``<axis xyz>`` together
@@ -72,7 +72,7 @@ Wrong Joint Moves
 
   .. code-block:: bash
 
-     ros2 service call /wmx/ecat/get_master_info \
+     wros ros2 service call /wmx/ecat/get_master_info \
        wmx_r2_message/srv/EcatGetMasterInfo "{master_id: 0}"
 
 - Re-cabling the drives in a different order shifts every axis index after the
@@ -114,7 +114,7 @@ interfaces only while they are ``active``, and
 
   .. code-block:: bash
 
-     ros2 service call /wmx/lifecycle/get_node_states \
+     wros ros2 service call /wmx/lifecycle/get_node_states \
        wmx_r2_message/srv/GetNodeStates "{}"
 
 - If they are ``unconfigured``, the engine is not communicating. Fix that
@@ -122,14 +122,14 @@ interfaces only while they are ``active``, and
 
   .. code-block:: bash
 
-     ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
+     wros ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
 
 - If the engine *is* communicating and the nodes are still down, bring them
   up by hand and read the error the failed transition logs:
 
   .. code-block:: bash
 
-     ros2 service call /wmx/lifecycle/set_node_state \
+     wros ros2 service call /wmx/lifecycle/set_node_state \
        wmx_r2_message/srv/SetNodeState \
        "{node_name: '', transition: 'bringup'}"
 
@@ -155,7 +155,7 @@ running trajectory.
 
   .. code-block:: bash
 
-     ros2 service call /wmx/lifecycle/set_node_state \
+     wros ros2 service call /wmx/lifecycle/set_node_state \
        wmx_r2_message/srv/SetNodeState \
        "{node_name: 'joint_trajectory_controller', transition: 'deactivate'}"
 
@@ -217,7 +217,7 @@ Communication Start Failures
 
   .. code-block:: bash
 
-     ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
+     wros ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"
 
 Joint States All Zero
 ---------------------
@@ -231,15 +231,16 @@ Joint States All Zero
 
   .. code-block:: bash
 
-     ros2 topic echo /wmx/axes/status --field amp_alarm
+     wros ros2 topic echo /wmx/axes/status --field amp_alarm
 
-- Verify ``wmx_param_file_path`` in the config YAML points to the correct
-  WMX parameter XML file for your robot
+- Verify the ``wmx_param_file`` launch argument points to the correct WMX
+  parameter XML for your robot (the launch file injects it into the engine
+  node as ``wmx_param_file_path``)
 - Clear alarms and re-enable servos:
 
   .. code-block:: bash
 
-     ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
+     wros ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
        "{axis: [0,1,2,3,4,5], data: [0,0,0,0,0,0]}"
 
 Servo Alarm Errors
@@ -254,7 +255,7 @@ rejected.
 
   .. code-block:: bash
 
-     ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
+     wros ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
        "{axis: [0,1,2,3,4,5], data: [0,0,0,0,0,0]}"
 
 - Check for physical obstructions or overcurrent conditions on the robot
@@ -308,7 +309,7 @@ does not move.
 
   .. code-block:: bash
 
-     ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: true}"
+     wros ros2 service call /wmx/set_gripper std_srvs/srv/SetBool "{data: true}"
 
 - Check ``pre_setup_io``. It defaults to ``false``, and with it false the
   controller skips the gripper power-up sequence at ``configure`` — the
@@ -319,18 +320,20 @@ does not move.
 
   .. code-block:: bash
 
-     ros2 service call /wmx/io/set_out_bit wmx_r2_message/srv/SetIoBit \
+     wros ros2 service call /wmx/io/set_out_bit wmx_r2_message/srv/SetIoBit \
        "{addr: 0, bit: 0, data: 1}"
 
 Nodes Not Found
 ---------------
 
-**Symptom:** ``ros2 pkg list | grep wmx`` returns nothing.
+**Symptom:** ``wros ros2 pkg list | grep wmx`` returns nothing.
 
 **Solutions:**
 
-- Source the workspace: ``source ~/workspaces/movensys_ws/install/setup.bash``
-- Rebuild if needed: ``cd ~/workspaces/movensys_ws && colcon build``
+- Check the container is running: ``docker ps | grep wmx_r2_container``. The
+  packages live inside it, not on the host — ``wros`` sources the workspace
+  for you, so there is nothing to source by hand.
+- Rebuild if needed: ``wros colcon build``
 - Check the two-stage build was done correctly (message package first).
   See :doc:`../getting_started/index`.
 

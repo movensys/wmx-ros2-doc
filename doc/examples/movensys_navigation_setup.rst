@@ -17,7 +17,7 @@ used to run commands inside the container.
 
 .. code-block:: bash
 
-   export ROS_DOMAIN_ID=73                         # use any number
+   export ROS_DOMAIN_ID=73                         # must match the WMX R2 container
    export ROS_DISTRO=jazzy                         # {jazzy, humble}
    export CPU_ARCH=amd64                           # {amd64, arm64}
    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp

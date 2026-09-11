@@ -802,7 +802,7 @@ Tests under ``test/`` are launch tests and need no hardware:
 
 .. code-block:: bash
 
-   colcon test --packages-select wmx_r2_package
+   wros colcon test --packages-select wmx_r2_package
 
 See also
 --------

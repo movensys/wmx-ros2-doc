@@ -39,7 +39,8 @@ Before building a custom application:
   (see :doc:`../getting_started/index`)
 - The WMX R2 nodes are running (either the manipulator launch or
   the general launch)
-- Your workspace is sourced: ``source ~/workspaces/movensys_ws/install/setup.bash``
+- You run ROS 2 commands through ``wros``, which sources the workspace inside
+  the container for you
 - You have a basic understanding of ROS2 actions, services, and topics
 
 Available Interfaces
@@ -670,9 +671,11 @@ Adapting for Different Robots
 -------------------------------------
 
 WMX R2 is robot-agnostic by construction: no robot is baked into any launch
-file. Supporting a new EtherCAT manipulator means writing two files — a ROS
-parameter YAML and a WMX parameter XML — and passing them as launch
-arguments. No source changes, and no new launch file.
+file. Supporting a new EtherCAT manipulator is a change to the four kinds of
+configuration file listed in :doc:`../try_your_robot/robot_parameters` — the
+ENI, the WMX parameter XML, the URDF/xacro, and the ROS 2 parameter YAML —
+passed to the existing launch files as arguments. No source changes, and no
+new launch file.
 
 Configuration files to create or modify
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -683,32 +686,44 @@ Configuration files to create or modify
 
    * - File
      - Changes Required
-   * - **YAML config** (e.g., ``new_robot_config.yaml``)
-     - Set ``joint_axes``, ``joint_name`` list, ``joint_feedback_rate``,
-       gripper values, topic names, and ``wmx_param_file_path``
+   * - **ENI file**
+     - Generate it from a scan of your bus with NetConfigurator, so the master
+       knows which slaves are on the network. See
+       :doc:`../try_your_robot/wmx_web_tools`.
    * - **WMX XML parameters** (e.g., ``new_robot_wmx_parameters.xml``)
      - Define gear ratios, axis polarities, encoder modes, homing parameters,
        and limit switch settings for each servo axis
-   * - **Launch file**
-     - Nothing to write. ``wmx_r2_manipulator.launch.py`` and
-       ``wmx_r2_differential.launch.py`` take the YAML and XML as arguments,
-       so a new robot is a new pair of files, not a new launch file.
-   * - **ESI files** (``/opt/wmx3/ESI/``)
-     - Add the EtherCAT Slave Information file for any servo drive model the
-       WMX Runtime does not already ship
+   * - **URDF / xacro** (and the SRDF, if using MoveIt 2)
+     - Link geometry, joint axes and origins, and the planning limits. The
+       joint names here must match the ``joint_name`` list in the YAML.
+   * - **ROS2 YAML config** (e.g., ``new_robot_config.yaml``)
+     - Set ``joint_axes``, ``joint_name`` list, ``joint_feedback_rate``,
+       gripper values, and topic names
 
 Steps to adapt
 ^^^^^^^^^^^^^^^
 
-1. **Identify your servo drives** -- Determine the vendor and product IDs of
-   each EtherCAT servo drive in your robot, and check that a matching ESI file
-   is present in ``/opt/wmx3/ESI/``.
+1. **Describe the network** -- Check that a matching ESI file is present in
+   ``/opt/wmx3/ESI/`` for each servo drive; the drive manufacturer supplies it
+   and NetConfigurator registers it. Then scan the bus and generate the ENI
+   file. See :doc:`../try_your_robot/wmx_web_tools`.
 
 2. **Create the WMX parameter file** -- Copy ``cr3a_wmx_parameters.xml`` and
    modify gear ratios, polarities, and encoder settings for your servo drives.
    The gear ratio maps encoder counts to radians:
-   ``numerator = encoder_counts_per_revolution``,
-   ``denominator = 2 * pi (6.28319)``.
+
+   .. code-block:: text
+
+      numerator   = encoder counts per motor revolution x gear ratio
+      denominator = 2 * pi (6.28319)
+
+   .. warning::
+
+      The numerator counts one revolution of the **joint output**, not of the
+      motor, so the reducer ratio belongs in it. Omitting a 101:1 reducer
+      makes every commanded distance wrong by that factor. See
+      :doc:`../try_your_robot/robot_parameters` for the derivation and the
+      shipped values.
 
 3. **Create the YAML config** -- Copy ``example/cr3a_manipulator_config.yaml``
    and update. ``joint_axes`` and ``joint_name`` must be the **same lists, in
@@ -742,10 +757,11 @@ Steps to adapt
             - joint_trajectory_controller
             - joint_position_controller
 
-   The XML path is **not** set here — it is passed to the launch file as
-   ``wmx_param_file``, which injects it as ``wmx_param_file_path``.
+   The XML path is **not** set in this YAML — it is passed to the launch file
+   as ``wmx_param_file``, which injects it into the engine node as
+   ``wmx_param_file_path``.
 
-4. **Launch it** -- No new launch file. Pass your two files as arguments:
+4. **Launch it** -- No new launch file. Pass your files as arguments:
 
    .. code-block:: bash
 

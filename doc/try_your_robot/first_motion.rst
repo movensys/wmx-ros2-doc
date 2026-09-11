@@ -59,25 +59,25 @@ feedback.
 
 .. code-block:: bash
 
-   sudo --preserve-env=PATH \
-     --preserve-env=AMENT_PREFIX_PATH \
-     --preserve-env=COLCON_PREFIX_PATH \
-     --preserve-env=PYTHONPATH \
-     --preserve-env=LD_LIBRARY_PATH \
-     --preserve-env=ROS_DISTRO \
-     --preserve-env=ROS_VERSION \
-     --preserve-env=ROS_PYTHON_VERSION \
-     --preserve-env=ROS_DOMAIN_ID \
-     --preserve-env=RMW_IMPLEMENTATION \
-     bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && source $HOME/workspaces/movensys_ws/install/setup.bash && \
-     ros2 launch wmx_r2_package wmx_r2_general_nodes.launch.py"
+   wros ros2 launch wmx_r2_package wmx_r2_general_nodes.launch.py \
+       use_sim_time:=false \
+       'config_file:=$(ros2 pkg prefix --share wmx_r2_package)/example/<robot>_manipulator_config.yaml' \
+       'wmx_param_file:=$(ros2 pkg prefix --share wmx_r2_package)/example/<robot>_wmx_parameters.xml'
+
+.. important:: **Pass your robot's files explicitly.**
+
+   Launched with an empty ``wmx_param_file``, the engine imports nothing and
+   keeps whatever a previous session left in it — which is exactly the stale
+   state the read-back below is meant to catch. Point both arguments at the
+   parameter file and config you validated in
+   :doc:`robot_parameters`.
 
 Wait for the lifecycle manager to bring the nodes up — the ``/wmx/axes/*``
 services do not exist until ``wmx_core_motion_node`` is ``active``:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/lifecycle/get_node_states \
+   wros ros2 service call /wmx/lifecycle/get_node_states \
         wmx_r2_message/srv/GetNodeStates "{}"
 
 Confirm the engine and the bus, then read back the parameters the engine
@@ -85,10 +85,10 @@ actually holds:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"   # expect "Communicating"
-   ros2 service call /wmx/ecat/get_master_info \
+   wros ros2 service call /wmx/engine/get_engine_status std_srvs/srv/Trigger "{}"   # expect "Communicating"
+   wros ros2 service call /wmx/ecat/get_master_info \
         wmx_r2_message/srv/EcatGetMasterInfo "{master_id: 0}"     # expect every drive present
-   ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
+   wros ros2 service call /wmx/engine/get_axis_param wmx_r2_message/srv/GetAxisParam \
         "{axis: [0,1,2,3,4,5]}"                                      # gear ratio, polarity, mode
 
 **Checkpoint.** The gear ratio, polarity, and command mode in the response
@@ -100,7 +100,7 @@ hand** where the mechanics allow it:
 
 .. code-block:: bash
 
-   ros2 topic echo /wmx/axes/status
+   wros ros2 topic echo /wmx/axes/status
 
 .. list-table:: What to confirm before enabling a servo
    :header-rows: 1
@@ -136,9 +136,9 @@ Enable **one** axis only. Leave every other axis off.
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/clear_amp_alarm wmx_r2_message/srv/SetAxes \
         "{axis: [0], data: [0]}"
-   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
         "{axis: [0], data: [1]}"
 
 Command a small relative move. The units are radians, and the velocity and
@@ -148,7 +148,7 @@ acceleration are rad/s and rad/s² (this holds only because
 .. code-block:: bash
 
    # +0.05 rad (≈2.9°) at 0.05 rad/s with gentle ramps
-   ros2 service call /wmx/axes/start_mov wmx_r2_message/srv/StartAxesPose \
+   wros ros2 service call /wmx/axes/start_mov wmx_r2_message/srv/StartAxesPose \
      "{axis: [0], target: [0.05], velocity: [0.05], acc: [0.1], dec: [0.1]}"
 
 .. warning::
@@ -206,7 +206,7 @@ Disable the axis before moving to the next one:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
         "{axis: [0], data: [0]}"
 
 **Checkpoint.** Do not proceed to multi-axis motion until every axis has
@@ -334,7 +334,7 @@ controlled stop, still not an emergency stop:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
+   wros ros2 service call /wmx/axes/set_servo_on wmx_r2_message/srv/SetAxes \
         "{axis: [0,1,2,3,4,5], data: [0,0,0,0,0,0]}"
 
 .. warning:: **Known limitation — ``keyboard_teleop`` forces simulated time.**

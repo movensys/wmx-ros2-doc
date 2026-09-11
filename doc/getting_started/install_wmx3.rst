@@ -1,14 +1,28 @@
 Install WMX R2 Package
 ========================
 
-WMX R2 runs in the ``wmx_r2_container`` Docker container. Every command on this
-page is run inside it through ``wros``, which runs a command in the container as
-**root**, with ROS 2 and the workspace already sourced. 
+WMX R2 runs in the ``wmx_r2_container`` Docker container. The steps below set
+the container up from the host; once it is running, every ROS 2 command — on
+this page and throughout this documentation — goes through ``wros``, which
+runs a command inside the container as **root**, with ROS 2 and the workspace
+already sourced.
 
 .. important::
 
    The WMX Runtime must be installed **on the host** (``/opt/wmx3/``). The
    container mounts it; it does not provide it. See :doc:`install_wmx_runtime`.
+
+Clone the repository
+--------------------
+
+Clone first: the environment step below sources a file from inside the
+repository.
+
+.. code-block:: bash
+
+   mkdir -p ~/workspaces/movensys_ws/src
+   cd ~/workspaces/movensys_ws/src
+   git clone https://github.com/movensys/wmx-r2.git
 
 Configure the environment
 -------------------------
@@ -17,12 +31,18 @@ Add the following to your ``~/.bashrc``:
 
 .. code-block:: bash
 
-   export ROS_DOMAIN_ID=70                         # use any number
+   export ROS_DOMAIN_ID=73                         # any number; the same one everywhere
    export ROS_DISTRO=jazzy                         # {jazzy, humble}
    export CPU_ARCH=amd64                           # {amd64, arm64}
    export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
    source ~/workspaces/movensys_ws/src/wmx-r2/docker/wros.bash
+
+.. note::
+
+   ``ROS_DOMAIN_ID`` must be the **same value** in every container that has to
+   talk to WMX R2 — the manipulator and navigation setup pages set it too. A
+   mismatch is silent: the nodes start, and no ``/wmx/*`` topic is ever seen.
 
 Apply the changes:
 
@@ -30,16 +50,6 @@ Apply the changes:
 
    xhost +local:docker
    source ~/.bashrc
-
-
-Clone the repository
---------------------
-
-.. code-block:: bash
-
-   mkdir -p ~/workspaces/movensys_ws/src
-   cd ~/workspaces/movensys_ws/src
-   git clone https://github.com/movensys/wmx-r2.git
 
 Build and start the container
 -----------------------------

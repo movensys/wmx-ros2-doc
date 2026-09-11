@@ -148,8 +148,8 @@ anything in between.
 
 .. code-block:: bash
 
-   ros2 topic echo /joint_states
-   ros2 topic hz /joint_states      # should match joint_feedback_rate
+   wros ros2 topic echo /joint_states
+   wros ros2 topic hz /joint_states      # should match joint_feedback_rate
 
 Simulator mirrors
 ^^^^^^^^^^^^^^^^^
@@ -222,8 +222,8 @@ between them is the following error.
 
 .. code-block:: bash
 
-   ros2 topic echo /wmx/axes/status --once
-   ros2 topic echo /wmx/axes/status --field amp_alarm
+   wros ros2 topic echo /wmx/axes/status --once
+   wros ros2 topic echo /wmx/axes/status --field amp_alarm
 
 Controller arbitration topics
 -----------------------------
@@ -373,17 +373,17 @@ Checking topics at runtime
 
 .. code-block:: bash
 
-   ros2 topic list                       # only active nodes appear
-   ros2 topic info /joint_states -v      # publishers, subscribers, QoS
-   ros2 topic hz /joint_states           # confirm the feedback rate
-   ros2 topic echo /wmx/axes/status --once
+   wros ros2 topic list                       # only active nodes appear
+   wros ros2 topic info /joint_states -v      # publishers, subscribers, QoS
+   wros ros2 topic hz /joint_states           # confirm the feedback rate
+   wros ros2 topic echo /wmx/axes/status --once
 
 If a topic is missing, check the node's lifecycle state before anything
 else:
 
 .. code-block:: bash
 
-   ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
+   wros ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
 
 See also
 --------
