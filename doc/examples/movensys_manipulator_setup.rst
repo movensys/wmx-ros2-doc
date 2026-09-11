@@ -36,8 +36,8 @@ used to run commands inside the container.
 
    Running a different machine means supplying its own WMX parameter file,
    URDF, and planning configuration; it does not mean changing WMX R2. See
-   :doc:`../commissioning/robot_parameters` for what that involves and
-   :doc:`../commissioning/validated_hardware` for what has been validated.
+   :doc:`../try_your_robot/robot_parameters` for what that involves and
+   :doc:`../try_your_robot/validated_hardware` for what has been validated.
 
 .. note::
 

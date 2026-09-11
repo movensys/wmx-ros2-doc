@@ -8,7 +8,7 @@ Troubleshooting
    URDF to hide a wrong gear ratio, or flipping a sign in application code to
    hide a wrong polarity, leaves the robot able to move unexpectedly in every
    path that does not go through your workaround. See
-   :doc:`../commissioning/robot_parameters`.
+   :doc:`../try_your_robot/robot_parameters`.
 
 Robot Moves in the Wrong Direction
 -----------------------------------
@@ -36,7 +36,7 @@ RViz and the physical robot move opposite ways.
 - Confirm the URDF's sign convention for that joint (``<axis xyz>`` together
   with the joint ``<origin rpy>``) before deciding which sign is correct.
 - Re-verify with the single-axis procedure in
-  :doc:`../commissioning/first_motion`. A runtime polarity override is lost on
+  :doc:`../try_your_robot/first_motion`. A runtime polarity override is lost on
   the next engine restart — write the corrected value into the XML.
 
 Robot Moves the Wrong Distance
@@ -56,7 +56,7 @@ rotation, or the robot moves by a large factor more or less than expected.
   file — the engine may be holding values from a previous session, since the
   general nodes load no parameter file.
 - Re-measure with a small commanded step and a physical reference; see
-  :doc:`../commissioning/first_motion`.
+  :doc:`../try_your_robot/first_motion`.
 
 Wrong Joint Moves
 -----------------
@@ -259,7 +259,7 @@ rejected.
 
 - Check for physical obstructions or overcurrent conditions on the robot
 - Verify gear ratios and polarities match the physical servo configuration
-  (see :doc:`../commissioning/robot_parameters`). A wrong polarity drives the
+  (see :doc:`../try_your_robot/robot_parameters`). A wrong polarity drives the
   joint away from its target, which shows up as a following error or an
   overcurrent alarm rather than as an obviously wrong direction.
 

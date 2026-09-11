@@ -100,5 +100,5 @@ The MIT license disclaims all warranties, including merchantability and
 fitness for a particular purpose, for the ROS 2 interface source code. This
 disclaimer is significant in a motion-control context: the software carries no
 warranty that it will produce correct or safe motion on your hardware. See
-:doc:`commissioning/safety` for the safety functions this stack does not
+:doc:`try_your_robot/safety` for the safety functions this stack does not
 provide and for where responsibility sits.

@@ -42,6 +42,18 @@ states before anything else:
 
    ros2 service call /wmx/lifecycle/get_node_states wmx_r2_message/srv/GetNodeStates "{}"
 
+.. note:: **There is a second, non-ROS 2 way into the same engine.**
+
+   The WMX Runtime ships a browser UI — WOS, NetConfigurator, and MotionScope
+   — that sets and tests axis parameters, servo power, homing, jogging, and
+   I/O directly. It is the fastest way to tell an engine problem from a WMX R2
+   problem, and it is where the ENI file is generated. See
+   :doc:`../try_your_robot/wmx_web_tools`.
+
+   Below the ROS 2 layer is the vendor SDK these nodes are built on. Its
+   reference ships with the runtime at ``/opt/wmx3/Doc/Web/`` — see
+   :doc:`wmx3_api`.
+
 Interfaces by node
 ------------------
 
@@ -94,3 +106,4 @@ Interfaces by node
    wmx_r2_message
    wmx_r2_package
    wmx_r2_control
+   wmx3_api

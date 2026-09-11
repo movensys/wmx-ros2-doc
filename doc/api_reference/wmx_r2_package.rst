@@ -646,7 +646,7 @@ A deployment is **one YAML plus one XML**.
    Joint values pass through the ROS nodes **unconverted**. There is no
    gear-ratio or offset parameter anywhere in ``wmx_r2_package``. If the
    robot moves the wrong distance, the XML is wrong — not the YAML. See
-   :doc:`../commissioning/robot_parameters`.
+   :doc:`../try_your_robot/robot_parameters`.
 
 cr3a_manipulator_config.yaml
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -811,4 +811,4 @@ See also
 - :doc:`ros2_topics` -- every topic, with QoS and rates
 - :doc:`ros2_actions` -- the ``FollowJointTrajectory`` contract
 - :doc:`wmx_r2_message` -- interface definitions
-- :doc:`../commissioning/robot_parameters` -- what belongs in the WMX XML
+- :doc:`../try_your_robot/robot_parameters` -- what belongs in the WMX XML

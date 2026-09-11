@@ -23,7 +23,7 @@ Follow the steps in order. At step 6 choose the path that matches your setup
    controller are not available once that controller is bypassed.
 
    Before commanding motion on a physical robot, continue with
-   :doc:`../commissioning/index`.
+   :doc:`../try_your_robot/index`.
 
 .. toctree::
    :maxdepth: 1

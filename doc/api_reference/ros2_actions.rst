@@ -232,10 +232,10 @@ Expected:
 
    This action moves real motors. Before sending trajectory goals, confirm
    that the robot parameters have been verified
-   (:doc:`../commissioning/robot_parameters`), that the robot has passed the
-   first-motion procedure (:doc:`../commissioning/first_motion`), that the
+   (:doc:`../try_your_robot/robot_parameters`), that the robot has passed the
+   first-motion procedure (:doc:`../try_your_robot/first_motion`), that the
    workspace is clear, and that the separate safety measures in
-   :doc:`../commissioning/safety` are in place. Cancelling a goal is a
+   :doc:`../try_your_robot/safety` are in place. Cancelling a goal is a
    controlled stop, not an emergency stop.
 
 MoveIt2 Integration

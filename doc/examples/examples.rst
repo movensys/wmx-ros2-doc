@@ -45,8 +45,8 @@ core WMX R2 container — see :doc:`testing_wmx_r2`). Isaac Sim runs on the host
    of brand.
 
    Running your own machine means supplying its configuration — see
-   :doc:`../commissioning/robot_parameters` — and
-   :doc:`../commissioning/validated_hardware` for what has been validated so
+   :doc:`../try_your_robot/robot_parameters` — and
+   :doc:`../try_your_robot/validated_hardware` for what has been validated so
    far. :doc:`testing_wmx_r2` needs no robot model at all; it exercises the
    axes directly.
 
@@ -94,11 +94,11 @@ EtherCAT platform) and by which USD scene you open. See
    Simulation and HIL are where those errors are cheap to find.
 
    Before the **Real** tab of any scenario, complete
-   :doc:`../commissioning/index`: verify the robot parameters
-   (:doc:`../commissioning/robot_parameters`), run the low-speed single-axis
-   procedure (:doc:`../commissioning/first_motion`), and put the separate
-   safety measures in :doc:`../commissioning/safety` in place. Check
-   :doc:`../commissioning/validated_hardware` for what has actually been
+   :doc:`../try_your_robot/index`: verify the robot parameters
+   (:doc:`../try_your_robot/robot_parameters`), run the low-speed single-axis
+   procedure (:doc:`../try_your_robot/first_motion`), and put the separate
+   safety measures in :doc:`../try_your_robot/safety` in place. Check
+   :doc:`../try_your_robot/validated_hardware` for what has actually been
    validated on your robot.
 
 .. toctree::
@@ -139,7 +139,7 @@ tracked below.
    industrial robot controller. Planned safety-related material — recommended
    safety architectures, STO and safety-PLC integration examples, and
    commissioning guidance — is listed separately in
-   :doc:`../commissioning/safety`.
+   :doc:`../try_your_robot/safety`.
 
 .. list-table::
    :header-rows: 1

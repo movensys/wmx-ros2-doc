@@ -12,44 +12,58 @@ Robot Parameter Configuration and Validation
 Where the parameters live
 -------------------------
 
-A working robot configuration is spread over four files. They must agree with
-each other; nothing in the stack checks that they do.
+A robot configuration is **data, not code**. Everything that makes the stack
+drive one machine rather than another lives in four kinds of file, and a
+different robot, a different drive brand, or a different axis count is a
+change to those files only — no C++ or Python in ``wmx-r2``,
+``movensys-manipulator``, or ``movensys-navigation`` is modified, and the
+launch files take each file as an argument rather than hard-coding it.
 
 .. list-table::
    :header-rows: 1
-   :widths: 30 24 46
+   :widths: 38 62
 
    * - File
-     - Owned by
      - Defines
-   * - ``<robot>_wmx_parameters.xml``
+   * - **1. EtherCAT network description**
 
-       (``wmx_r2_package/config/``)
-     - WMX engine
-     - Gear ratio, encoder resolution, axis polarity, command mode, torque and
-       motor-speed limits, homing, soft limits, limit-switch and E-stop
-       configuration — everything the motion engine needs, **per WMX axis
-       index**.
-   * - ``<robot>_<application>_config.yaml``
+       ``/opt/wmx3/`` — ENI, ESI, ``ec_network.def``, ``Module.ini``
+     - The devices on the bus, the communication cycle, and whether the
+       engine runs on the EtherCAT or the simulation platform.
+   * - **2. WMX parameter file**
 
-       (``wmx_r2_package/config/``)
-     - WMX R2 nodes
-     - The mapping from ROS 2 joint names to WMX axis indices
-       (``joint_name`` ↔ ``joint_axes``), feedback rate, topic and action
-       names, gripper I/O addresses and open/close values.
-   * - ``<robot>.xacro`` / ``.urdf``
+       ``wmx_r2_package/example/<robot>_wmx_parameters.xml``
+     - Gear ratio, encoder resolution, polarity, command mode, torque and
+       speed limits, homing, and soft limits — per WMX axis index.
+   * - **3. URDF / xacro**
 
-       (``movensys_manipulator_description`` /
-       ``movensys_navigation_description``)
-     - ROS 2 / MoveIt / Nav2
-     - Link geometry, joint axes and origins, and the position, velocity, and
-       effort limits used for planning and collision checking.
-   * - ``joint_limits.yaml``
+       ``movensys_*_description/urdf/<model>/``, ``wmx_r2_control/urdf/``
+     - Link geometry, joint axes and origins, the limits used for planning
+       and collision checking, and the ``ros2_control`` hardware interface.
+   * - **4. ROS 2 parameter YAML**
 
-       (``movensys_manipulator_moveit_config/config/<model>/``)
-     - MoveIt 2
-     - Velocity and acceleration limits that override or augment the URDF for
-       trajectory generation.
+       ``wmx_r2_package/example/``, ``wmx_r2_control/config/``, and the
+       MoveIt, Nav2, and perception ``config/<model>/`` directories
+     - Joint name ↔ axis index, feedback rate, topic and action names,
+       gripper I/O addresses, and the planner and controller settings.
+
+Of the EtherCAT files, the **ENI** is the only one you create — ESI files come
+from the device manufacturer. Both are handled by the NetConfigurator app in
+the WMX web gateway; see :doc:`wmx_web_tools` for the
+Scan → Quick Create → Start Communication procedure and for where the
+generated ENI is written.
+
+They must agree with each other; nothing in the stack checks that they do.
+The rest of this page is about the values inside them and how to verify each
+one.
+
+.. note::
+
+   "Only four files" is a statement about *where* the work is, not about how
+   much of it there is. Producing a correct parameter set, URDF, and planning
+   configuration for a machine nobody has commissioned yet is an integration
+   project — see :doc:`validated_hardware`. What it is *not* is a change to
+   WMX R2.
 
 .. note::
 
@@ -118,7 +132,7 @@ wiring, not configuration.
      - 6th drive
      - Wrist 3
 
-For the differential-drive base, ``diffbot_navigation_config.yaml`` binds the
+For the differential-drive base, ``diffbot_differential_config.yaml`` binds the
 axes twice — once for feedback and once for the drive controller — and both
 must agree:
 
@@ -408,8 +422,11 @@ trusting any axis index:
         wmx_r2_message/srv/EcatGetMasterInfo "{master_id: 0}"
 
 The scan matches each discovered slave against the EtherCAT Slave
-Information (ESI) files installed with the WMX Runtime at ``/opt/wmx3/ESI/``.
-A drive with no matching ESI file will fail the scan, and a chain that is
+Information (ESI) files installed with the WMX Runtime at ``/opt/wmx3/ESI/``,
+and the network as a whole is described by the EtherCAT Network Information
+(ENI) file in ``/opt/wmx3/eni/``, generated from a scan by **NetConfigurator
+→ ENI File → Quick Create** (see :doc:`wmx_web_tools`). A
+drive with no matching ESI file will fail the scan, and a chain that is
 re-cabled in a different order shifts every axis index after the change —
 silently, from ROS 2's point of view.
 
@@ -459,7 +476,7 @@ to agree, and none of them is checked automatically.
      - URDF wheel ``<cylinder radius>`` = 0.095 m and wheel joint origins
        ``y = ±0.275`` m
      - ``wheel_radius: 0.095`` and ``wheel_to_wheel: 0.55`` in
-       ``diffbot_navigation_config.yaml``
+       ``diffbot_differential_config.yaml``
 
 Source of each parameter, and how to verify it
 -----------------------------------------------

@@ -1,17 +1,23 @@
 Hardware Compatibility and Validation
 =====================================
 
-.. important:: **WMX R2 does not "work with any robot".**
+.. important:: **"Any EtherCAT machine" is about the software, not about**
+   **what has been validated.**
 
-   WMX R2 controls EtherCAT servo drives. Whether it can drive *your* robot
-   depends on whether the drives speak EtherCAT CoE in a supported mode,
-   whether an EtherCAT Network Information (ENI) file exists for them, and
-   whether someone has produced and verified a correct parameter set,
-   URDF, and planning configuration for that specific machine.
+   WMX R2 controls axes over EtherCAT CoE rather than a specific robot model,
+   and moving it to a new machine changes only configuration files — see
+   :doc:`index`. That is a real property of the stack, and it is not the same
+   thing as the machine being ready to run.
 
-   The robots below are the ones for which this project ships a parameter set
-   and a configuration. Everything else is an integration project, not a
-   configuration change.
+   Whether WMX R2 can drive *your* robot today depends on whether the drives
+   speak EtherCAT CoE in a supported mode, whether a matching ESI file is
+   installed for them and an EtherCAT Network Information (ENI) file exists
+   for the network, and whether someone has produced and verified a correct
+   parameter set, URDF, and planning configuration for that specific machine.
+
+   The robots below are the ones for which this project ships and has verified
+   that configuration. For anything else the files exist but their contents do
+   not yet — producing and validating them is an integration project.
 
 Status definitions
 ------------------
@@ -195,7 +201,7 @@ Homing, absolute position, brakes, and safety
 Validated parameter files
 --------------------------
 
-The parameter files shipped in ``wmx_r2_package/config/`` are the starting
+The parameter files shipped in ``wmx_r2_package/example/`` are the starting
 point for the corresponding robot model:
 
 .. list-table::
@@ -213,7 +219,7 @@ point for the corresponding robot model:
      - ``cr5a_manipulator_config.yaml``
    * - ``diffbot_wmx_parameters.xml``
      - Differential-drive base
-     - ``diffbot_navigation_config.yaml``
+     - ``diffbot_differential_config.yaml``
 
 .. warning::
 

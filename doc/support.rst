@@ -16,8 +16,8 @@ step-by-step solutions.
    Unexpected motion on a physical robot: wrong direction, wrong distance,
    wrong joint, or a constant offset is almost always a robot-parameter
    problem rather than a software fault. Start at
-   :doc:`commissioning/robot_parameters`, and see
-   :doc:`commissioning/validated_hardware` for what has been validated on your
+   :doc:`try_your_robot/robot_parameters`, and see
+   :doc:`try_your_robot/validated_hardware` for what has been validated on your
    robot and what has not.
 
 For additional help, contact your MOVENSYS representative or visit

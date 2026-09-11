@@ -173,7 +173,7 @@ Real robot
 
 .. danger:: **This moves a physical arm under model control.**
 
-   The VLM decides the moves. Complete :doc:`../commissioning/index` first,
+   The VLM decides the moves. Complete :doc:`../try_your_robot/index` first,
    keep the workspace clear, and keep a hand on the emergency stop.
 
 ``movensys_sample/doc/run_robopoly.sh`` orchestrates the services across

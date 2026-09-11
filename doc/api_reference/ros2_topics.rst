@@ -136,7 +136,7 @@ Content:
    Joint values pass through with no scaling. One axis user unit must equal
    one radian at the joint, and that is set on the WMX side in the axis
    parameter XML. There is no gear-ratio or offset parameter in any of these
-   nodes. See :doc:`../commissioning/robot_parameters`.
+   nodes. See :doc:`../try_your_robot/robot_parameters`.
 
 The timer period is ``1000 / joint_feedback_rate`` truncated to whole
 milliseconds, so prefer rates that divide 1000 — 100, 125, 200, 250, 500. A

@@ -200,7 +200,7 @@ wheels if no velocity command arrives, so a stalled planner stops the base.
    This is a functional software timer, not a safety function. It runs in a
    non-real-time ROS 2 node and has no redundancy, no monitoring, and no
    guaranteed stopping time. A physical base needs a separate emergency stop
-   that removes drive power — see :doc:`../commissioning/safety`.
+   that removes drive power — see :doc:`../try_your_robot/safety`.
 
 See Also
 --------

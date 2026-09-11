@@ -124,7 +124,7 @@ commands run through ``nros``.
 
       .. danger:: **This drives the physical base.**
 
-         Complete :doc:`../commissioning/index` first, keep the area clear,
+         Complete :doc:`../try_your_robot/index` first, keep the area clear,
          and keep a hand on the emergency stop. Start at the lowest speed the
          teleop allows.
 

@@ -296,7 +296,7 @@ manual motion services. ``axis`` and ``data`` arrays must be the same length.
 
    ``start_pos``, ``start_mov``, ``start_vel``, ``start_jog``, and
    ``start_home`` **rotate the axes**. On a physical robot, complete
-   :doc:`../commissioning/index` first.
+   :doc:`../try_your_robot/index` first.
 
 Configuration and power
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -355,7 +355,7 @@ service that is never blocked, even while a controller owns the axes.
 .. warning::
 
    ``stop`` is a controlled deceleration, not an emergency stop. A real
-   e-stop must be a hardware circuit — see :doc:`../commissioning/safety`.
+   e-stop must be a hardware circuit — see :doc:`../try_your_robot/safety`.
 
 Manual motion
 ^^^^^^^^^^^^^

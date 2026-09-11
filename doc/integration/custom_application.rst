@@ -761,7 +761,7 @@ Steps to adapt
 
 6. **Commission it** -- Verify the parameters, then run the low-speed
    single-axis procedure before any coordinated motion. See
-   :doc:`../commissioning/index`.
+   :doc:`../try_your_robot/index`.
 
 What stays the same
 ^^^^^^^^^^^^^^^^^^^^

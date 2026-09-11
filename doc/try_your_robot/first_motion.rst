@@ -1,5 +1,5 @@
-Commissioning and First Motion
-==============================
+First Motion on Hardware
+========================
 
 .. warning::
 
@@ -13,6 +13,14 @@ Commissioning and First Motion
    described in :doc:`safety` are installed and tested — in particular a
    hardwired emergency stop that removes drive power independently of this
    software.
+
+.. tip:: **You can do this without ROS 2 first.**
+
+   The WOS **Single-Axis Control** screen jogs and homes one axis straight
+   from the engine, with its own E-stop — no ROS 2 node in the path. Running
+   the checks below there first separates "this axis is wired and configured
+   wrong" from "the ROS 2 layer is wrong". See
+   :doc:`wmx_web_tools`.
 
 Preconditions
 -------------

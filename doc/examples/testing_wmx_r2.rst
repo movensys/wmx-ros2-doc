@@ -98,9 +98,9 @@ EtherCAT platform.
 .. warning:: **Real Hardware mode moves a physical machine.**
 
    Start with the Simulation platform. Before switching to EtherCAT and
-   enabling servos on a robot, complete :doc:`../commissioning/index` —
+   enabling servos on a robot, complete :doc:`../try_your_robot/index` —
    parameter validation, the low-speed single-axis procedure, and the
-   separate safety measures described in :doc:`../commissioning/safety`.
+   separate safety measures described in :doc:`../try_your_robot/safety`.
 
 2. Launch the general nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -179,7 +179,7 @@ count — ``axis: [0,1,2,3,4,5]`` for a six-axis arm — keeping ``axis`` and
 
    In Real Hardware mode, do this at low velocity on an axis that is free to
    move, with a hand on the emergency stop, after completing
-   :doc:`../commissioning/first_motion`.
+   :doc:`../try_your_robot/first_motion`.
 
 .. code-block:: bash
 
@@ -334,7 +334,7 @@ The full interface list is in :doc:`../api_reference/ros2_services` and
    ``joint_state_broadcaster`` enables the servos when it activates. If you
    command motion from the general nodes alone, run the sequence below first.
 
-   See :doc:`../commissioning/robot_parameters`.
+   See :doc:`../try_your_robot/robot_parameters`.
 
 The sequence is the same in Simulation and Real Hardware mode. The examples
 below use six axes; use however many your machine has. The ``axis`` and
@@ -434,7 +434,7 @@ Two more axis settings are available when a machine needs them:
 
    On real hardware, start with one axis, a small relative move, and a low
    velocity, with a hand on the emergency stop. Follow the low-speed
-   single-axis procedure in :doc:`../commissioning/first_motion` before doing
+   single-axis procedure in :doc:`../try_your_robot/first_motion` before doing
    this on a robot for the first time.
 
 Motion is a **service call**, not a topic publish. All of them take parallel
@@ -713,4 +713,4 @@ Next steps
 - :doc:`movensys_manipulator_setup` — bring up a full manipulator stack
 - :doc:`movensys_navigation_setup` — bring up the differential-drive base
 - :doc:`../api_reference/api_reference` — the complete interface reference
-- :doc:`../commissioning/index` — before moving a physical robot
+- :doc:`../try_your_robot/index` — before moving a physical robot

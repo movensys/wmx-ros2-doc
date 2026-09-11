@@ -1,5 +1,5 @@
-Commissioning
-=============
+Try Your Robot
+==============
 
 .. warning:: **Read this before moving a physical robot.**
 
@@ -21,6 +21,48 @@ robot moves the way you intended": configuring and validating the
 robot-specific parameters, bringing the first axis to life at low speed, and
 understanding which safety functions this stack does and does not provide.
 
+What changes when the robot changes
+-----------------------------------
+
+WMX R2 controls axes over EtherCAT CoE, not a specific robot model, so the
+packages themselves are the same on every machine. Commissioning a different
+robot, a different drive brand, or a different axis count is a change to four
+kinds of file — and to no source code:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 66
+
+   * - File
+     - Carries
+   * - **EtherCAT network description**
+
+       ENI file, ESI files, ``ec_network.def``, ``Module.ini``
+     - The devices on the bus, the communication cycle, and the platform the
+       engine runs on. Part of the WMX Runtime on the host: the ENI file in
+       ``/opt/wmx3/eni/`` describes the network, the ESI files in
+       ``/opt/wmx3/ESI/`` describe the device types on it.
+   * - **WMX parameter file**
+
+       ``<robot>_wmx_parameters.xml``
+     - Gear ratios, encoder resolution, polarity, homing, and limits, per WMX
+       axis index.
+   * - **URDF / xacro**
+
+       ``<robot>.xacro``, ``.ros2_control.xacro``, ``.srdf``
+     - Link geometry, joint axes and origins, planning limits, and the
+       ``ros2_control`` hardware interface.
+   * - **ROS 2 parameter YAML**
+
+       application, controller, MoveIt, Nav2, and perception YAML
+     - Joint-name ↔ axis-index mapping, I/O addresses, and the planner and
+       controller settings.
+
+:doc:`robot_parameters` lists exactly where each of these lives and what goes
+in it. The stages below are how you verify that what you put in them is
+right — that work, not a code change, is what commissioning a new machine
+actually costs.
+
 .. _simulation-first-workflow:
 
 The simulation-first workflow
@@ -38,6 +80,15 @@ clean.
      - Stage
      - What it proves
      - What it catches
+   * - 0
+     - **Network and engine setup in the UI**
+
+       (:doc:`wmx_web_tools`)
+     - The bus is described and the engine is reachable: every slave is
+       recognised, the ENI file is generated, and the axis parameters are
+       loaded into the engine and read back.
+     - Missing ESI files, a stale or absent ENI, slaves that never reach
+       ``Op``, and parameters left behind by a previous session.
    * - 1
      - **Parameter configuration and review**
 
@@ -82,9 +133,11 @@ clean.
 
 .. note::
 
-   Stages 2 and 3 map directly onto the **Simulation** and **HIL** tabs used
-   throughout :doc:`../examples/examples`. Stage 6 is the **Real** tab. Stages
-   4 and 5 sit between them and are described in :doc:`first_motion`.
+   Stage 0 is done in the browser tools, not in ROS 2, and is the only stage
+   that needs no WMX R2 package built. Stages 2 and 3 map directly onto the
+   **Simulation** and **HIL** tabs used throughout
+   :doc:`../examples/examples`. Stage 6 is the **Real** tab. Stages 4 and 5
+   sit between them and are described in :doc:`first_motion`.
 
 Where the stages are documented
 -------------------------------
@@ -95,11 +148,15 @@ Where the stages are documented
 
    * - Page
      - Covers
+   * - :doc:`wmx_web_tools`
+     - **Start here.** The browser tools shipped with the WMX Runtime — the UI
+       you use to generate the EtherCAT ENI file, set and export axis
+       parameters, and jog an axis to test it, all without ROS 2 in the way.
    * - :doc:`robot_parameters`
      - Every robot-specific parameter, where it lives, what it means, where
        its value comes from, and how to verify it against the running engine.
    * - :doc:`first_motion`
-     - The commissioning and first-motion procedure: single axis, low speed,
+     - The first-motion procedure: single axis, low speed,
        what to check at each step, and the exact stopping behavior of the jog
        tools.
    * - :doc:`safety`
@@ -114,6 +171,7 @@ Where the stages are documented
    :maxdepth: 2
    :hidden:
 
+   wmx_web_tools
    robot_parameters
    first_motion
    safety

@@ -233,7 +233,7 @@ so it works in any of the three modes once the planner is up. Pick a mode first
    per-keypress step size, the command timeout, and the exact stopping
    behavior of each mode, see
    :ref:`keyboard-jogging-behavior`. On a physical robot, do not use keyboard
-   jogging as the first motion. Follow :doc:`../commissioning/first_motion`
+   jogging as the first motion. Follow :doc:`../try_your_robot/first_motion`
    first.
 
 .. list-table::

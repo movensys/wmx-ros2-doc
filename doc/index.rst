@@ -244,7 +244,7 @@ Where to go next
 * Follow the :doc:`getting_started/index` guide to set up the environment and run the package.
 * Work through the :doc:`examples/examples` to run trajectory, perception, and intelligence demos.
 * See :doc:`integration/integration` for the supported motion-planning and application integrations.
-* Work through :doc:`commissioning/index` before moving a physical robot;
+* Work through :doc:`try_your_robot/index` before moving a physical robot;
   parameter validation, first motion, safety responsibilities, and the list of
   validated robots.
 * Refer to the :doc:`api_reference/api_reference` for ROS2 services, topics, and actions.
@@ -264,7 +264,7 @@ Where to go next
 
    getting_started/index
    examples/examples
-   commissioning/index
+   try_your_robot/index
    integration/integration
    api_reference/api_reference
    support
