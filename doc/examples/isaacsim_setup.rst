@@ -1,7 +1,8 @@
-NVIDIA Isaac ROS Setup (Optional)
-=================================
+NVIDIA Isaac Setup (Optional)
+=============================
 
-This setup is optional. It is needed for two NVIDIA components used by the examples:
+This setup is optional. It covers the two NVIDIA components used by the
+examples:
 
 - **Isaac Sim** — the desktop simulator that renders the robot for the
   Simulation and HIL modes. Set up :ref:`isaac-sim-desktop` if you run any

@@ -264,8 +264,8 @@ Where to go next
 
    getting_started/index
    examples/examples
-   integration/integration
    commissioning/index
+   integration/integration
    api_reference/api_reference
    support
    licensing

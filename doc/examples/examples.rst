@@ -2,27 +2,55 @@ Example Applications
 ====================
 
 This section provides complete examples that you can run from start to finish
-on the WMX R2 stack. The **manipulator scenarios** come from the
-`movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
-repository (manipulator with MoveIt2 / Isaac cuMotion planning and
-Nvblox / YOLO / AprilTag perception). The **navigation scenarios** come from the
-`movensys-navigation <https://github.com/movensys/movensys-navigation>`_
-repository (a differential-drive base with Nav2 planning, EKF odometry, and SLAM
-mapping). The **Robopoly game** is a voice-driven VLM/LLM application from the
-`movensys-intelligence <https://github.com/movensys/movensys-intelligence>`_
-repository, built on top of the manipulator stack.
+on the WMX R2 stack. They draw on four repositories:
 
-Every manipulator and navigation scenario runs in three execution modes. The
-difference between them is *where the motion actually happens*:
+.. list-table::
+   :header-rows: 1
+   :widths: 18 28 44 10
 
-.. mermaid::
-   :caption: Each mode makes one more layer real
+   * - Part
+     - Repository
+     - What it contains
+     - Helper
+   * - **Manipulator**
+     - `movensys-manipulator <https://github.com/movensys/movensys-manipulator>`_
+     - Manipulator with MoveIt2 / Isaac cuMotion planning and
+       Nvblox / YOLO / AprilTag perception
+     - ``mros``
+   * - **Navigation**
+     - `movensys-navigation <https://github.com/movensys/movensys-navigation>`_
+     - A differential-drive base with Nav2 planning, EKF odometry, and SLAM
+       mapping
+     - ``nros``
+   * - **Robopoly game**
+     - `movensys-intelligence <https://github.com/movensys/movensys-intelligence>`_
+     - A voice-driven VLM/LLM application built on top of the manipulator stack
+     - ``mros``
+   * - **Isaac Sim scenes**
+     - `movensys-simulation <https://github.com/movensys/movensys-simulation>`_
+     - The USD scenes used by the manipulator and navigation scenarios
+     - —
 
-   flowchart LR
-       S["<b>Simulation</b><br/>planner and simulator physics"]
-       H["<b>HIL</b><br/>plus the real WMX engine"]
-       R["<b>Real</b><br/>plus the physical servos"]
-       S -->|"the engine becomes real"| H -->|"the motors become real"| R
+Each stack runs in its own Docker container, and the **Helper** column names
+the shell helper that runs a command inside it (``wros`` does the same for the
+core WMX R2 container — see :doc:`testing_wmx_r2`). Isaac Sim runs on the host.
+
+.. note:: **The robots in these scenarios are examples.**
+
+   The scenarios run on the Dobot CR3A and CR5A arms and the ``diffbot``
+   differential-drive base because those are the models this project ships a
+   ready-made parameter file, URDF, and planning configuration for. WMX R2
+   itself controls axes, not a specific robot model: it commands EtherCAT
+   servo drives over CoE and drives any EtherCAT robot or machine regardless
+   of brand.
+
+   Running your own machine means supplying its configuration — see
+   :doc:`../commissioning/robot_parameters` — and
+   :doc:`../commissioning/validated_hardware` for what has been validated so
+   far. :doc:`testing_wmx_r2` needs no robot model at all; it exercises the
+   axes directly.
+
+Every scenario is presented in three modes:
 
 .. list-table::
    :header-rows: 1

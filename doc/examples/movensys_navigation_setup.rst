@@ -27,6 +27,19 @@ used to run commands inside the container.
 
    source ~/workspaces/movensys_ws/src/movensys-navigation/docker/nros.bash
 
+.. note:: **The robot models here are examples, not a hardware list.**
+
+   WMX R2 itself is robot-agnostic: it commands EtherCAT servo drives over
+   CoE, so it drives any EtherCAT robot or machine regardless of brand — see
+   :doc:`../index`. ``diffbot`` are simply the models this
+   project ships a ready-made configuration for, so the examples have
+   something concrete to run on.
+
+   Running a different machine means supplying its own WMX parameter file,
+   URDF, and planning configuration; it does not mean changing WMX R2. See
+   :doc:`../commissioning/robot_parameters` for what that involves and
+   :doc:`../commissioning/validated_hardware` for what has been validated.
+
 .. note::
 
    The host paths the compose files need — ``MOVENSYS_NAVIGATION_PACKAGES``,
